@@ -34,13 +34,13 @@ Als nächsten Schritt müsst ihr die Verbindungsdaten zu eurer Datenbank anpasse
 
 ## Screenshots
 ### Startseite:
-![Index](/screenshots/index.png)
+![Index](/public/login/screenshots/index.png)
 
 ### Registrierung:
-![Registrierung](/screenshots/registrierung.png)
+![Registrierung](/public/login/screenshots/registrierung.png)
 
 ### Interner Bereich (nach erfolgreichem Login):
-![Interner Bereich](/screenshots/interner_bereich.png)
+![Interner Bereich](/public/login/screenshots/interner_bereich.png)
 
 
 ## Webhosting
