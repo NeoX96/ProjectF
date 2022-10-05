@@ -14,7 +14,7 @@ Entwickler der App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-At first you need to install NodeJS (Recommended: v18.10.0+) - [NodeJS](https://nodejs.org)
+At first you need to install [NodeJS](https://nodejs.org) (Recommended: v18.10.0+)
 
 ## Commands
 
