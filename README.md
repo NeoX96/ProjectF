@@ -1,15 +1,25 @@
 # Project F
-Dies ist ein Test repository
+Informatik Techniker Abschlussprojekt der Rudolf-Diesel-Fachschule in Nürnberg.
 
+    Name: SportConnect
+
+Entwickler der App:
+    - Thomas
+    - Rene
+    - Lisa
+    - Valentin
 
 
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+At first you need to install NodeJS (Recommended: v18.10.0+) - https://nodejs.org
 
-## Available Scripts
+## Getting Started
 
-In the project directory, you can run:
+### `npm install`
+To install the node_modules to run this app
+
 
 ### `npm start`
 
@@ -19,6 +29,3 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
-### `npm install react-app`
-
-To get the node_modules to run this app
