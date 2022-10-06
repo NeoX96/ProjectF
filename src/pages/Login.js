@@ -7,7 +7,7 @@ function Login() {
   return (
     <div>
         <h1> Register/Login </h1>
-        <div>Aenderung 2</div>
+        <div>Aenderung 3</div>
         <button
             onClick={() => {navigate("/Home");}}>Login
         </button>
