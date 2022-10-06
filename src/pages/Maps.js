@@ -1,6 +1,16 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
+
+// Create the function
+export function AddLibrary(urlOfTheLibrary) {
+  const script = document.createElement('script');
+  script.src = urlOfTheLibrary;
+  script.async = true;
+  document.body.appendChild(script);
+}
+
+
 function Maps() {
   const navigate = useNavigate();
 
@@ -18,6 +28,15 @@ function Maps() {
         <button
             onClick={() => {navigate("/Login");}}>Logout
         </button>
+
+        {AddLibrary('http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js')}
+
+
+
+  
+
+
+
     </div>
   );
 }
