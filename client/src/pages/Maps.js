@@ -1,14 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-
-
-// Create the function
-export function AddLibrary(urlOfTheLibrary) {
-  const script = document.createElement('script');
-  script.src = urlOfTheLibrary;
-  script.async = true;
-  document.body.appendChild(script);
-}
+import './css/Chat.css';
+// Leaflet-React Import
+import { Marker, Popup, TileLayer, MapContainer} from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 
 function Maps() {
@@ -16,6 +11,7 @@ function Maps() {
 
   return (
     <div>
+      <div>
         <h1> Maps </h1>
         <button
             onClick={() => {navigate("/Home");}}>Home
@@ -28,14 +24,21 @@ function Maps() {
         <button
             onClick={() => {navigate("/Login");}}>Logout
         </button>
+      </div>
 
-        {AddLibrary('http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js')}
-
-
-
-  
-
-
+        <div id="map">
+          <MapContainer center={[51.505, -0.09]} zoom={13} scrollWheelZoom={false} style={{ height: "50vh", width: "100vh"}}>
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <Marker position={[51.505, -0.09]}>
+              <Popup>
+                A pretty CSS3 popup. <br /> Easily customizable.
+              </Popup>
+            </Marker>
+          </MapContainer>
+        </div>
 
     </div>
   );
