@@ -2,8 +2,8 @@ const express = require("express");
 const app = express();
 const mongoose = require('mongoose');
 const UserModel = require('./models/Users');
-
 app.use(express.json());
+const mongoPort = 4000;
 
 // MongoDB Connection URL
 mongoose.connect(
@@ -31,6 +31,52 @@ app.post("/createUser", async (req, res) => {
     res.json(user);
 });
 
-app.listen(3001, () => {
-    console.log("Server läuft auf Port 3001");
+app.listen(mongoPort, () => {
+    console.log(`MongoDB backend Server auf http://localhost:${mongoPort}/getUsers`);
+});
+
+
+
+// ---------------------------------------------------------------- //
+
+
+// SocketIO Chat
+const http = require('http').Server(app);
+const socketPort = 4001;
+const cors = require("cors");
+const socketIO = require('socket.io')(http, {
+    cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST"]
+    }
+});
+
+app.use(cors());
+
+socketIO.on("connection", (socket) => {
+    console.log(`Client ${socket.id} connected`);
+
+    socket.on("send_message", (data) => {
+        console.log(data);
+        socketIO.emit("receive_message", data);
+    })
+
+    socket.on("ping", () => {
+        console.log("pong");
+      });
+
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+      })
+});
+
+
+app.get("/api", (req, res) => {
+    res.json({message: "Socket Test"})
+});
+
+
+
+http.listen(socketPort, () => {
+  console.log(`SocketIO läuft auf http://localhost:${socketPort}/api`);
 });
