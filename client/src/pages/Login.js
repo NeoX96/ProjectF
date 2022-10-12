@@ -9,7 +9,8 @@ function Login() {
 
   if (authMode === "signin") {
     return (
-      <div className="Auth-form-container">
+      <div class="justify-content-center d-flex">
+      <div className="Auth-form-container w-25">
         <form className="Auth-form">
           <div className="Auth-form-content">
             <h3 className="Auth-form-title">Sign In</h3>
@@ -41,16 +42,18 @@ function Login() {
               </button>
             </div>
             <p className="text-center mt-2">
-              Forgot <a href="#">password?</a>
+              Forgot <a href="/login">password?</a>
             </p>
           </div>
         </form>
+      </div>
       </div>
     )
   }
 
   return (
-    <div className="Auth-form-container">
+    <div class="justify-content-center d-flex">
+    <div className="Auth-form-container w-25">
       <form className="Auth-form">
         <div className="Auth-form-content">
           <h3 className="Auth-form-title">Sign In</h3>
@@ -90,10 +93,11 @@ function Login() {
             </button>
           </div>
           <p className="text-center mt-2">
-            Forgot <a href="#">password?</a>
+            Forgot <a href="/login">password?</a>
           </p>
         </div>
       </form>
+    </div>
     </div>
   )
 }
