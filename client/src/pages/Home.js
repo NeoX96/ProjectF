@@ -4,6 +4,27 @@ import { useNavigate } from "react-router-dom";
 
 import { Carousel } from 'react-bootstrap';
 
+/*
+von APP.js moved to Home.js
+
+import AliceCarousel from 'react-alice-carousel';
+import 'react-alice-carousel/lib/alice-carousel.css';
+
+const handleDragStart = (e) => e.preventDefault();
+
+const items = [
+  <img src="./assets/index" onDragStart={handleDragStart} role="presentation" />,
+  <img src="./assets/index" onDragStart={handleDragStart} role="presentation" />,
+  <img src="./assets/index" onDragStart={handleDragStart} role="presentation" />,
+];
+
+const Gallery = () => {
+  return (
+    <AliceCarousel mouseTracking items={items} />
+  );
+}
+*/
+
 function Home() {
     const navigate = useNavigate();
 
@@ -27,40 +48,26 @@ function Home() {
             <br></br>
 
             <Carousel>
-
-
                 <Carousel.Item>
                     <div>
-                        <img src={images.a} />
+                        <img src={images.frisbee} alt="Frisbee"/>
                         <p className="legend">Sportart 1</p>
                     </div>
                 </Carousel.Item>
 
-
-
                 <Carousel.Item>
-                     <div className="">
-                        <img src={images.b} />
+                     <div>
+                        <img src={images.fussball} alt="Fußball"/>
                         <p className="legend">Sportart 2</p>
                     </div>
                 </Carousel.Item>
 
-
-
                 <Carousel.Item>
-                    
                     <div>
-
-
-                        <img src={images.c} />
+                        <img src={images.volleyball} alt="Volleyball"/>
                         <p className="legend">Sportart 3</p>
                     </div>
-
                 </Carousel.Item>
-
-                
-
-
             </Carousel>
         </div>
 
