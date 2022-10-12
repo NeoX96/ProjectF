@@ -1,12 +1,12 @@
 
-import a from "./1.jpg";
-import b from "./2.jpg";
-import c from "./3.jpg";
+import frisbee from "./1.jpg";
+import fussball from "./2.jpg";
+import volleyball from "./3.jpg";
 
 const images = {
-    a,
-    b,
-    c
+    frisbee,
+    fussball,
+    volleyball
 }
 export default images;
 
