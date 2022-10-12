@@ -1,6 +1,8 @@
 import React, { useState } from "react"
+import { useNavigate } from "react-router-dom";
 
 function Login() {
+  const navigate = useNavigate();
   let [authMode, setAuthMode] = useState("signin")
 
   const changeAuthMode = () => {
@@ -37,9 +39,8 @@ function Login() {
               />
             </div>
             <div className="d-grid gap-2 mt-3">
-              <button type="submit" className="btn btn-primary">
-                Submit
-              </button>
+            <button onClick={() => {navigate("/Home")}} className="btn btn-primary">Submit
+            </button>
             </div>
             <p className="text-center mt-2">
               Forgot <a href="/login">password?</a>
@@ -88,7 +89,7 @@ function Login() {
             />
           </div>
           <div className="d-grid gap-2 mt-3">
-            <button type="submit" className="btn btn-primary">
+            <button onClick={() => {navigate("/Home")}} className="btn btn-primary">
               Submit
             </button>
           </div>
