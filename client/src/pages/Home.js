@@ -68,6 +68,24 @@ function Home() {
                         <p className="legend">Sportart 3</p>
                     </div>
                 </Carousel.Item>
+                <Carousel.Item>
+                    <div>
+                        <img src={images.baskettball} alt="Baskettball"/>
+                        <p className="legend">Sportart 4</p>
+                    </div>
+                </Carousel.Item>
+                <Carousel.Item>
+                    <div>
+                        <img src={images.tischtennis} alt="Tischtennis"/>
+                        <p className="legend">Sportart 4</p>
+                    </div>
+                </Carousel.Item>
+                <Carousel.Item>
+                    <div>
+                        <img src={images.skateboard} alt="Skateboard"/>
+                        <p className="legend">Sportart 4</p>
+                    </div>
+                </Carousel.Item>
             </Carousel>
         </div>
 
