@@ -17,14 +17,7 @@ function Login() {
           <div className="Auth-form-content">
             <h6 className="Auth-form-title">Welcome to SPORTSCONNECT</h6>
             
-             <div className="form-group mt-3">
-              
-              <input
-                type="email"
-                className="form-control mt-1"
-                placeholder="Nickname"
-              />
-            </div>
+             
             <div className="form-group mt-3">
               <label>Email address</label>
               <input
@@ -33,16 +26,9 @@ function Login() {
                 placeholder="Enter email"
               />
             </div>
-            <div className="form-group mt-3">
-              <label>Password</label>
-              <input
-                type="password"
-                className="form-control mt-1"
-                placeholder="Enter password"
-              />
-            </div>
+            
             <div className="d-grid gap-2 mt-3">
-            <button onClick={() => {navigate("/Home")}} className="btn btn-primary">Submit
+            <button onClick={() => {navigate("/Home")}} className="btn btn-primary">Send new Password
             </button>
             </div>
             
@@ -83,14 +69,7 @@ function Login() {
               placeholder="Email Address"
             />
           </div>
-          <div className="form-group mt-3">
-            <label>Password</label>
-            <input
-              type="password"
-              className="form-control mt-1"
-              placeholder="Password"
-            />
-          </div>
+          
           <div className="d-grid gap-2 mt-3">
             <button onClick={() => {navigate("/Home")}} className="btn btn-primary">
               Submit
