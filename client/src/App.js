@@ -1,7 +1,7 @@
 import React from 'react';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
 import './App.css';
-import { BrowserRouter as Router, Route, Routes, Container, Col , Row  } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import Home from "./pages/Home";
 import Chat from "./pages/Chat";
 import Maps from "./pages/Maps";
@@ -9,7 +9,6 @@ import Login from "./pages/Login";
 import Settings from "./pages/settings";
 import Wait from "./pages/wait";
 import Forgotpw from "./pages/Forgotpw";
-
 
 
 function App() {
