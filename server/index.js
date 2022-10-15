@@ -7,7 +7,7 @@ const mongoPort = 4000;
 
 // MongoDB Connection URL
 mongoose.connect(
-    "mongodb+srv://valentin:ProjektPasswort@projectf.iserctp.mongodb.net/ProjectF?retryWrites=true&w=majority"
+    "mongodb+srv://valentin:ProjektPasswort@projectf.iserctp.mongodb.net/ProjectFDB?retryWrites=true&w=majority"
 );
 
 // MongoDB Anfrage für alle Users + ausgabe wenn Error
