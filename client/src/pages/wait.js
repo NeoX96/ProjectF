@@ -1,9 +1,11 @@
 import React, { Component } from "react";
+
 export default class SignUp extends Component {
     render() {
         return (
-            <div>
-                <h3>Wait just one more second</h3>
+            <div class="justify-content-center d-flex" className="text-center">
+                <form className="Auth-form">
+                <h3>Wait just one more second</h3></form>
             </div>
         );
     }
