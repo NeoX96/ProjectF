@@ -35,13 +35,15 @@ function Home() {
               />
             </div>
             <div className="d-grid gap-2 mt-3">
-            <button onClick={() => {navigate("/Home")}} className="btn btn-primary">Submit
+            <button onClick={() => {navigate("/Maps")}} className="btn btn-primary">Submit
             </button>
             
             </div>
             <div className="text-center mt-2">
               Forgot {" "}
-                <a href="/forgotpw">password? </a> 
+                
+                <span className="link-primary"  onClick={() => {navigate("/forgotpw")}} >Password?</span>
+                {" "}
             
               Not registered ?{" "}
               <span className="link-primary" onClick={() => {navigate("/login")}} >
@@ -52,6 +54,10 @@ function Home() {
         </form>
       </div>
       </div>
+
+
+      
+      
     
 
 <div class="justify-content-center d-flex">
@@ -61,53 +67,60 @@ function Home() {
                 <Carousel.Item>
                     <div onClick={() => {navigate("/Maps")}}>
                         
-                        <p className="legend">Sportart 1</p>
+                       
                         <img src={images.frisbee} alt="Frisbee"/>
                         
 
-                        <Carousel.Caption><h3>Frisbee</h3></Carousel.Caption>
+                        <Carousel.Caption><h6>NR 1 Frisbee</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
 
                 <Carousel.Item>
                      <div onClick={() => {navigate("/Maps")}}>
                         <img src={images.fussball} alt="Fußball"/>
-                        <p className="legend">Sportart 2</p>
-                        <Carousel.Caption><h3>Soccer</h3></Carousel.Caption>
+                    
+                        <Carousel.Caption><h6>NR 2 Soccer</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
 
                 <Carousel.Item>
                     <div>
                         <img src={images.volleyball} alt="Volleyball"/>
-                        <p className="legend">Sportart 3</p>
-                        <Carousel.Caption><h3>Volleyball</h3></Carousel.Caption>
+                      
+                        <Carousel.Caption><h6>NR 3Volleyball</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
                 <Carousel.Item>
                     <div>
                         <img src={images.baskettball} alt="Baskettball"/>
-                        <p className="legend">Sportart 4</p>
-                        <Carousel.Caption><h3>Baskettball</h3></Carousel.Caption>
+                      
+                        <Carousel.Caption><h6>NR 4 Baskettball</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
                 <Carousel.Item>
                     <div>
                         <img src={images.tischtennis} alt="Tischtennis"/>
-                        <p className="legend">Sportart 4</p>
-                        <Carousel.Caption><h3>Football</h3></Carousel.Caption>
+                        
+                        <Carousel.Caption><h6>NR 5 Football</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
                 <Carousel.Item>
                     <div>
                         <img src={images.skateboard} alt="Skateboard"/>
-                        <p className="legend">Sportart 4</p>
-                        <Carousel.Caption><h3>Skateboard</h3></Carousel.Caption>
+                        
+                        <Carousel.Caption><h6>NR 6 Skateboard</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
             </Carousel>
             </div>
+            
+            <div>
+            <button  onClick={() => {navigate("/Maps")}} class="justify-content-center d-flex" className="btn btn-secondary" class="center" >LET´S PLAY !
+            </button>
+            
+            </div>
         </div>
+      
     );
 }
 
@@ -119,9 +132,13 @@ export default Home;
 
 /*
 
+      <script src="https://apis.google.com/js/platform.js" async defer></script>
 
+      <div class="g-signin2" data-onsuccess="onSignIn"></div>
 
+ <p className="legend">Sportart 1</p>
 
+<a href="/forgotpw">password? </a> 
 
 
 import React, { useState } from "react"
@@ -188,7 +205,7 @@ function Login() {
       <div className="Auth-form-container w-25">
         <form className="Auth-form">
           <div className="Auth-form-content">
-            <h3 className="Auth-form-title">Sign In</h3>
+            <h6 className="Auth-form-title">Sign In</h6>
             <div className="text-center">
               Already registered?{" "}
               <span className="link-primary" onClick={changeAuthMode}>
@@ -283,7 +300,7 @@ function Home() {
                         <img src={images.frisbee} alt="Frisbee"/>
                         
 
-                        <Carousel.Caption><h3>Frisbee</h3></Carousel.Caption>
+                        <Carousel.Caption><h6>Frisbee</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
 
@@ -291,7 +308,7 @@ function Home() {
                      <div onClick={() => {navigate("/Maps")}}>
                         <img src={images.fussball} alt="Fußball"/>
                         <p className="legend">Sportart 2</p>
-                        <Carousel.Caption><h3>Soccer</h3></Carousel.Caption>
+                        <Carousel.Caption><h6>Soccer</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
 
@@ -299,28 +316,28 @@ function Home() {
                     <div>
                         <img src={images.volleyball} alt="Volleyball"/>
                         <p className="legend">Sportart 3</p>
-                        <Carousel.Caption><h3>Volleyball</h3></Carousel.Caption>
+                        <Carousel.Caption><h6>Volleyball</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
                 <Carousel.Item>
                     <div>
                         <img src={images.baskettball} alt="Baskettball"/>
                         <p className="legend">Sportart 4</p>
-                        <Carousel.Caption><h3>Baskettball</h3></Carousel.Caption>
+                        <Carousel.Caption><h6>Baskettball</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
                 <Carousel.Item>
                     <div>
                         <img src={images.tischtennis} alt="Tischtennis"/>
                         <p className="legend">Sportart 4</p>
-                        <Carousel.Caption><h3>Football</h3></Carousel.Caption>
+                        <Carousel.Caption><h6>Football</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
                 <Carousel.Item>
                     <div>
                         <img src={images.skateboard} alt="Skateboard"/>
                         <p className="legend">Sportart 4</p>
-                        <Carousel.Caption><h3>Skateboard</h3></Carousel.Caption>
+                        <Carousel.Caption><h6>Skateboard</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
             </Carousel>
