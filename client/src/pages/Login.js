@@ -1,9 +1,12 @@
 import React, { useState } from "react"
-import { useNavigate } from "react-router-dom";
+import { useNavigate,form } from "react-router-dom";
 
 function Login() {
   const navigate = useNavigate();
   let [authMode, setAuthMode] = useState("signin")
+ //const[taskName, setTaskName] = useState( initialState: '');
+
+ 
 
   const changeAuthMode = () => {
     setAuthMode(authMode === "signin" ? "signup" : "signin")
@@ -15,13 +18,13 @@ function Login() {
       <div className="Auth-form-container w-25">
         <form className="Auth-form">
           <div className="Auth-form-content">
-            <h6 className="Auth-form-title">Welcome to SPORTSCONNECT</h6>
+            <h6 >Welcome to SPORTSCONNECT</h6>
             
              <div className="form-group mt-3">
               
               <input
-                type="email"
-                className="form-control mt-1"
+                type={"text"} /*onChange={e => setTaskName(e.target.value)}*/  className="form-control mt-1"
+                //value={taskName}
                 placeholder="Nickname"
               />
             </div>
@@ -50,6 +53,7 @@ function Login() {
         </form>
       </div>
       </div>
+      
 
       
     )
