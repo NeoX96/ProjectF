@@ -55,19 +55,19 @@ app.use(cors());
 
 socketIO.on("connection", (socket) => {
     console.log(`Client ${socket.id} connected`);
-
     socket.on("send_message", (data) => {
         console.log(data);
         socketIO.emit("receive_message", data);
     })
 
-    socket.on("ping", () => {
-        console.log("pong");
-      });
+    socket.on("private", (data) => {
+        socketIO.to(socket.id).emit("receive-private_message", data);
+    })
 
     socket.on('disconnect', () => {
         console.log('user disconnected');
       })
+
 });
 
 
