@@ -14,3 +14,10 @@
 #messages > li:nth-child(odd) {
   background: #efefef11;
 }
+
+#text {
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  background: #efefef11;
+  height: 85vh;
+}
