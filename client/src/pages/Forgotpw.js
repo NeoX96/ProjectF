@@ -19,7 +19,7 @@ function Login() {
             
              
             <div className="form-group mt-3">
-              <label>Email address</label>
+              <label>Forgot Password ?</label>
               <input
                 type="email"
                 className="form-control mt-1"
