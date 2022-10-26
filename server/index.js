@@ -55,18 +55,24 @@ app.use(cors());
 
 socketIO.on("connection", (socket) => {
     console.log(`Client ${socket.id} connected`);
-    socket.on("send_message", (data) => {
-        console.log(data);
-        socketIO.emit("receive_message", data);
-    })
+    // emit to all clients that someone is connected with username
+    socketIO.emit("user_connected", socket.id);
 
-    socket.on("private", (data) => {
-        socketIO.to(socket.id).emit("receive-private_message", data);
+    socket.on("send_message", (data) => {
+        socketIO.emit("receive_message", data);
+        console.log(data);
     })
 
     socket.on('disconnect', () => {
         console.log('user disconnected');
-      })
+        // Emit to everyone that ID disconnected
+        socketIO.emit("user_disconnected", socket.id);
+    })
+
+    // set username
+    socket.on("set_username", (data) => {
+        socketIO.emit("set_username", data);
+    })
 
 });
 
