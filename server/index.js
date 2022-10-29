@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const mongoose = require('mongoose');
 const UserModel = require('./models/Users');
+const MessageModel = require('./models/Messages');
 app.use(express.json());
 const mongoPort = 4000;
 
@@ -31,6 +32,28 @@ app.post("/createUser", async (req, res) => {
     res.json(user);
 });
 
+// MongoDB Anfrage für alle Messages
+app.get("/getMessages", (req, res) => {
+    MessageModel.find({}, (err, result) => {
+        if(err) {
+            res.json(err);
+        } else {
+            res.json(result);
+        }
+    });
+});
+
+// MongoDB Erstellen einer Message
+app.post("/createMessage", async (req, res) => {
+    const message = req.body;
+    const newMessage = new MessageModel(message);
+    await newMessage.save();
+    
+    // Rückgabe des Eintrages zum Vergleichen ob eintrag mit Usereingaben übereinstimmen
+    res.json(message);
+});
+
+
 app.listen(mongoPort, () => {
     console.log(`MongoDB backend Server auf http://localhost:${mongoPort}/getUsers`);
 });
@@ -54,26 +77,46 @@ const socketIO = require('socket.io')(http, {
 app.use(cors());
 
 socketIO.on("connection", (socket) => {
-    console.log(`Client ${socket.id} connected`);
-    // emit to all clients that someone is connected with username
-    socketIO.emit("user_connected", socket.id);
 
-    socket.on("send_message", (data) => {
-        socketIO.emit("receive_message", data);
-        console.log(data);
-    })
+    // SocketIO User Connected Chat Bot
+    socket.on("user_connected", (username) => {
+        socket.username = username;
+        socketIO.emit("user_connected", username);
+        console.log(`Client ${socket.id}: ${socket.username} connected`);
+    });
 
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
-        // Emit to everyone that ID disconnected
-        socketIO.emit("user_disconnected", socket.id);
-    })
 
-    // set username
-    socket.on("set_username", (data) => {
-        socketIO.emit("set_username", data);
-    })
+    // Store Message in MongoDB when sending and emit to all client
+    socket.on("send_message", (message) => {
+        console.log(message);
+        socketIO.emit("receive_message", message);
+        const newMessage = new MessageModel(message);
+        newMessage.save();
+    });
 
+    // Emit to all clients that someone is disconnected
+    socket.on("disconnect", () => {
+        console.log(`Client ${socket.id}: ${socket.username} disconnected`);
+        socketIO.emit("user_disconnected", socket.username);
+    });
+
+    // set Username to specific socket client ID
+    socket.on("set_username", (username) => {
+        socket.username = username;
+        console.log(socket.username);
+        socketIO.emit("set_username", socket.username);
+    });
+
+    // get Messages from MongoDB and emit to client
+    socket.on("get_messages", () => {
+        MessageModel.find({}, (err, result) => {
+            if(err) {
+                console.log(err);
+            } else {
+                socketIO.emit("get_messages", result);
+            }
+        });
+    });
 });
 
 
