@@ -1,9 +1,8 @@
 import React from "react";
 import images from './assets/index';
 import { useNavigate } from "react-router-dom";
-
 import { Carousel } from 'react-bootstrap';
-
+import Navigationbar from "./navigationbar";
 
 
 function Home() {
@@ -11,6 +10,7 @@ function Home() {
 
     return (
         <div >
+            <Navigationbar />
             <h6>Welcome to SPORTSCONNECT </h6>
             <div class="justify-content-center d-flex">
       <div className="Auth-form-container w-25">
@@ -115,7 +115,7 @@ function Home() {
             </div>
             
             <div>
-            <button  onClick={() => {navigate("/Maps")}} class="justify-content-center d-flex" className="btn btn-secondary" class="center" >LET´S PLAY !
+            <button  onClick={() => {navigate("/Maps")}} className="btn btn-secondary justify-content-center d-flex" >LET´S PLAY !
             </button>
             
             </div>
