@@ -2,6 +2,7 @@ import "./css/Chat.css";
 import React, { useEffect, useState, useRef } from "react";
 import socketIO from "socket.io-client";
 import Navigationbar from "./navigationbar";
+import { Button } from "react-bootstrap";
 const socket = socketIO.connect("http://localhost:4001");
 
 
@@ -14,7 +15,6 @@ function Chat() {
   const [message, setMessage] = useState("");
   const [username, setUsername] = useState("");
   const [connected, setConnected] = useState(false);
-
 
 
   // SocketIO
@@ -44,14 +44,12 @@ function Chat() {
     socket.emit("get_messages");
   };
 
-
   // SocketIO Receive Messages from MongoDB
   socket.on("get_messages", (data) => {
     // for each message.username message.message
-    data.forEach((messageIN) => {
-      setMessages([...messages, { username: messageIN.username, message: messageIN.message }]);
-      console.log(`Name: ${messageIN.username} Message: ${messageIN.message}`)
-      });
+    let newMessages = data.map(el => ({ username: el.username, message: el.message }));
+
+    setMessages(messages => [ ...messages, ...newMessages]);
     console.log(data);
   });
 
@@ -68,7 +66,7 @@ function Chat() {
     setUsername(username);
     setConnected(true);
         // SocketIo Emit Connection to Server
-        socket.emit("user_connected", username);
+    socket.emit("user_connected", username);
   }
   
   if (!connected) {
@@ -77,13 +75,13 @@ function Chat() {
 
   return (
     <div className="container">
+      <Navigationbar />
       <div className="row ">
-        <div className="navigation col ">
-          <Navigationbar />
-          <button onClick={getMessagesEmit}>Get Messages</button>
+        <div className="col-sm">
+          <Button onClick={getMessagesEmit}>Get Messages</Button>
       </div>
 
-      <div id="chatContainer" className="col">
+      <div id="chatContainer" className="col-sm">
           <div
             id="text"
             className="overflow-auto d-flex flex-column justify-content-between rounded"
@@ -106,7 +104,7 @@ function Chat() {
             <div>
               <form onSubmit={sendMessage}>
                 <div className="row mt-2 mb-2  d-block ">
-                  <div className="col input-group">
+                  <div className="col-sm input-group">
                     <input
                       placeholder="Message ..."
                       required
@@ -121,7 +119,7 @@ function Chat() {
                       <i className="bi bi-send"></i>
                     </button>
                   </div>
-                  <div className="col" id="SocketID"></div>
+                  <div className="col-sm" id="SocketID"></div>
                 </div>
               </form>
             </div>
