@@ -20,7 +20,7 @@ function App() {
             <Route path="/Home" element={<Home />} />
             <Route path="/Chat" element={<Chat />} />
             <Route path="/Maps" element={<Maps />} />
-            <Route path="/Login" element={<Login />} />
+            <Route path="/" element={<Login />} />
             <Route path="/Settings" element={<Settings />} />
             <Route path="/Wait" element={<Wait />} />
             <Route path="/Forgotpw" element={<Forgotpw />} />
