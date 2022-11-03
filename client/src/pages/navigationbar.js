@@ -8,7 +8,7 @@ export default function Navigationbar() {
     const user = localStorage.getItem("username");
 
     const logout = () => {
-        localStorage.removeItem("username");
+      localStorage.removeItem("username");
         navigate("/");
     };
 
@@ -37,24 +37,3 @@ export default function Navigationbar() {
       </div>
     );
 }
-
-/*
-    <Navbar bg="dark" variant="dark" className="" >
-      <Container>
-          <Navbar.Brand >SportConnect</Navbar.Brand>
-          <Nav className="justify-content-center">
-            <Nav.Link onClick={() => navigate("/Home")}>Home</Nav.Link>
-            <Nav.Link onClick={() => navigate("/Maps")}>Maps</Nav.Link>
-            <Nav.Link onClick={() => navigate("/Chat")}>Chat</Nav.Link>
-            <Nav.Link onClick={() => navigate("/")}>Logout</Nav.Link>
-
-            <Navbar.Collapse className="">
-              <Navbar.Text>
-                Signed in as: <a className="" onClick={() => navigate("/")}>User</a>
-              </Navbar.Text>
-            </Navbar.Collapse>
-          </Nav>
-        </Container>
-      </Navbar>
-
-      */
