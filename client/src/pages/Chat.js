@@ -1,9 +1,11 @@
 import "./css/Chat.css";
 import React, { useEffect, useState, useRef } from "react";
 import socketIO from "socket.io-client";
+import { useNavigate } from "react-router-dom";
 import Navigationbar from "./navigationbar";
 import { Button } from "react-bootstrap";
 const socket = socketIO.connect("http://localhost:4001");
+
 
 
 function Chat() {
@@ -15,7 +17,8 @@ function Chat() {
   const [message, setMessage] = useState("");
   const [username, setUsername] = useState("");
   const [connected, setConnected] = useState(false);
-
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [offlineUsers, setOfflineUsers] = useState([]);
 
   // SocketIO
   useEffect(() => {
@@ -24,33 +27,47 @@ function Chat() {
     // SocketIO Receive Message and store in MongoDB
     socket.on("receive_message", (data) => {
       setMessages([...messages, data]);
+      messagesRef.current.scrollIntoView({ behavior: "smooth" });
     });
 
     // SocketIO User Disconnected Chat Bot
     socket.on("user_disconnected", (username) => {
       setMessages([...messages, { username: "Chat Bot", message: `${username} disconnected` }]);
+      setConnected(false);
     });
 
     // SocketIO User Connected Chat Bot
     socket.on("user_connected", (username) => {
       setMessages([...messages,{ username: "Chat Bot", message: `${username} connected` }]);
+      socket.emit("ask_users");
     });
+
 
   }, [messages]);
 
-
-  // const for emit get_messages
+  // const for emit ask_messages
   const getMessagesEmit = () => {
-    socket.emit("get_messages");
+    socket.emit("ask_messages");
   };
 
-  // SocketIO Receive Messages from MongoDB
+  // get Messages
   socket.on("get_messages", (data) => {
     // for each message.username message.message
     let newMessages = data.map(el => ({ username: el.username, message: el.message }));
 
     setMessages(messages => [ ...messages, ...newMessages]);
     console.log(data);
+  });
+
+
+  // get Users
+  socket.on("get_users", (online, offline) => {
+    let onlineUser = online.map(on => on.name);
+    let offlineUser = offline.map(off => off.name);
+
+    setOnlineUsers(onlineUser);
+    setOfflineUsers(offlineUser);
+    console.log(online, offline);
   });
 
   // Send Message
@@ -62,11 +79,24 @@ function Chat() {
 
   // Set Username and connect to SocketIO with prompt
   const setUsernameAndConnect = () => {
-    const username = prompt("Username");
-    setUsername(username);
-    setConnected(true);
-        // SocketIo Emit Connection to Server
-    socket.emit("user_connected", username);
+    let username = "";
+    
+    // if localstorage username is set
+    if(localStorage.getItem("username")) {
+      username = localStorage.getItem("username");
+    } else {
+      while (username === "" || username === null) {
+        username = prompt("Please enter your username");
+      }
+      localStorage.setItem("username", username);
+    }
+    
+    if (username) {
+      setUsername(username);
+      setConnected(true);
+      socket.emit("user_connected", username);
+
+    }
   }
   
   if (!connected) {
@@ -74,17 +104,35 @@ function Chat() {
   }
 
   return (
-    <div className="container">
+    <div>
       <Navigationbar />
-      <div className="row ">
-        <div className="col-sm">
-          <Button onClick={getMessagesEmit}>Get Messages</Button>
-      </div>
+    
+    <div className="container-md">
+      <div className="row">
+        <div className="col-md">
+          <div className=" ">
+            <Button className="" onClick={getMessagesEmit}>Get Messages</Button>
+          </div>
 
-      <div id="chatContainer" className="col-sm">
+          <div className="UserList">
+            <h4>Online</h4>
+            <ul className="users">
+              {onlineUsers.map((user, index) => (
+                <li onClick={() => alert("Debug: Changed Text Chat")}key={index}>{user}</li>
+              ))}
+            </ul>
+            <h4>Offline</h4>
+            <ul className="users">
+              {offlineUsers.map((user, index) => (
+                <li onClick={() => alert("Debug: Changed Text Chat") }key={index}>{user}</li>
+              ))}
+            </ul>
+          </div>
+      </div>
+      <div id="chatContainer" className="col-md">
           <div
             id="text"
-            className="overflow-auto d-flex flex-column justify-content-between rounded"
+            className="overflow-auto d-flex flex-column justify-content-between rounded" 
           >
             <ul id="messages">
           {messages.map((message, index) => (
@@ -104,7 +152,7 @@ function Chat() {
             <div>
               <form onSubmit={sendMessage}>
                 <div className="row mt-2 mb-2  d-block ">
-                  <div className="col-sm input-group">
+                  <div className="col-md input-group">
                     <input
                       placeholder="Message ..."
                       required
@@ -128,6 +176,7 @@ function Chat() {
           </div>
       </div>
     </div>
+  </div>
   </div>
   );
 }
