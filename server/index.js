@@ -85,7 +85,7 @@ socketIO.on("connection", (socket) => {
     });
 
     // Emit to all clients that someone is disconnected
-    socket.on("user_disconnected", () => {
+    socket.on("disconnect", () => {
         console.log(`Client ${socket.id}: ${socket.username} disconnected`);
         socketIO.emit("user_disconnected", socket.username);
         socket.disconnect();
