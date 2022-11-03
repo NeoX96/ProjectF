@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 function Login() {
   const navigate = useNavigate();
-  let [authMode, setAuthMode] = useState("signin")
+  let [authMode, setAuthMode] = useState("signup")
  //const[taskName, setTaskName] = useState( initialState: '');
 
  
@@ -14,20 +14,12 @@ function Login() {
 
   if (authMode === "signin") {
     return (
-      <div class="justify-content-center d-flex">
+      <div className="justify-content-center d-flex">
       <div className="Auth-form-container w-25">
         <form className="Auth-form">
           <div className="Auth-form-content">
             <h6 >Welcome to SPORTSCONNECT</h6>
             
-             <div className="form-group mt-3">
-              
-              <input
-                type={"text"} /*onChange={e => setTaskName(e.target.value)}*/  className="form-control mt-1"
-                //value={taskName}
-                placeholder="Nickname"
-              />
-            </div>
             <div className="form-group mt-3">
               <label>Email address</label>
               <input
@@ -60,7 +52,7 @@ function Login() {
   }
 
   return (
-    <div class="justify-content-center d-flex">
+    <div className="justify-content-center d-flex">
     <div className="Auth-form-container w-25">
       <form className="Auth-form">
         <div className="Auth-form-content">
@@ -101,7 +93,7 @@ function Login() {
             </button>
           </div>
           <p className="text-center mt-2">
-            Forgot <a href="/login">password?</a>
+            Forgot <a href="/">password?</a>
           </p>
         </div>
       </form>
