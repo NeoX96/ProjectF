@@ -1,18 +1,60 @@
-import { Button } from "react-bootstrap";
+import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
+
 import { useNavigate } from "react-router-dom";
+import React from "react";
 
 export default function Navigationbar() {
     const navigate = useNavigate();
-  
+    const user = localStorage.getItem("username");
+
+    const logout = () => {
+        localStorage.removeItem("username");
+        navigate("/");
+    };
+
     return (
-      <div className="navigationbar ml-2">
-        <Button variant="primary" onClick={() => navigate("/Home")}>Home</Button>
-
-        <Button variant="primary" onClick={() => navigate("/Chat")}>Chat</Button>
-
-        <Button variant="primary" onClick={() => navigate("/Maps")}>Maps</Button>
-
-        <Button variant="primary" onClick={() => navigate("/Settings")}>Settings</Button>
+      <div className="navigationbar">
+        <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+          <Container>
+            <Navbar.Brand href="#home">SportConnect</Navbar.Brand>
+            <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+            <Navbar.Collapse id="responsive-navbar-nav">
+              <Nav className="me-auto">
+                <Nav.Link onClick={() => navigate("/Home")}>Home</Nav.Link>
+                <Nav.Link onClick={() => navigate("/Maps")}>Maps</Nav.Link>
+                <Nav.Link onClick={() => navigate("/Chat")}>Chat</Nav.Link>
+              </Nav>
+              <Nav>
+              <NavDropdown title={user} id="collasible-nav-dropdown">
+                <NavDropdown.Item onClick={() => navigate("/settings")}>Settings</NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item onClick={() => logout()}>Logout</NavDropdown.Item>
+                </NavDropdown>
+              </Nav>
+            </Navbar.Collapse>
+          </Container>
+        </Navbar>
       </div>
     );
 }
+
+/*
+    <Navbar bg="dark" variant="dark" className="" >
+      <Container>
+          <Navbar.Brand >SportConnect</Navbar.Brand>
+          <Nav className="justify-content-center">
+            <Nav.Link onClick={() => navigate("/Home")}>Home</Nav.Link>
+            <Nav.Link onClick={() => navigate("/Maps")}>Maps</Nav.Link>
+            <Nav.Link onClick={() => navigate("/Chat")}>Chat</Nav.Link>
+            <Nav.Link onClick={() => navigate("/")}>Logout</Nav.Link>
+
+            <Navbar.Collapse className="">
+              <Navbar.Text>
+                Signed in as: <a className="" onClick={() => navigate("/")}>User</a>
+              </Navbar.Text>
+            </Navbar.Collapse>
+          </Nav>
+        </Container>
+      </Navbar>
+
+      */
