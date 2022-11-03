@@ -10,9 +10,10 @@ function Home() {
 
     return (
         <div >
+          
             <Navigationbar />
             <h6>Welcome to SPORTSCONNECT </h6>
-            <div class="justify-content-center d-flex">
+            <div className="justify-content-center d-flex">
       <div className="Auth-form-container w-25">
         <form className="Auth-form">
           <div className="Auth-form-content">
@@ -60,7 +61,7 @@ function Home() {
       
     
 
-<div class="justify-content-center d-flex">
+<div className="justify-content-center d-flex">
             <Carousel slide={true} wrap={true} touch={true} keyboard={true} interval={6000} >
                 
            
