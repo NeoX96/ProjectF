@@ -1,84 +1,32 @@
 import React from "react";
-import images from './assets/index';
+import images from './assets/home/index';
 import { useNavigate } from "react-router-dom";
 import { Carousel } from 'react-bootstrap';
-import Navigationbar from "./navigationbar";
-
+import "./css/Home.css";
 
 function Home() {
     const navigate = useNavigate();
 
     return (
         <div >
-          
-            <Navigationbar />
-            <h6>Welcome to SPORTSCONNECT </h6>
-            <div className="justify-content-center d-flex">
-      <div className="Auth-form-container w-25">
-        <form className="Auth-form">
-          <div className="Auth-form-content">
-            
-            
-            <div className="form-group mt-3">
-              <label>Email address</label>
-              <input
-                type="email"
-                className="form-control mt-1"
-                placeholder="Enter email"
-              />
-            </div>
-            <div className="form-group mt-3">
-              <label>Password</label>
-              <input
-                type="password"
-                className="form-control mt-1"
-                placeholder="Enter password"
-              />
-            </div>
-            <div className="d-grid gap-2 mt-3">
-            <button onClick={() => {navigate("/Maps")}} className="btn btn-primary">Submit
-            </button>
-            
-            </div>
-            <div className="text-center mt-2">
-              Forgot {" "}
-                
-                <span className="link-primary"  onClick={() => {navigate("/forgotpw")}} >Password?</span>
-                {" "}
-            
-              Not registered ?{" "}
-              <span className="link-primary" onClick={() => {navigate("/login")}} >
-                Sign Up
-              </span>
-            </div>
+          <div className="justify-content-center d-flex">
+            <h6>Wähle deine Sportart aus</h6>
           </div>
-        </form>
-      </div>
-      </div>
 
-
-      
-      
-    
-
-<div className="justify-content-center d-flex">
-            <Carousel slide={true} wrap={true} touch={true} keyboard={true} interval={6000} >
+          <div className="justify-content-center d-flex">
+            <Carousel wrap={true} touch={true} keyboard={true}>
                 
            
                 <Carousel.Item>
                     <div onClick={() => {navigate("/Maps")}}>
-                        
-                       
-                        <img src={images.frisbee} alt="Frisbee"/>
-                        
-
+                        <img src={images.frisbee} alt="Frisbee" className="photo"/>
                         <Carousel.Caption><h6>NR 1 Frisbee</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
 
                 <Carousel.Item>
                      <div onClick={() => {navigate("/Maps")}}>
-                        <img src={images.fussball} alt="Fußball"/>
+                        <img src={images.fussball} alt="Fußball" className="photo"/>
                     
                         <Carousel.Caption><h6>NR 2 Soccer</h6></Carousel.Caption>
                     </div>
@@ -86,28 +34,28 @@ function Home() {
 
                 <Carousel.Item>
                     <div>
-                        <img src={images.volleyball} alt="Volleyball"/>
+                        <img src={images.volleyball} alt="Volleyball" className="photo"/>
                       
                         <Carousel.Caption><h6>NR 3Volleyball</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
                 <Carousel.Item>
                     <div>
-                        <img src={images.baskettball} alt="Baskettball"/>
+                        <img src={images.baskettball} alt="Baskettball" className="photo"/>
                       
                         <Carousel.Caption><h6>NR 4 Baskettball</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
                 <Carousel.Item>
                     <div>
-                        <img src={images.tischtennis} alt="Tischtennis"/>
+                        <img src={images.tischtennis} alt="Tischtennis" className="photo"/>
                         
                         <Carousel.Caption><h6>NR 5 Football</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
                 <Carousel.Item>
                     <div>
-                        <img src={images.skateboard} alt="Skateboard"/>
+                        <img src={images.skateboard} alt="Skateboard" className="photo"/>
                         
                         <Carousel.Caption><h6>NR 6 Skateboard</h6></Carousel.Caption>
                     </div>
@@ -115,10 +63,8 @@ function Home() {
             </Carousel>
             </div>
             
-            <div>
-            <button  onClick={() => {navigate("/Maps")}} className="btn btn-secondary justify-content-center d-flex" >LET´S PLAY !
-            </button>
-            
+            <div className="justify-content-center d-flex mt-5">
+              <button  onClick={() => {navigate("/Maps")}} className="btn btn-secondary justify-content-center d-flex" >LET´S PLAY !</button>
             </div>
         </div>
       
@@ -378,4 +324,4 @@ export default Home;
                     <p className="legend2">Sportart 3</p>
                 </div>
                 
-                */
+    */
