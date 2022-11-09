@@ -1,31 +1,34 @@
-import React from 'react';
+import React, { Suspense, lazy} from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import Home from "./pages/Home";
-import Chat from "./pages/Chat";
-import Maps from "./pages/Maps";
-import Login from "./pages/Login";
-import Settings from "./pages/settings";
-import Wait from "./pages/wait";
-import Forgotpw from "./pages/Forgotpw";
+import Navbar from './components/navigationbar';
+import { Button } from "react-bootstrap";
 
+
+const Home = lazy(() => import('./pages/Home'));
+const Chat = lazy(() => import('./pages/Chat'));
+const Maps = lazy(() => import('./pages/Maps'));
+const Login = lazy(() => import('./pages/Login'));
+const Settings = lazy(() => import('./pages/settings'));
+const Wait = lazy(() => import('./components/wait'));
+const Forgotpw = lazy(() => import('./pages/Forgotpw'));
 
 function App() {
     
   return (
     <div className="App">
     <Router>
-      
-        <Routes>
+      <Navbar />
+        <Suspense fallback={<Wait/>}>
+          <Routes>
+            <Route path="/" element={<Login />} />
             <Route path="/Home" element={<Home />} />
             <Route path="/Chat" element={<Chat />} />
             <Route path="/Maps" element={<Maps />} />
-            <Route path="/" element={<Login />} />
             <Route path="/Settings" element={<Settings />} />
-            <Route path="/Wait" element={<Wait />} />
             <Route path="/Forgotpw" element={<Forgotpw />} />
-            
-        </Routes>
+          </Routes>
+        </Suspense>
     </Router>
 
     </div>
