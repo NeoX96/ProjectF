@@ -1,7 +1,6 @@
 import "./css/Chat.css";
 import React, { useEffect, useState, useRef } from "react";
 import socketIO from "socket.io-client";
-import Navigationbar from "./navigationbar";
 import { Button } from "react-bootstrap";
 const endpoint = "http://localhost:4001";
 
@@ -51,9 +50,9 @@ function Chat() {
       console.log(data);
     });
 
-    socket.on("disconnect", () => {
-      
-    });
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -84,16 +83,16 @@ function Chat() {
 
   // Set Username and connect to SocketIO with prompt
   const setUsernameAndConnect = () => {
-      let username = "";
+    let username = "";
 
-      while (username === "" || username === null) {
-        username = prompt("Please enter your username");
-      }
+    while (username === "" || username === null) {
+      username = prompt("Please enter your username");
+    }
 
-      setUsername(username);
-      socket.connect();
-      socket.emit("user_connected", username);
-  }
+    setUsername(username);
+    socket.connect();
+    socket.emit("user_connected", username);
+}
   
   if (username === "") {
     setUsernameAndConnect();
@@ -101,8 +100,6 @@ function Chat() {
 
   return (
     <div>
-      <Navigationbar />
-    
     <div className="container-md">
       <div className="row">
         <div className="col-md">
