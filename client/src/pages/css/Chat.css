@@ -1,9 +1,9 @@
-#messages {
+#messages, .users {
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
-#messages > li {
+#messages > li, .users > li {
   padding: 0.5rem 1rem;
 }
 #messages > li:nth-child(odd) {
