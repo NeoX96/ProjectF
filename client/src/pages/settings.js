@@ -1,5 +1,4 @@
 import React from "react";
-import Navigationbar from "./navigationbar";
 import { useGeolocated } from "react-geolocated";
 
 
@@ -17,7 +16,6 @@ const Demo = () => {
         <div>Your browser does not support Geolocation</div>
     ) : !isGeolocationEnabled ? (
         <div>
-            <Navigationbar />
             Geolocation is not enabled</div>
     ) : coords ? (
         <table>
