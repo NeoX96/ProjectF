@@ -9,6 +9,7 @@
     "bootstrap": "^5.2.2",
     "bootstrap-icons": "^1.9.1",
     "leaflet": "^1.9.2",
+    "leaflet-control-geocoder": "^2.4.0",
     "react": "^18.2.0",
     "react-alice-carousel": "^2.6.4",
     "react-app": "^1.1.2",
