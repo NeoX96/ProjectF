@@ -113,7 +113,7 @@ socketIO.on("connection", (socket) => {
             if(err) {
                 console.log(err);
             } else {
-                socketIO.to(socket.id).emit("get_messages", result);
+                socket.emit("get_messages", result);
             }
         });
        
@@ -147,7 +147,7 @@ socketIO.on("connection", (socket) => {
                 });
 
                 // emit the arrays to the client
-                socketIO.to(socket.id).emit("get_users", onlineUsers, offlineUsers);
+                socket.emit("get_users", onlineUsers, offlineUsers);
             }
         });
     });
