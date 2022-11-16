@@ -3,14 +3,19 @@ const bcrypt = require('bcrypt');
 
 // MongoDB User Tabelle
 const UserSchema = new mongoose.Schema({
-  name: {
+  vorname: {
     type: String,
     required: true,
     maxlength: 30
   },
-  age: {
-    type: Number,
-    maxlength: 3
+  nickname: {
+    type: String,
+    required: true,
+    maxlength: 30
+  },
+  birthday: {
+    type: Date,
+    required: true
   },
   email: {
     type: String,
