@@ -68,7 +68,6 @@ function Chat() {
     socket.emit("ask_messages");
   };
 
- 
   // Send Message
   const sendMessage = (e) => {
     e.preventDefault();
@@ -107,13 +106,13 @@ function Chat() {
               <h4>Online</h4>
               <ul className="users">
                 {onlineUsers.map((user, index) => (
-                  <li key={index}><Button variant="outline-light" onClick={() => alert("MongoDB_ID: " + user._id)} >{user.name}</Button></li>
+                  <li key={index}><Button variant="outline-light" onClick={() => alert("MongoDB_ID: " + user._id)} >{user.vorname}</Button></li>
                 ))}
               </ul>
               <h4>Offline</h4>
               <ul className="users">
                 {offlineUsers.map((user, index) => (
-                  <li key={index}><Button variant="outline-light" onClick={() => alert("MongoDB_ID: " + user._id)} >{user.name}</Button></li>
+                  <li key={index}><Button variant="outline-light" onClick={() => alert("MongoDB_ID: " + user._id)} >{user.vorname}</Button></li>
                 ))}
               </ul>
             </div>
