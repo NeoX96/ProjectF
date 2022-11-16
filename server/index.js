@@ -1,15 +1,23 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
+const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+
 const UserModel = require('./models/Users');
 const MessageModel = require('./models/Messages');
-app.use(express.json());
 const mongoPort = 4000;
 
+dotenv.config();
+app.use(express.json());
+app.use(cors({
+    origin: 'localhost:3000'
+}));
+
+
+
 // MongoDB Connection URL
-mongoose.connect(
-    "mongodb+srv://valentin:ProjektPasswort@projectf.iserctp.mongodb.net/ProjectFDB?retryWrites=true&w=majority"
-);
+mongoose.connect(process.env.DATABASE_ACCESS, () => console.log("Database connected"));
 
 // MongoDB Anfrage für alle Users + ausgabe wenn Error
 app.get("/getUsers", (req, res) => {
@@ -66,14 +74,13 @@ app.listen(mongoPort, () => {
 // SocketIO Chat
 const socketPort = 4001;
 const http = require('http').Server(app);
-const cors = require("cors");
 const socketIO = require('socket.io')(http, {
     cors: {
         origin: "*"
     }
 });
 
-app.use(cors());
+
 
 socketIO.on("connection", (socket) => {
 
