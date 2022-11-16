@@ -13,7 +13,7 @@ export default function Navigationbar() {
     };
 
     // only return if user is on home, chat or maps page
-    if (window.location.pathname === "/Home" || window.location.pathname === "/Chat" || window.location.pathname === "/Maps") {
+    if (window.location.pathname === "/Home" || window.location.pathname === "/Chat" || window.location.pathname === "/Maps" || window.location.pathname === "/settings") {
 
     return (
       <div className="navigationbar">
