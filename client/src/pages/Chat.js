@@ -50,23 +50,18 @@ function Chat() {
       console.log(data);
     });
 
+    // get Users
+    socket.on("get_users", (online, offline) => {
+      setOnlineUsers(online);
+      setOfflineUsers(offline);
+      console.log(online, offline);
+    });
+
     return () => {
       socket.disconnect();
     };
   }, []);
 
-  useEffect(() => {
-    // get Users
-    socket.on("get_users", (online, offline) => {
-      let onlineUser = online.map(on => on.name);
-      let offlineUser = offline.map(off => off.name);
-
-      setOnlineUsers(onlineUser);
-      setOfflineUsers(offlineUser);
-      console.log(online, offline);
-    });
-
-  }, [onlineUsers, offlineUsers]);
 
   // const for emit ask_messages
   const getMessagesEmit = () => {
@@ -92,84 +87,83 @@ function Chat() {
     setUsername(username);
     socket.connect();
     socket.emit("user_connected", username);
-}
-  
+  }
+
   if (username === "") {
     setUsernameAndConnect();
   }
 
   return (
     <div>
-    <div className="container-md">
-      <div className="row">
-        <div className="col-md">
-          <div className=" ">
-            <Button className="" onClick={getMessagesEmit}>Get Messages</Button>
-          </div>
-
-          <div className="UserList">
-            <h4>Online</h4>
-            <ul className="users">
-              {onlineUsers.map((user, index) => (
-                <li key={index}><Button variant="outline-light" onClick={() => alert("Debug: Changed Text Chat")} >{user}</Button></li>
-              ))}
-            </ul>
-            <h4>Offline</h4>
-            <ul className="users">
-              {offlineUsers.map((user, index) => (
-                <li key={index}><Button variant="outline-light" onClick={() => alert("Debug: Changed Text Chat")} >{user}</Button></li>
-              ))}
-            </ul>
-          </div>
-      </div>
-      <div id="chatContainer" className="col-md">
-          <div
-            id="text"
-            className="overflow-auto d-flex flex-column justify-content-between rounded" 
-          >
-            <ul id="messages">
-          {messages.map((message, index) => (
-            <li
-              key={index}
-              className={
-                message.username === username ? "text-end" : "text-start"
-              }
-            >
-              <b>{message.username}</b>: {message.message}
-            </li>
-          ))}
-          </ul>
-          <div ref={messagesRef}></div>
-        </div>
-        
-            <div>
-              <form onSubmit={sendMessage}>
-                <div className="row mt-2 mb-2  d-block ">
-                  <div className="col-md input-group">
-                    <input
-                      placeholder="Message ..."
-                      required
-                      value={message}
-                      onChange={(event) => {
-                        setMessage(event.target.value);
-                      }}
-                      className="form-control"
-                      type="text"
-                    />
-                    <button className="btn btn-primary" type="submit">
-                      <iconify-icon icon="ic:round-send"></iconify-icon>
-                    </button>
-                  </div>
-                  <div className="col-sm" id="SocketID"></div>
-                </div>
-              </form>
+      <div className="container-md">
+        <div className="row">
+          <div className="col-md">
+            <div className=" ">
+              <Button className="" onClick={getMessagesEmit}>Get Messages</Button>
             </div>
-          <div className="connection">
-            <p>Connected as: {username}</p>
+
+            
+            <div className="UserList">
+              <h4>Online</h4>
+              <ul className="users">
+                {onlineUsers.map((user, index) => (
+                  <li key={index}><Button variant="outline-light" onClick={() => alert("MongoDB_ID: " + user._id)} >{user.name}</Button></li>
+                ))}
+              </ul>
+              <h4>Offline</h4>
+              <ul className="users">
+                {offlineUsers.map((user, index) => (
+                  <li key={index}><Button variant="outline-light" onClick={() => alert("MongoDB_ID: " + user._id)} >{user.name}</Button></li>
+                ))}
+              </ul>
+            </div>
+        </div>
+        <div id="chatContainer" className="col-md">
+            <div
+              id="text"
+              className="overflow-auto d-flex flex-column justify-content-between rounded" 
+            >
+              <ul id="messages">
+            {messages.map((message, index) => (
+              <li
+                key={index}
+                className={message.username === username ? "text-end" : "text-start"}
+              >
+                <b>{message.username}</b>: {message.message}
+              </li>
+            ))}
+            </ul>
+            <div ref={messagesRef}></div>
           </div>
+          
+              <div>
+                <form onSubmit={sendMessage}>
+                  <div className="row mt-2 mb-2 d-block ">
+                    <div className="col-md input-group">
+                      <input
+                        placeholder="Message ..."
+                        required
+                        value={message}
+                        onChange={(event) => {
+                          setMessage(event.target.value);
+                        }}
+                        className="form-control"
+                        type="text"
+                      />
+                      <button className="btn btn-primary" type="submit">
+                        <iconify-icon icon="ic:round-send"></iconify-icon>
+                      </button>
+                    </div>
+                    <div className="col-sm" id="SocketID"></div>
+                  </div>
+                </form>
+              </div>
+            <div className="connection">
+              <p>Connected as: {username}</p>
+            </div>
+        </div>
       </div>
     </div>
-  </div>
   </div>
   );
 }
