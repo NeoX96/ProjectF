@@ -22,7 +22,7 @@ function Login() {
     event.preventDefault();
     const registered = {
         vorname: vorname,
-        nickname: nickname,
+        username: nickname,
         birthday: geburtstag,
         email: email,
         password: password
