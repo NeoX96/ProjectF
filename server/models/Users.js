@@ -8,7 +8,7 @@ const UserSchema = new mongoose.Schema({
     required: true,
     maxlength: 30
   },
-  nickname: {
+  username: {
     type: String,
     required: true,
     maxlength: 30
@@ -27,6 +27,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 8
+  },
+  online: {
+    type: Boolean,
+    default: false
   },
   createdAt: {
     type: Date,
