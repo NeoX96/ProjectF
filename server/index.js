@@ -3,9 +3,9 @@ const cors = require("cors");
 const app = express();
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-
 const UserModel = require('./models/Users');
 const MessageModel = require('./models/Messages');
+const routesAPI = require('./routes/routes');
 const mongoPort = 4000;
 
 dotenv.config();
@@ -14,56 +14,14 @@ app.use(cors({
     origin: 'localhost:3000'
 }));
 
-
-
 // MongoDB Connection URL
 mongoose.connect(process.env.DATABASE_ACCESS, () => console.log("Database connected"));
 
-// MongoDB Anfrage für alle Users + ausgabe wenn Error
-app.get("/getUsers", (req, res) => {
-    UserModel.find({}, (err, result) => {
-        if(err) {
-            res.json(err);
-        } else {
-            res.json(result);
-        }
-    });
-});
-
-// MongoDB Erstellen eines Users
-app.post("/createUser", async (req, res) => {
-    const user = req.body;
-    const newUser = new UserModel(user);
-    await newUser.save();
-
-    // Rückgabe des Eintrages zum Vergleichen ob eintrag mit Usereingaben übereinstimmen
-    res.json(user);
-});
-
-// MongoDB Anfrage für alle Messages
-app.get("/getMessages", (req, res) => {
-    MessageModel.find({}, (err, result) => {
-        if(err) {
-            res.json(err);
-        } else {
-            res.json(result);
-        }
-    });
-});
-
-// MongoDB Erstellen einer Message
-app.post("/createMessage", async (req, res) => {
-    const message = req.body;
-    const newMessage = new MessageModel(message);
-    await newMessage.save();
-    
-    // Rückgabe des Eintrages zum Vergleichen ob eintrag mit Usereingaben übereinstimmen
-    res.json(message);
-});
+app.use('/', routesAPI);
 
 
 app.listen(mongoPort, () => {
-    console.log(`MongoDB backend Server auf http://localhost:${mongoPort}/getUsers`);
+    console.log(`MongoDB backend Server auf http://localhost:${mongoPort}`);
 });
 
 
@@ -98,6 +56,12 @@ socketIO.on("connection", (socket) => {
         socket.disconnect();
     });
 
+    // send private message to target user 
+    socket.on("send_private_message", (data) => {
+        socketIO.to(data.targetId.username).emit("receive_private_message", data);
+        socket.emit("receive_private_message", data);
+        console.log(`Client ${socket.id}: ${socket.username} send private message to ${data.targetId} with message: ${data.message}`);
+    });
 
     // Store Message in MongoDB when sending and emit to all client
     socket.on("send_message", (message) => {
@@ -138,19 +102,18 @@ socketIO.on("connection", (socket) => {
                 // compare the Name with the all connected users
                 result.forEach((user) => {
                     socketIO.sockets.sockets.forEach((socket) => {
-                        if(user.name === socket.username) {
-                            user.connected = true;
+                        if(user.vorname === socket.username) {
+                            user.online = true;
+                        } else {
+                            user.online = false;
                         }
                         });
-                });
 
-                // push the users in the right array
-                result.forEach((user) => {
-                    if(user.connected === true) {
-                        onlineUsers.push(user);
-                    } else {
-                        offlineUsers.push(user);
-                    }
+                        if(user.online === true) {
+                            onlineUsers.push(user);
+                        } else {
+                            offlineUsers.push(user);
+                        }
                 });
 
                 // emit the arrays to the client
