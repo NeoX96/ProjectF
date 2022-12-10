@@ -58,9 +58,8 @@ socketIO.on("connection", (socket) => {
 
     // send private message to target user 
     socket.on("send_private_message", (data) => {
-        socketIO.to(data.targetId.username).emit("receive_private_message", data);
-        socket.emit("receive_private_message", data);
-        console.log(`Client ${socket.id}: ${socket.username} send private message to ${data.targetId} with message: ${data.message}`);
+        socketIO.to(data.target).emit("receive_private_message", data);
+        console.log(data);
     });
 
     // Store Message in MongoDB when sending and emit to all client
@@ -103,17 +102,18 @@ socketIO.on("connection", (socket) => {
                 result.forEach((user) => {
                     socketIO.sockets.sockets.forEach((socket) => {
                         if(user.vorname === socket.username) {
-                            user.online = true;
-                        } else {
-                            user.online = false;
+                            user.connected = true;
                         }
                         });
+                });
 
-                        if(user.online === true) {
-                            onlineUsers.push(user);
-                        } else {
-                            offlineUsers.push(user);
-                        }
+                // push the users in the right array
+                result.forEach((user) => {
+                    if(user.connected === true) {
+                        onlineUsers.push(user);
+                    } else {
+                        offlineUsers.push(user);
+                    }
                 });
 
                 // emit the arrays to the client
