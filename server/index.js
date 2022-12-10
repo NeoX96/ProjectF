@@ -20,9 +20,8 @@ mongoose.connect(process.env.DATABASE_ACCESS, () => console.log("Database connec
 app.use('/', routesAPI);
 
 
-
 app.listen(mongoPort, () => {
-    console.log(`MongoDB backend Server auf http://localhost:${mongoPort}/getUsers`);
+    console.log(`MongoDB backend Server auf http://localhost:${mongoPort}`);
 });
 
 
@@ -57,6 +56,12 @@ socketIO.on("connection", (socket) => {
         socket.disconnect();
     });
 
+    // send private message to target user 
+    socket.on("send_private_message", (data) => {
+        socketIO.to(data.targetId.username).emit("receive_private_message", data);
+        socket.emit("receive_private_message", data);
+        console.log(`Client ${socket.id}: ${socket.username} send private message to ${data.targetId} with message: ${data.message}`);
+    });
 
     // Store Message in MongoDB when sending and emit to all client
     socket.on("send_message", (message) => {
@@ -97,19 +102,18 @@ socketIO.on("connection", (socket) => {
                 // compare the Name with the all connected users
                 result.forEach((user) => {
                     socketIO.sockets.sockets.forEach((socket) => {
-                        if(user.name === socket.username) {
-                            user.connected = true;
+                        if(user.vorname === socket.username) {
+                            user.online = true;
+                        } else {
+                            user.online = false;
                         }
                         });
-                });
 
-                // push the users in the right array
-                result.forEach((user) => {
-                    if(user.connected === true) {
-                        onlineUsers.push(user);
-                    } else {
-                        offlineUsers.push(user);
-                    }
+                        if(user.online === true) {
+                            onlineUsers.push(user);
+                        } else {
+                            offlineUsers.push(user);
+                        }
                 });
 
                 // emit the arrays to the client

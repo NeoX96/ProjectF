@@ -119,6 +119,45 @@ function Chat() {
     
   }
 
+  function ChatContainer (user) {
+    // Messages Ref to scroll down
+    const messagesRef = useRef(null);
+    console.log("ChatContainer: ", user);
+
+    // if user object is empty than return select user
+    if (targetUser === null) {
+      return (
+        <div
+          id="text"
+          className="overflow-auto d-flex flex-column justify-content-between rounded" 
+        >
+          <div className="d-flex justify-content-center" >Select a User to chat with</div>
+      </div>
+      );
+    } else {
+      return (
+        // key is the user id
+        <div
+          id="text"
+          className="overflow-auto d-flex flex-column justify-content-between rounded"
+          key={user.id}
+        >
+          <div className="d-flex justify-content-center" >Chat with {user.vorname}</div>
+          <div className="d-flex flex-column">
+            {privateMessages.map((message, index) => {
+              return (
+                <ul>
+                </ul>
+              );
+            })}
+          </div>
+          <div ref={messagesRef} />
+        </div>
+      );
+    }
+  }
+
+
   if (username === "") {
     setUsernameAndConnect();
   }
