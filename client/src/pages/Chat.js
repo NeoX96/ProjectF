@@ -6,8 +6,6 @@ const endpoint = "http://localhost:4001";
 
 const socket = socketIO(endpoint, { autoConnect: false });
 
-
-
 function Chat() {
   // Messages Ref to scroll down
   const messagesRef = useRef(null);
@@ -15,9 +13,11 @@ function Chat() {
   // States
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
+  const [privateMessages, setPrivateMessages] = useState([]);
   const [username, setUsername] = useState("");
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [offlineUsers, setOfflineUsers] = useState([]);
+  const [targetUser, setTargetUser] = useState(null);
 
 
   useEffect(() => {
@@ -40,6 +40,17 @@ function Chat() {
     });
   }, [messages]);
 
+  // useEffect for private Messages
+  useEffect(() => {
+    messagesRef.current.scrollIntoView({ behavior: "smooth" });
+
+    // SocketIO Receive Private Message
+    socket.on("receive_private_message", (data) => {
+      setPrivateMessages([...privateMessages, data]);
+      messagesRef.current.scrollIntoView({ behavior: "smooth" });
+    });
+  }, [privateMessages]);
+
   useEffect(() => {
      // get Messages
     socket.on("get_messages", (data) => {
@@ -50,7 +61,6 @@ function Chat() {
       console.log(data);
     });
 
-    // get Users
     socket.on("get_users", (online, offline) => {
       setOnlineUsers(online);
       setOfflineUsers(offline);
@@ -71,7 +81,16 @@ function Chat() {
   // Send Message
   const sendMessage = (e) => {
     e.preventDefault();
-    socket.emit("send_message", { username: username, message: message });
+    // if private message send to target user
+    if (targetUser !== null) {
+      socket.emit("send_private_message", {
+        message: message,
+        username: username,
+      });
+    } else {
+      // else send to all users
+      socket.emit("send_message", { username: username, message: message });
+    }
     setMessage("");
   }
 
@@ -86,6 +105,18 @@ function Chat() {
     setUsername(username);
     socket.connect();
     socket.emit("user_connected", username);
+}
+
+  // select user to chat with
+  const selectUser = (user) => {
+    setTargetUser(user);
+    socket.emit("ask_private_messages", user._id);
+  }
+
+  // ChatContainer for each user
+
+  function ChatContainer (user) {
+    
   }
 
   if (username === "") {
@@ -101,40 +132,35 @@ function Chat() {
               <Button className="" onClick={getMessagesEmit}>Get Messages</Button>
             </div>
 
-            
             <div className="UserList">
               <h4>Online</h4>
               <ul className="users">
-                {onlineUsers.map((user, index) => (
-                  <li key={index}><Button variant="outline-light" onClick={() => alert("MongoDB_ID: " + user._id)} >{user.vorname}</Button></li>
-                ))}
+              { onlineUsers.map((user, idx) => {
+                  return (
+                    <li key={idx}>
+                        <Button variant="outline-light" onClick={() => selectUser(user)} >{user.vorname}</Button>
+                    </li>
+                  );
+                })
+                }
               </ul>
               <h4>Offline</h4>
               <ul className="users">
-                {offlineUsers.map((user, index) => (
-                  <li key={index}><Button variant="outline-light" onClick={() => alert("MongoDB_ID: " + user._id)} >{user.vorname}</Button></li>
-                ))}
+              { offlineUsers.map((user, idx) => {
+                  return (
+                    <li key={idx}>
+                        <Button variant="outline-light" onClick={() => selectUser(user)} >{user.vorname}</Button>
+                    </li>
+                  );
+                })
+                }
               </ul>
             </div>
         </div>
-        <div id="chatContainer" className="col-md">
-            <div
-              id="text"
-              className="overflow-auto d-flex flex-column justify-content-between rounded" 
-            >
-              <ul id="messages">
-            {messages.map((message, index) => (
-              <li
-                key={index}
-                className={message.username === username ? "text-end" : "text-start"}
-              >
-                <b>{message.username}</b>: {message.message}
-              </li>
-            ))}
-            </ul>
+
+          <div className="ChatContainer col">
+            <ChatContainer user={targetUser}/>
             <div ref={messagesRef}></div>
-          </div>
-          
               <div>
                 <form onSubmit={sendMessage}>
                   <div className="row mt-2 mb-2 d-block ">
@@ -157,13 +183,13 @@ function Chat() {
                   </div>
                 </form>
               </div>
+              </div>
             <div className="connection">
               <p>Connected as: {username}</p>
             </div>
         </div>
       </div>
     </div>
-  </div>
   );
 }
 
