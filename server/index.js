@@ -3,9 +3,9 @@ const cors = require("cors");
 const app = express();
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-
 const UserModel = require('./models/Users');
 const MessageModel = require('./models/Messages');
+const routesAPI = require('./routes/routes');
 const mongoPort = 4000;
 
 dotenv.config();
@@ -14,52 +14,11 @@ app.use(cors({
     origin: 'localhost:3000'
 }));
 
-
-
 // MongoDB Connection URL
 mongoose.connect(process.env.DATABASE_ACCESS, () => console.log("Database connected"));
 
-// MongoDB Anfrage für alle Users + ausgabe wenn Error
-app.get("/getUsers", (req, res) => {
-    UserModel.find({}, (err, result) => {
-        if(err) {
-            res.json(err);
-        } else {
-            res.json(result);
-        }
-    });
-});
+app.use('/', routesAPI);
 
-// MongoDB Erstellen eines Users
-app.post("/createUser", async (req, res) => {
-    const user = req.body;
-    const newUser = new UserModel(user);
-    await newUser.save();
-
-    // Rückgabe des Eintrages zum Vergleichen ob eintrag mit Usereingaben übereinstimmen
-    res.json(user);
-});
-
-// MongoDB Anfrage für alle Messages
-app.get("/getMessages", (req, res) => {
-    MessageModel.find({}, (err, result) => {
-        if(err) {
-            res.json(err);
-        } else {
-            res.json(result);
-        }
-    });
-});
-
-// MongoDB Erstellen einer Message
-app.post("/createMessage", async (req, res) => {
-    const message = req.body;
-    const newMessage = new MessageModel(message);
-    await newMessage.save();
-    
-    // Rückgabe des Eintrages zum Vergleichen ob eintrag mit Usereingaben übereinstimmen
-    res.json(message);
-});
 
 
 app.listen(mongoPort, () => {
