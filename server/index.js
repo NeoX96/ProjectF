@@ -17,7 +17,7 @@ app.use(cors({
 // MongoDB Connection URL
 mongoose.connect(process.env.DATABASE_ACCESS, () => console.log("Database connected"));
 
-app.use('/', routesAPI);
+app.use(routesAPI);
 
 
 app.listen(mongoPort, () => {
@@ -39,18 +39,89 @@ const socketIO = require('socket.io')(http, {
 });
 
 
+socketIO.use(async (socket, next) => {
+    const sessionID = socket.handshake.auth.sessionID;
+    const username = socket.handshake.auth.username;
+
+    if (sessionID || username) {
+
+        const session = await UserModel.findOne({sessionID: sessionID});
+        const user = await UserModel.findOne({username: username});
+
+        // if sessionID or username exists in MongoDB
+        if (session) {
+            console.log("sessionID exists in MongoDB");
+            socket.sessionID = sessionID;
+            socket.id = session.userID;
+            socket.username = session.username;
+            return next();
+        }
+        if (user) {
+            console.log("username exists in MongoDB");
+
+            socket.sessionID = user.sessionID;
+            socket.id = user.userID;
+            socket.username = user.username;
+            return next();
+        } else {
+            // return error if username does not exist in MongoDB
+            console.log("username does not exist in MongoDB");
+            return next(new Error("username does not exist in MongoDB"));
+        }
+    } else {
+        console.log("sessionID and username does not exist");
+        // return error if sessionID and username does not exist
+        return next(new Error("sessionID and username does not exist"));
+    }
+    });
+
+
 
 socketIO.on("connection", (socket) => {
+    console.log(`Client ${socket.id}: ${socket.username} connected`);
+    // search username in MongoDB
+    const user = UserModel.findOne({username: socket.username});
+
+    // if user does not exist in MongoDB dont go in Update One
+    if (user) {
+    UserModel.updateOne({
+        username: socket.username
+    }, {
+        sessionID: socket.sessionID,
+        userID: socket.id,
+        online: true
+    }, {
+        upsert: true
+    }, (err, res) => {
+        if (err) throw err;
+        console.log(res);
+    });
+    }
+
+      // emit session details
+    socket.emit("session", {
+        sessionID: socket.sessionID,
+        userID: socket.id,
+        username: socket.username
+    });
 
     // SocketIO User Connected Chat Bot
     socket.on("user_connected", (username) => {
-        socket.username = username;
         socketIO.emit("user_connected", username);
         console.log(`Client ${socket.id}: ${socket.username} connected`);
     });
 
     // Emit to all clients that someone is disconnected
     socket.on("disconnect", () => {
+        // set user offline in MongoDB
+        UserModel.updateOne({
+            username: socket.username
+        }, {
+            online: false
+        }, (err, res) => {
+            if (err) throw err;
+            console.log(res);
+        });
         console.log(`Client ${socket.id}: ${socket.username} disconnected`);
         socketIO.emit("user_disconnected", socket.username);
         socket.disconnect();
@@ -58,7 +129,8 @@ socketIO.on("connection", (socket) => {
 
     // send private message to target user 
     socket.on("send_private_message", (data) => {
-        socketIO.to(data.target).emit("receive_private_message", data);
+        socket.to(data.targetUser).emit("receive_private_message", data);
+        socket.emit("receive_private_message", data);
         console.log(data);
     });
 
@@ -68,13 +140,6 @@ socketIO.on("connection", (socket) => {
         socketIO.emit("receive_message", message);
         const newMessage = new MessageModel(message);
         newMessage.save();
-    });
-
-    // set Username to specific socket client ID
-    socket.on("set_username", (username) => {
-        socket.username = username;
-        console.log(socket.username);
-        socketIO.broadcast.emit("set_username", socket.username);
     });
 
     // get Messages from MongoDB and emit to client
@@ -99,17 +164,10 @@ socketIO.on("connection", (socket) => {
                 console.log(err);
             } else {
                 // compare the Name with the all connected users
-                result.forEach((user) => {
-                    socketIO.sockets.sockets.forEach((socket) => {
-                        if(user.vorname === socket.username) {
-                            user.connected = true;
-                        }
-                        });
-                });
 
                 // push the users in the right array
                 result.forEach((user) => {
-                    if(user.connected === true) {
+                    if(user.online === true) {
                         onlineUsers.push(user);
                     } else {
                         offlineUsers.push(user);
