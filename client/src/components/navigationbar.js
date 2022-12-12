@@ -5,10 +5,10 @@ import { useNavigate } from "react-router-dom";
 
 export default function Navigationbar() {
     const navigate = useNavigate();
-    const user = localStorage.getItem("username");
+    const user = localStorage.getItem("sessionID");
 
     const logout = () => {
-      localStorage.removeItem("username");
+      localStorage.removeItem("sessionID");
         navigate("/");
     };
 
