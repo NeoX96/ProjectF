@@ -36,6 +36,14 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
     required: true
+  },
+// session ID für SocketIO
+  sessionID: {
+    type: String
+  },
+// User ID für SocketIO
+  userID: {
+    type: String
   }
 });
 
