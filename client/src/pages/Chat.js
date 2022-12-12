@@ -20,6 +20,55 @@ function Chat() {
   const [targetUser, setTargetUser] = useState(null);
 
 
+  const sessionID = localStorage.getItem("sessionID");
+
+  if (sessionID) {
+    if (username === "") {
+      // call api get user by sessionID
+      fetch(`http://localhost:4000/api/user/${sessionID}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setUsername(data.username);
+          socket.auth = { sessionID };
+          socket.connect();
+          // get Username from MongoDB and set to socket
+          socket.on("session", (data) => {
+            setUsername(data.username);
+            socket.username = data.username;
+            socket.id = data.userID;
+            socket.emit("user_connected", data.username);
+          });
+        });
+    }
+    socket.auth = { sessionID };
+    socket.connect();
+    // get Username from MongoDB and set to socket
+    socket.on("session", (data) => {
+      setUsername(data.username);
+      socket.username = data.username;
+      socket.id = data.userID;
+      socket.emit("user_connected", data.username);
+    });
+  } else {
+    let user_promt = prompt("Please enter your username");
+    while (user_promt === "" || user_promt === null) {
+      user_promt = prompt("Please enter your username");
+    }
+    setUsername(user_promt);
+    socket.auth = { username: user_promt };
+    socket.connect();
+
+
+    socket.on("session", (data) => {
+      localStorage.setItem("sessionID", data.sessionID);
+      socket.username = data.username;
+      socket.id = data.userID;
+      socket.emit("user_connected", data.username);
+    });
+
+    socket.emit("ask_users");
+  }
+
   useEffect(() => {
     messagesRef.current.scrollIntoView({ behavior: "smooth" });
 
@@ -38,6 +87,12 @@ function Chat() {
       setMessages([...messages,{ username: "Chat Bot", message: `${username} connected` }]);
       socket.emit("ask_users");
     });
+
+    return () => {
+      socket.off ("receive_message");
+      socket.off ("user_disconnected");
+      socket.off ("user_connected");
+    }
   }, [messages]);
 
   // useEffect for private Messages
@@ -49,6 +104,10 @@ function Chat() {
       setPrivateMessages([...privateMessages, data]);
       messagesRef.current.scrollIntoView({ behavior: "smooth" });
     });
+
+    return () => {
+      socket.off ("receive_private_message");
+    }
   }, [privateMessages]);
 
   useEffect(() => {
@@ -67,9 +126,20 @@ function Chat() {
       console.log(online, offline);
     });
 
+    
+    socket.on("session", ({ sessionID, userID }) => {
+      socket.auth = { sessionID };
+      // store it in the localStorage
+      localStorage.setItem("sessionID", sessionID);
+      // save the ID of the user
+      socket.id = userID;
+    });
+
     return () => {
-      socket.disconnect();
-    };
+      socket.off ("get_messages");
+      socket.off ("get_users");
+      socket.off ("session");
+    }
   }, []);
 
 
@@ -86,6 +156,8 @@ function Chat() {
       socket.emit("send_private_message", {
         message: message,
         username: username,
+        // target user socketID
+        targetUser: targetUser.userID
       });
     } else {
       // else send to all users
@@ -94,18 +166,6 @@ function Chat() {
     setMessage("");
   }
 
-  // Set Username and connect to SocketIO with prompt
-  const setUsernameAndConnect = () => {
-    let username = "";
-
-    while (username === "" || username === null) {
-      username = prompt("Please enter your username");
-    }
-
-    setUsername(username);
-    socket.connect();
-    socket.emit("user_connected", username);
-}
 
   // select user to chat with
   const selectUser = (user) => {
@@ -113,15 +173,43 @@ function Chat() {
     socket.emit("ask_private_messages", user._id);
   }
 
+
   // ChatContainer for each user
-
-  function ChatContainer (user) {
-    
-  }
-
-
-  if (username === "") {
-    setUsernameAndConnect();
+  function ChatContainer () {
+    // chat container for each user to chat with seperatly key = user._id
+    if (targetUser !== null) {
+      return (
+        <div className="ChatContainer" key={targetUser.userID}>
+          <h4>Chat with {targetUser.vorname}</h4>
+          <ul className="list-group-item">
+            {privateMessages.map((message, idx) => {
+              return (
+                <li key={idx}>
+                  <b>{message.username}</b>: {message.message}
+                </li>
+              );
+            })}
+          </ul>
+          <div ref={messagesRef}></div>
+        </div>
+      );
+    } else {
+      return (
+        <div className="ChatContainer">
+          <h4>Chat</h4>
+          <ul className="list-group-item">
+            {messages.map((message, idx) => {
+              return (
+                <li key={idx}>
+                  <b>{message.username}</b>: {message.message}
+                </li>
+              );
+            })}
+          </ul>
+          <div ref={messagesRef}></div>
+        </div>
+      );
+    }
   }
 
   return (
@@ -160,7 +248,12 @@ function Chat() {
         </div>
 
           <div className="ChatContainer col">
-            <ChatContainer user={targetUser}/>
+          <div
+            id="text"
+            className="overflow-auto d-flex flex-column justify-content-between rounded" 
+          >
+            <ChatContainer />
+          </div>
             <div ref={messagesRef}></div>
               <div>
                 <form onSubmit={sendMessage}>
