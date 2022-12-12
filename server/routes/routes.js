@@ -4,10 +4,15 @@ const UserModel = require('../models/Users');
 const MessageModel = require('../models/Messages');
 const dotenv = require('dotenv');
 dotenv.config();
+const crypto = require('crypto');
+const randomId = () => crypto.randomBytes(16).toString("hex");
 
 
 router.post("/createUser", async (req, res) => {
     const user = req.body;
+    user.sessionID = randomId();
+    user.userID = randomId();
+    // Erstellen eines Eintrages in der MongoDB
     const newUser = new UserModel(user);
     await newUser.save();
 
@@ -40,6 +45,13 @@ router.post("/createMessage", async (req, res) => {
     
     // Rückgabe des Eintrages zum Vergleichen ob eintrag mit Usereingaben übereinstimmen
     res.json(message);
+});
+
+// get specific user by sessionID
+router.get("/getUserBySessionID/:sessionID", async (req, res) => {
+    const sessionID = req.params.sessionID;
+    const user = await UserModel.findOne({sessionID: sessionID});
+    res.json(user);
 });
 
 
