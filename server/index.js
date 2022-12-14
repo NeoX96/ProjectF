@@ -11,7 +11,11 @@ const mongoPort = 4000;
 dotenv.config();
 app.use(express.json());
 app.use(cors({
-    origin: 'localhost:3000'
+    origin: 'localhost:3000',
+    // allow post and get requests
+    methods: ['POST', 'GET'],
+    // allow cookies
+    credentials: true
 }));
 
 // MongoDB Connection URL
@@ -36,6 +40,16 @@ const socketIO = require('socket.io')(http, {
     cors: {
         origin: "*"
     }
+});
+
+// when server starts set all users to offline in MongoDB
+UserModel.updateMany({
+    online: true
+}, {
+    online: false
+}, (err, res) => {
+    if (err) throw err;
+    console.log("All users set to offline");
 });
 
 
@@ -104,6 +118,8 @@ socketIO.on("connection", (socket) => {
         userID: socket.id,
         username: socket.username
     });
+
+    socketIO.emit("user_connected", socket.username);
 
     // SocketIO User Connected Chat Bot
     socket.on("user_connected", (username) => {
