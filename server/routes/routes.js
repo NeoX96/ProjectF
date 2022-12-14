@@ -16,6 +16,7 @@ router.post("/createUser", async (req, res) => {
     const newUser = new UserModel(user);
     await newUser.save();
 
+    console.log("User created");
     // Rückgabe des Eintrages zum Vergleichen ob eintrag mit Usereingaben übereinstimmen
     res.json(user);
 });
