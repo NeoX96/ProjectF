@@ -12,7 +12,7 @@ function Chat() {
 
   // States
   const [messages, setMessages] = useState([]);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState();
   const [privateMessages, setPrivateMessages] = useState([]);
   const [username, setUsername] = useState("");
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -30,14 +30,7 @@ function Chat() {
         .then((data) => {
           setUsername(data.username);
           socket.auth = { sessionID };
-          socket.connect();
           // get Username from MongoDB and set to socket
-          socket.on("session", (data) => {
-            setUsername(data.username);
-            socket.username = data.username;
-            socket.id = data.userID;
-            socket.emit("user_connected", data.username);
-          });
         });
     }
     socket.auth = { sessionID };
@@ -47,11 +40,10 @@ function Chat() {
       setUsername(data.username);
       socket.username = data.username;
       socket.id = data.userID;
-      socket.emit("user_connected", data.username);
     });
   } else {
-    let user_promt = prompt("Please enter your username");
-    while (user_promt === "" || user_promt === null) {
+    let user_promt = null;
+    while (user_promt === null) {
       user_promt = prompt("Please enter your username");
     }
     setUsername(user_promt);
@@ -62,8 +54,8 @@ function Chat() {
     socket.on("session", (data) => {
       localStorage.setItem("sessionID", data.sessionID);
       socket.username = data.username;
+      setUsername(data.username);
       socket.id = data.userID;
-      socket.emit("user_connected", data.username);
     });
 
     socket.emit("ask_users");
@@ -173,9 +165,20 @@ function Chat() {
     socket.emit("ask_private_messages", user._id);
   }
 
+  useEffect(() => {
+    setPrivateMessages([]);
+  }, [targetUser]);
 
   // ChatContainer for each user
   function ChatContainer () {
+    // if targetUser is changing clear the privateMessages array
+
+    // SocketIO Receive Private Message
+    socket.on("receive_private_message", (data) => {
+      setPrivateMessages([...privateMessages, data]);
+      messagesRef.current.scrollIntoView({ behavior: "smooth" });
+    });
+
     // chat container for each user to chat with seperatly key = user._id
     if (targetUser !== null) {
       return (
@@ -184,8 +187,8 @@ function Chat() {
           <ul className="list-group-item">
             {privateMessages.map((message, idx) => {
               return (
-                <li key={idx}>
-                  <b>{message.username}</b>: {message.message}
+                <li key={idx} className={message.username === username ? "text-end" : "text-start"} >
+                  <b>{message.vorname}</b>: {message.message}
                 </li>
               );
             })}
@@ -200,7 +203,7 @@ function Chat() {
           <ul className="list-group-item">
             {messages.map((message, idx) => {
               return (
-                <li key={idx}>
+                <li key={idx} className={message.username === username ? "text-end users" : "text-start users"} >
                   <b>{message.username}</b>: {message.message}
                 </li>
               );
