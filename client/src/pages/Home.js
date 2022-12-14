@@ -50,7 +50,7 @@ function Home() {
                     <div>
                         <img src={images.tischtennis} alt="Tischtennis" className="photo"/>
                         
-                        <Carousel.Caption><h6>NR 5 Football</h6></Carousel.Caption>
+                        <Carousel.Caption><h6>NR 5 Tischtennis</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
                 <Carousel.Item>
