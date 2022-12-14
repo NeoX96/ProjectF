@@ -1,4 +1,8 @@
 body {
-    background-color: #121212;
-    color: lightgray;
+    background-color: #bcbcbc;
+    color: black;
+}
+
+#carousel-caption{
+    color: red;
 }

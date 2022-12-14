@@ -28,7 +28,7 @@ function Home() {
                      <div onClick={() => {navigate("/Maps")}}>
                         <img src={images.fussball} alt="Fußball" className="photo"/>
                     
-                        <Carousel.Caption><h6>NR 2 Soccer</h6></Carousel.Caption>
+                        <Carousel.Caption><h6>NR 2 Fußball</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
 
@@ -36,7 +36,7 @@ function Home() {
                     <div>
                         <img src={images.volleyball} alt="Volleyball" className="photo"/>
                       
-                        <Carousel.Caption><h6>NR 3Volleyball</h6></Carousel.Caption>
+                        <Carousel.Caption><h6>NR 3 Volleyball</h6></Carousel.Caption>
                     </div>
                 </Carousel.Item>
                 <Carousel.Item>
