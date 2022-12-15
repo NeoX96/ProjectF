@@ -22,7 +22,6 @@ function Chat() {
 
   const sessionID = localStorage.getItem("sessionID");
 
-  
   if (sessionID) {
     socket.auth = { sessionID };
     socket.connect();
@@ -32,6 +31,7 @@ function Chat() {
       setUsername(data.username);
       socket.username = data.username;
       socket.id = data.userID;
+      socket.name = data.name;
     });
   } else {
     let user_promt = null;
@@ -48,6 +48,7 @@ function Chat() {
       socket.username = data.username;
       setUsername(data.username);
       socket.id = data.userID;
+      socket.name = data.name;
     });
 
     socket.emit("ask_users");
@@ -63,12 +64,12 @@ function Chat() {
     });
 
     socket.on("user_disconnected", (username) => {
-      setMessages([...messages,{ username: "Chat Bot", message: `${username} disconnected` }]);
+      setMessages([...messages,{ vorname: "Chat Bot", message: `${username} disconnected` }]);
       socket.emit("ask_users");
     });
   
     socket.on("user_connected", (username) => {
-      setMessages([...messages,{ username: "Chat Bot", message: `${username} connected` }]);
+      setMessages([...messages,{ vorname: "Chat Bot", message: `${username} connected` }]);
       socket.emit("ask_users");
     });
 
@@ -141,11 +142,11 @@ function Chat() {
         message: message,
         username: username,
         targetUser: targetUser.userID,
-        vorname : targetUser.vorname
+        vorname : socket.name
       });
     } else {
       // else send to all users
-      socket.emit("send_message", { username: username, message: message });
+      socket.emit("send_message", { username: username, message: message, vorname : socket.name });
     }
     setMessage("");
   }
@@ -155,6 +156,15 @@ function Chat() {
   const selectUser = (user) => {
     setTargetUser(user);
     socket.emit("ask_private_messages", user._id);
+  }
+
+  const unselectUser = () => {
+    setTargetUser(null);
+  }
+
+  const clear = () => {
+    setPrivateMessages([]);
+    setMessages([]);
   }
 
   useEffect(() => {
@@ -189,12 +199,12 @@ function Chat() {
     } else {
       return (
         <div className="ChatContainer">
-          <h4>Chat</h4>
+          <h4>All Chat</h4>
           <ul className="list-group-item">
             {messages.map((message, idx) => {
               return (
                 <li key={idx} className={message.username === username ? "text-end users" : "text-start users"} >
-                  <b>{message.username}</b>: {message.message}
+                  <b>{message.vorname}</b>: {message.message}
                 </li>
               );
             })}
@@ -210,8 +220,12 @@ function Chat() {
       <div className="container-md">
         <div className="row">
           <div className="col-md">
-            <div className=" ">
+            <div className="">
               <Button className="" onClick={getMessagesEmit}>Get Messages</Button>
+              <Button className="" onClick={clear}>Clear</Button>
+            </div>
+            <div className="mt-1">
+              <Button className="" onClick={unselectUser}>All Chat</Button>
             </div>
 
             <div className="UserList">
@@ -272,7 +286,7 @@ function Chat() {
               </div>
               </div>
             <div className="connection">
-              <p>Connected as: {username}</p>
+              <p>Connected as: {socket.name}</p>
             </div>
         </div>
       </div>
