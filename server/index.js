@@ -68,6 +68,7 @@ socketIO.use(async (socket, next) => {
             socket.sessionID = sessionID;
             socket.id = session.userID;
             socket.username = session.username;
+            socket.name = session.vorname;
             return next();
         }
         if (user) {
@@ -76,6 +77,7 @@ socketIO.use(async (socket, next) => {
             socket.sessionID = user.sessionID;
             socket.id = user.userID;
             socket.username = user.username;
+            socket.name = user.vorname;
             return next();
         } else {
             // return error if username does not exist in MongoDB
@@ -116,11 +118,11 @@ socketIO.on("connection", (socket) => {
     socket.emit("session", {
         sessionID: socket.sessionID,
         userID: socket.id,
-        username: socket.username
+        username: socket.username,
+        name: socket.name
     });
 
     socketIO.emit("user_connected", socket.username);
-
     // SocketIO User Connected Chat Bot
     socket.on("user_connected", (username) => {
         socketIO.emit("user_connected", username);

@@ -1,10 +1,11 @@
 import React, {useState, useEffect} from "react";
-import {MapContainer, TileLayer, Marker, Popup, useMap,Circle,useMapEvents} from "react-leaflet";
+import {MapContainer, TileLayer, Marker, Popup, useMap, Circle, useMapEvents} from "react-leaflet";
 import 'leaflet/dist/leaflet.css';
 import L, { latLng } from 'leaflet';
 import images from './assets/map/index.js';
 import 'leaflet/dist/leaflet.css';
 import "./css/Maps.css";
+import Form from 'react-bootstrap/Form';
 
 
 
@@ -17,17 +18,28 @@ function GetIcon(_iconSize) {
   });
 }
 
+function setMarker(_iconSize) {
+  return L.icon({
+    iconUrl: images.marker,
+    iconSize: _iconSize
+  });
+}
+
 
 function Maps() {
  const [zoom, setZoom] = useState(15);
+ const [enable, setEnable] = useState(false);
 
 //Clickevent setzen 
  function Event() {
   const map = useMapEvents({
     click: (e) => {
       const { lat, lng } = e.latlng;
-      L.marker([lat, lng], {GetIcon}).addTo(map)
-
+      L.marker([lat, lng]).addTo(map)
+      .bindPopup('Event erstellt')
+      .openPopup()
+      // add Icon to Marker
+      .setIcon(setMarker());
     }
   });
   return null;
@@ -49,53 +61,44 @@ function Maps() {
     return position === null ? null : (
       <Circle center={position} radius={100} fillColor={'green'} color={'black'}>
         <Marker position={position} icon={GetIcon(40)}>
-        <Popup>
-          Dein Standort
-        </Popup>
-      
-        
-      </Marker>
+          <Popup>
+            Dein Standort
+          </Popup>
+        </Marker>
       </Circle>
       
     );
   }
+
+
+
  
  
   return (
-
-  
-
-    <MapContainer 
-      center={[48.777500, 11.431111]}
-      zoom={zoom}
-      scrollWheelZoom
-      style={{ height: "100vh" }}
-    >
-
-      
-  <body background color="green">
-
-
-</body>
-<ul>
-  <li><a href="Home?">Home</a></li>
-  <li><a href="news.asp">Einstellung</a></li>
-  <li><a href="chat">Chat</a></li>
-  <li><a href="about.asp">About</a></li>
-</ul> 
-      <TileLayer
-        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    <div>
+      <Form.Check 
+        type="switch"
+        id="custom-switch"
+        label="Events erstellen"
+        checked={enable} onChange={() => setEnable(!enable)}
       />
-      <button></button>
-      
-      <LocationMarker></LocationMarker>
-      <Event></Event>
-      
-       
-  
-   
-    </MapContainer>
+
+      <MapContainer 
+        center={[48.777500, 11.431111]}
+        zoom={zoom}
+        scrollWheelZoom
+        style={{ height: "100vh" }}
+      >
+        <TileLayer
+          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <button></button>
+        
+        <LocationMarker />
+        {enable === true? <Event /> : null}
+      </MapContainer>
+    </div>
   );
 }
  
