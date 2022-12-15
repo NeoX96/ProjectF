@@ -3,67 +3,29 @@ const cors = require("cors");
 const app = express();
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-
 const UserModel = require('./models/Users');
 const MessageModel = require('./models/Messages');
+const routesAPI = require('./routes/routes');
 const mongoPort = 4000;
 
 dotenv.config();
 app.use(express.json());
 app.use(cors({
-    origin: 'localhost:3000'
+    origin: 'localhost:3000',
+    // allow post and get requests
+    methods: ['POST', 'GET'],
+    // allow cookies
+    credentials: true
 }));
-
-
 
 // MongoDB Connection URL
 mongoose.connect(process.env.DATABASE_ACCESS, () => console.log("Database connected"));
 
-// MongoDB Anfrage für alle Users + ausgabe wenn Error
-app.get("/getUsers", (req, res) => {
-    UserModel.find({}, (err, result) => {
-        if(err) {
-            res.json(err);
-        } else {
-            res.json(result);
-        }
-    });
-});
-
-// MongoDB Erstellen eines Users
-app.post("/createUser", async (req, res) => {
-    const user = req.body;
-    const newUser = new UserModel(user);
-    await newUser.save();
-
-    // Rückgabe des Eintrages zum Vergleichen ob eintrag mit Usereingaben übereinstimmen
-    res.json(user);
-});
-
-// MongoDB Anfrage für alle Messages
-app.get("/getMessages", (req, res) => {
-    MessageModel.find({}, (err, result) => {
-        if(err) {
-            res.json(err);
-        } else {
-            res.json(result);
-        }
-    });
-});
-
-// MongoDB Erstellen einer Message
-app.post("/createMessage", async (req, res) => {
-    const message = req.body;
-    const newMessage = new MessageModel(message);
-    await newMessage.save();
-    
-    // Rückgabe des Eintrages zum Vergleichen ob eintrag mit Usereingaben übereinstimmen
-    res.json(message);
-});
+app.use(routesAPI);
 
 
 app.listen(mongoPort, () => {
-    console.log(`MongoDB backend Server auf http://localhost:${mongoPort}/getUsers`);
+    console.log(`MongoDB backend Server auf http://localhost:${mongoPort}`);
 });
 
 
@@ -80,24 +42,113 @@ const socketIO = require('socket.io')(http, {
     }
 });
 
+// when server starts set all users to offline in MongoDB
+UserModel.updateMany({
+    online: true
+}, {
+    online: false
+}, (err, res) => {
+    if (err) throw err;
+    console.log("All users set to offline");
+});
+
+
+socketIO.use(async (socket, next) => {
+    const sessionID = socket.handshake.auth.sessionID;
+    const username = socket.handshake.auth.username;
+
+    if (sessionID || username) {
+
+        const session = await UserModel.findOne({sessionID: sessionID});
+        const user = await UserModel.findOne({username: username});
+
+        // if sessionID or username exists in MongoDB
+        if (session) {
+            console.log("sessionID exists in MongoDB");
+            socket.sessionID = sessionID;
+            socket.id = session.userID;
+            socket.username = session.username;
+            return next();
+        }
+        if (user) {
+            console.log("username exists in MongoDB");
+
+            socket.sessionID = user.sessionID;
+            socket.id = user.userID;
+            socket.username = user.username;
+            return next();
+        } else {
+            // return error if username does not exist in MongoDB
+            console.log("username does not exist in MongoDB");
+            return next(new Error("username does not exist in MongoDB"));
+        }
+    } else {
+        console.log("sessionID and username does not exist");
+        // return error if sessionID and username does not exist
+        return next(new Error("sessionID and username does not exist"));
+    }
+    });
+
 
 
 socketIO.on("connection", (socket) => {
+    console.log(`Client ${socket.id}: ${socket.username} connected`);
+    // search username in MongoDB
+    const user = UserModel.findOne({username: socket.username});
+
+    // if user does not exist in MongoDB dont go in Update One
+    if (user) {
+    UserModel.updateOne({
+        username: socket.username
+    }, {
+        sessionID: socket.sessionID,
+        userID: socket.id,
+        online: true
+    }, {
+        upsert: true
+    }, (err, res) => {
+        if (err) throw err;
+        console.log(res);
+    });
+    }
+
+      // emit session details
+    socket.emit("session", {
+        sessionID: socket.sessionID,
+        userID: socket.id,
+        username: socket.username
+    });
+
+    socketIO.emit("user_connected", socket.username);
 
     // SocketIO User Connected Chat Bot
     socket.on("user_connected", (username) => {
-        socket.username = username;
         socketIO.emit("user_connected", username);
         console.log(`Client ${socket.id}: ${socket.username} connected`);
     });
 
     // Emit to all clients that someone is disconnected
     socket.on("disconnect", () => {
+        // set user offline in MongoDB
+        UserModel.updateOne({
+            username: socket.username
+        }, {
+            online: false
+        }, (err, res) => {
+            if (err) throw err;
+            console.log(res);
+        });
         console.log(`Client ${socket.id}: ${socket.username} disconnected`);
         socketIO.emit("user_disconnected", socket.username);
         socket.disconnect();
     });
 
+    // send private message to target user 
+    socket.on("send_private_message", (data) => {
+        socket.to(data.targetUser).emit("receive_private_message", data);
+        socket.emit("receive_private_message", data);
+        console.log(data);
+    });
 
     // Store Message in MongoDB when sending and emit to all client
     socket.on("send_message", (message) => {
@@ -105,13 +156,6 @@ socketIO.on("connection", (socket) => {
         socketIO.emit("receive_message", message);
         const newMessage = new MessageModel(message);
         newMessage.save();
-    });
-
-    // set Username to specific socket client ID
-    socket.on("set_username", (username) => {
-        socket.username = username;
-        console.log(socket.username);
-        socketIO.broadcast.emit("set_username", socket.username);
     });
 
     // get Messages from MongoDB and emit to client
@@ -136,17 +180,10 @@ socketIO.on("connection", (socket) => {
                 console.log(err);
             } else {
                 // compare the Name with the all connected users
-                result.forEach((user) => {
-                    socketIO.sockets.sockets.forEach((socket) => {
-                        if(user.name === socket.username) {
-                            user.connected = true;
-                        }
-                        });
-                });
 
                 // push the users in the right array
                 result.forEach((user) => {
-                    if(user.connected === true) {
+                    if(user.online === true) {
                         onlineUsers.push(user);
                     } else {
                         offlineUsers.push(user);

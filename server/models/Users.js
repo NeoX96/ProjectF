@@ -8,7 +8,7 @@ const UserSchema = new mongoose.Schema({
     required: true,
     maxlength: 30
   },
-  nickname: {
+  username: {
     type: String,
     required: true,
     maxlength: 30
@@ -28,10 +28,22 @@ const UserSchema = new mongoose.Schema({
     required: true,
     minlength: 8
   },
+  online: {
+    type: Boolean,
+    default: false
+  },
   createdAt: {
     type: Date,
     default: Date.now,
     required: true
+  },
+// session ID für SocketIO
+  sessionID: {
+    type: String
+  },
+// User ID für SocketIO
+  userID: {
+    type: String
   }
 });
 
