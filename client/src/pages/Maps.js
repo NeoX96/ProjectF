@@ -1,17 +1,15 @@
 import React, {useState, useEffect} from "react";
-import {MapContainer, TileLayer, Marker, Popup, useMap,Circle } from "react-leaflet";
+import {MapContainer, TileLayer, Marker, Popup, useMap,Circle,useMapEvents} from "react-leaflet";
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import L, { latLng } from 'leaflet';
 import images from './assets/map/index.js';
 import 'leaflet/dist/leaflet.css';
+import "./css/Maps.css";
 
 
 
 
-
-
-
- 
+// Icon für Standort  
 function GetIcon(_iconSize) {
   return L.icon({
     iconUrl: images.me,
@@ -21,13 +19,20 @@ function GetIcon(_iconSize) {
 
 
 function Maps() {
+ const [zoom, setZoom] = useState(15);
 
-  
-   
+//Clickevent setzen 
+ function Event() {
+  const map = useMapEvents({
+    click: (e) => {
+      const { lat, lng } = e.latlng;
+      L.marker([lat, lng], {GetIcon}).addTo(map)
 
- 
- 
-  const [zoom, setZoom] = useState(15);
+    }
+  });
+  return null;
+}
+
  
   function LocationMarker() {
     const [position, setPosition] = useState(null);
@@ -47,6 +52,7 @@ function Maps() {
         <Popup>
           Dein Standort
         </Popup>
+      
         
       </Marker>
       </Circle>
@@ -57,37 +63,37 @@ function Maps() {
  
   return (
 
-    
-    <MapContainer 
-    
+  
 
-    
+    <MapContainer 
       center={[48.777500, 11.431111]}
       zoom={zoom}
       scrollWheelZoom
       style={{ height: "100vh" }}
     >
+
+      
   <body background color="green">
 
-<nav >
-   <ul>
-      <li><a href="#">Home</a></li>
-      <li><a href="#">Über uns</a></li>
-      <li><a href="#">Leistungen</a></li>
-      <li><a href="#">FAQ</a></li>
-      <li><a href="#">Kontakt</a></li>
-  </ul>
-</nav>
 
 </body>
+<ul>
+  <li><a href="Home?">Home</a></li>
+  <li><a href="news.asp">Einstellung</a></li>
+  <li><a href="chat">Chat</a></li>
+  <li><a href="about.asp">About</a></li>
+</ul> 
       <TileLayer
         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <LocationMarker>
-         
-        </LocationMarker>
-
+      <button></button>
+      
+      <LocationMarker></LocationMarker>
+      <Event></Event>
+      
+       
+  
    
     </MapContainer>
   );
