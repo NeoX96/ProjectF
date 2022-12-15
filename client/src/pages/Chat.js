@@ -22,19 +22,11 @@ function Chat() {
 
   const sessionID = localStorage.getItem("sessionID");
 
+  
   if (sessionID) {
-    if (username === "") {
-      // call api get user by sessionID
-      fetch(`http://localhost:4000/api/user/${sessionID}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setUsername(data.username);
-          socket.auth = { sessionID };
-          // get Username from MongoDB and set to socket
-        });
-    }
     socket.auth = { sessionID };
     socket.connect();
+
     // get Username from MongoDB and set to socket
     socket.on("session", (data) => {
       setUsername(data.username);
@@ -148,8 +140,8 @@ function Chat() {
       socket.emit("send_private_message", {
         message: message,
         username: username,
-        // target user socketID
-        targetUser: targetUser.userID
+        targetUser: targetUser.userID,
+        vorname : targetUser.vorname
       });
     } else {
       // else send to all users
@@ -171,8 +163,6 @@ function Chat() {
 
   // ChatContainer for each user
   function ChatContainer () {
-    // if targetUser is changing clear the privateMessages array
-
     // SocketIO Receive Private Message
     socket.on("receive_private_message", (data) => {
       setPrivateMessages([...privateMessages, data]);
@@ -183,11 +173,11 @@ function Chat() {
     if (targetUser !== null) {
       return (
         <div className="ChatContainer" key={targetUser.userID}>
-          <h4>Chat with {targetUser.vorname}</h4>
+          <h4 className="justify-content-center">Chat with {targetUser.vorname}</h4>
           <ul className="list-group-item">
             {privateMessages.map((message, idx) => {
               return (
-                <li key={idx} className={message.username === username ? "text-end" : "text-start"} >
+                <li key={idx} className={message.username === username ? "text-end users" : "text-start users"} >
                   <b>{message.vorname}</b>: {message.message}
                 </li>
               );
