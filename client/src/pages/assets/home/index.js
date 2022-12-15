@@ -1,10 +1,10 @@
 
-import frisbee from "./1.jpg";
-import fussball from "./2.jpg";
-import volleyball from "./3.jpg";
-import baskettball from "./img5.jpg";
-import tischtennis from "./img4.jpg";
-import skateboard from "./img6.jpg";
+import frisbee from "./frisbee.png";
+import fussball from "./fussball.png";
+import volleyball from "./volleyball.png";
+import baskettball from "./baskettball.png";
+import tischtennis from "./tischtennis.png";
+import skateboard from "./skateboard.png";
 
 const images = {
     frisbee,
