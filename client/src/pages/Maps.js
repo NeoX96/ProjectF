@@ -11,20 +11,12 @@ import Form from 'react-bootstrap/Form';
 
 
 // Icon für Standort  
-function GetIcon(_iconSize) {
+function GetIcon(_iconSize, _iconName) {
   return L.icon({
-    iconUrl: images.me,
+    iconUrl: images[_iconName],
     iconSize: _iconSize
   });
 }
-
-function setMarker(_iconSize) {
-  return L.icon({
-    iconUrl: images.marker,
-    iconSize: _iconSize
-  });
-}
-
 
 function Maps() {
  const [zoom, setZoom] = useState(15);
@@ -38,8 +30,7 @@ function Maps() {
       L.marker([lat, lng]).addTo(map)
       .bindPopup('Event erstellt')
       .openPopup()
-      // add Icon to Marker
-      .setIcon(setMarker());
+      .setIcon(GetIcon([20, 30], 'marker'));
     }
   });
   return null;
@@ -60,7 +51,7 @@ function Maps() {
   
     return position === null ? null : (
       <Circle center={position} radius={100} fillColor={'green'} color={'black'}>
-        <Marker position={position} icon={GetIcon(40)}>
+        <Marker position={position} icon={GetIcon(40, 'me')}>
           <Popup>
             Dein Standort
           </Popup>
