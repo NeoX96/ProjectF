@@ -5,18 +5,26 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const UserModel = require('./models/Users');
 const MessageModel = require('./models/Messages');
+const FriendModel = require('./models/Friends');
 const routesAPI = require('./routes/routes');
 const mongoPort = 4000;
 
+
 dotenv.config();
 app.use(express.json());
+
 app.use(cors({
-    origin: 'localhost:3000',
-    // allow post and get requests
-    methods: ['POST', 'GET'],
-    // allow cookies
-    credentials: true
-}));
+    origin: ['http://localhost:3000']
+  }));
+  
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept"
+    );
+    next();
+  });
 
 // MongoDB Connection URL
 mongoose.connect(process.env.DATABASE_ACCESS, () => console.log("Database connected"));
@@ -27,7 +35,6 @@ app.use(routesAPI);
 app.listen(mongoPort, () => {
     console.log(`MongoDB backend Server auf http://localhost:${mongoPort}`);
 });
-
 
 
 // ---------------------------------------------------------------- //
@@ -69,6 +76,7 @@ socketIO.use(async (socket, next) => {
             socket.id = session.userID;
             socket.username = session.username;
             socket.name = session.vorname;
+            socket._id = session._id;
             return next();
         }
         if (user) {
@@ -78,6 +86,7 @@ socketIO.use(async (socket, next) => {
             socket.id = user.userID;
             socket.username = user.username;
             socket.name = user.vorname;
+            socket._id = user._id;
             return next();
         } else {
             // return error if username does not exist in MongoDB
@@ -119,7 +128,8 @@ socketIO.on("connection", (socket) => {
         sessionID: socket.sessionID,
         userID: socket.id,
         username: socket.username,
-        name: socket.name
+        name: socket.name,
+        _id: socket._id
     });
 
     socketIO.emit("user_connected", socket.username);
@@ -145,11 +155,54 @@ socketIO.on("connection", (socket) => {
         socket.disconnect();
     });
 
+
     // send private message to target user 
-    socket.on("send_private_message", (data) => {
+    socket.on("send_private_message", async (data) => {
         socket.to(data.targetUser).emit("receive_private_message", data);
         socket.emit("receive_private_message", data);
-        console.log(data);
+
+        const sender = await UserModel.findOne({userID: data.sender});
+        const target = await UserModel.findOne({userID: data.targetUser});
+
+        const message = new MessageModel({
+            sender: sender._id,
+            receiver: target._id,
+            message: data.message,
+            date: new Date()
+        });
+        try {
+            await message.save();
+            console.log("message saved successfully");
+        } catch (err) {
+            console.log(err);
+        }
+    });
+
+    socket.on("ask_private_messages", (data) => {
+        // Find the sender user by ID
+        UserModel.findOne({ userID: data.sender }, (err, sender) => {
+            if (err) {
+                console.log(err);
+            } else {
+                // Find the receiver user by ID
+                UserModel.findOne({ userID: data.targetUser }, (err, receiver) => {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        // Find all messages from sender to receiver
+                        MessageModel.find({ $or: [{ sender: sender._id, receiver: receiver._id }, { sender: receiver._id, receiver: sender._id }] }, (err, result) => {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                // Emit the messages to the client
+                                socket.emit("get_private_messages", result);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    
     });
 
     // Store Message in MongoDB when sending and emit to all client
@@ -160,20 +213,66 @@ socketIO.on("connection", (socket) => {
         newMessage.save();
     });
 
-    // get Messages from MongoDB and emit to client
-    socket.on("ask_messages", () => {
-        MessageModel.find({}, (err, result) => {
-            if(err) {
-                console.log(err);
-            } else {
-                socket.emit("get_messages", result);
-            }
-        });
-       
-    });
 
-    // get Users from MongoDB, check if they are online/offline and emit to client
-    socket.on("ask_users", () => {
+    // search for users when someone wants to add a friend
+    socket.on("search_user", (username) => {
+        if(username && typeof username === 'string' && username.trim().length > 0){
+            // live search in MongoDB for users and only return username and vorname
+            UserModel.find({username: {$regex: username, $options: "i"}}, {username: 1, vorname: 1, _id: 1}, (err, result) => {
+                if(err) {
+                    console.log(err);
+                } else {
+                    console.log(result);
+                    socket.emit("get_user", result);
+                }
+            });
+        }
+    });
+    
+    
+
+    socket.on("send_friend_request", async (data) => {
+        const { userId, friendId } = data;
+        console.log("request"+ userId + " " + friendId);
+        try {
+            // check if user and friend exist
+            const user = await UserModel.findById(userId);
+            const friend = await UserModel.findById(friendId);
+            if (!user || !friend) {
+                socket.emit("friend_request_response", { success: false, message: "User or friend not found" });
+                return;
+            }
+      
+            // check if they are already friends
+            const friendModel = await FriendModel.findOne({ friends: { $all: [userId, friendId] } });
+            if (friendModel) {
+                socket.emit("friend_request_response", { success: false, message: "You are already friends" });
+                return;
+            }
+          
+            //check if a friend request already sent
+            const friendModelWithPending = await FriendModel.findOne({ pending: { $all: [userId, friendId] } });
+            if (friendModelWithPending) {
+                socket.emit("friend_request_response", { success: false, message: "Friend request already sent" });
+                return;
+            }
+      
+            // add friendId to user's pending array
+            const updatedFriend = await FriendModel.findOneAndUpdate({ user: userId }, { $push: { pending: friendId } }, { new: true });
+            
+            if (updatedFriend) {
+                console.log(updatedFriend);
+                socket.emit("friend_request_response", { success: true, message: "Friend request sent" });
+            }
+
+        } catch (error) {
+          console.log(error);
+          socket.emit("friend_request_response", { success: false, message: "Error sending friend request" });
+        }
+      });
+
+
+      socket.on("ask_users", () => {
         const onlineUsers = [];
         const offlineUsers = [];
 
@@ -197,6 +296,41 @@ socketIO.on("connection", (socket) => {
             }
         });
     });
+
+
+    socket.on("ask_friends", async () => {
+        const onlineUsers = [];
+        const offlineUsers = [];
+        try {
+            // Find the friend model for the current user
+            const friendModel = await FriendModel.findOne({ userID: socket._id });
+            if (!friendModel) {
+                throw new Error("User does not have any friends");
+            }
+    
+            // Iterate through the friends array and find the corresponding user
+            for (const friend of friendModel.friends) {
+                const user = await UserModel.findById(friend);
+                if (!user) {
+                    throw new Error(`User with ID ${friend} not found`);
+                }
+                if (user.online === true) {
+                    onlineUsers.push(user);
+                } else {
+                    offlineUsers.push(user);
+                }
+            }
+            // Emit the arrays to the client
+            socket.emit("get_friends", onlineUsers, offlineUsers);
+        } catch (error) {
+            console.log(error);
+            socket.emit("error", error.message);
+        }
+    });
+    
+    
+    
+    
 });
 
 
@@ -207,5 +341,5 @@ app.get("/api", (req, res) => {
 
 
 http.listen(socketPort, () => {
-  console.log(`SocketIO läuft auf http://localhost:${socketPort}/api`);
+  console.log(`SocketIO läuft auf http://localhost:${socketPort}`);
 });
