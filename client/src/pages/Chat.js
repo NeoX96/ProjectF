@@ -1,7 +1,8 @@
 import "./css/Chat.css";
 import React, { useEffect, useState, useRef } from "react";
 import socketIO from "socket.io-client";
-import { Button } from "react-bootstrap";
+import { Button, ListGroup } from "react-bootstrap";
+import Cookies from 'js-cookie'
 const endpoint = "http://localhost:4001";
 
 const socket = socketIO(endpoint, { autoConnect: false });
@@ -12,15 +13,14 @@ function Chat() {
 
   // States
   const [messages, setMessages] = useState([]);
-  const [message, setMessage] = useState();
-  const [privateMessages, setPrivateMessages] = useState([]);
+  const [message, setMessage] = useState("");
+  const [privateMessages, setPrivateMessages] = useState({});
   const [username, setUsername] = useState("");
-  const [onlineUsers, setOnlineUsers] = useState([]);
-  const [offlineUsers, setOfflineUsers] = useState([]);
+  const [onlineFriends, setOnlineFriends] = useState([]);
+  const [offlineFriends, setOfflineFriends] = useState([]);
   const [targetUser, setTargetUser] = useState(null);
 
-
-  const sessionID = localStorage.getItem("sessionID");
+  const sessionID = Cookies.get('sessionID');
 
   if (sessionID) {
     socket.auth = { sessionID };
@@ -32,6 +32,7 @@ function Chat() {
       socket.username = data.username;
       socket.id = data.userID;
       socket.name = data.name;
+      socket._id = data._id;
     });
   } else {
     let user_promt = null;
@@ -44,7 +45,7 @@ function Chat() {
 
 
     socket.on("session", (data) => {
-      localStorage.setItem("sessionID", data.sessionID);
+      Cookies.set('sessionID', data.sessionID);
       socket.username = data.username;
       setUsername(data.username);
       socket.id = data.userID;
@@ -52,6 +53,7 @@ function Chat() {
     });
 
     socket.emit("ask_users");
+    
   }
 
   useEffect(() => {
@@ -65,12 +67,10 @@ function Chat() {
 
     socket.on("user_disconnected", (username) => {
       setMessages([...messages,{ vorname: "Chat Bot", message: `${username} disconnected` }]);
-      socket.emit("ask_users");
     });
   
     socket.on("user_connected", (username) => {
       setMessages([...messages,{ vorname: "Chat Bot", message: `${username} connected` }]);
-      socket.emit("ask_users");
     });
 
     return () => {
@@ -80,34 +80,38 @@ function Chat() {
     }
   }, [messages]);
 
+  useEffect(() => {
+    socket.on("user_connected", () => {
+      socket.emit("ask_users");
+    });
+
+    socket.on("user_disconnected", () => {
+      socket.emit("ask_users");
+    });
+  }, [onlineFriends, offlineFriends]);
+
   // useEffect for private Messages
   useEffect(() => {
     messagesRef.current.scrollIntoView({ behavior: "smooth" });
-
-    // SocketIO Receive Private Message
     socket.on("receive_private_message", (data) => {
-      setPrivateMessages([...privateMessages, data]);
+      setPrivateMessages({
+        ...privateMessages,
+        [targetUser]: [...privateMessages[targetUser], data],
+      });
       messagesRef.current.scrollIntoView({ behavior: "smooth" });
     });
 
     return () => {
-      socket.off ("receive_private_message");
-    }
-  }, [privateMessages]);
+      socket.off("receive_private_message");
+    };
+  }, [privateMessages, targetUser]);
+
 
   useEffect(() => {
-     // get Messages
-    socket.on("get_messages", (data) => {
-      // for each message.username message.message
-      let newMessages = data.map(el => ({ username: el.username, message: el.message }));
-
-      setMessages(messages => [ ...messages, ...newMessages]);
-      console.log(data);
-    });
-
+// get_friends erstmal auskommentiert
     socket.on("get_users", (online, offline) => {
-      setOnlineUsers(online);
-      setOfflineUsers(offline);
+      setOnlineFriends(online);
+      setOfflineFriends(offline);
       console.log(online, offline);
     });
 
@@ -121,17 +125,11 @@ function Chat() {
     });
 
     return () => {
-      socket.off ("get_messages");
-      socket.off ("get_users");
+      socket.off ("get_friends");
       socket.off ("session");
     }
   }, []);
 
-
-  // const for emit ask_messages
-  const getMessagesEmit = () => {
-    socket.emit("ask_messages");
-  };
 
   // Send Message
   const sendMessage = (e) => {
@@ -140,9 +138,9 @@ function Chat() {
     if (targetUser !== null) {
       socket.emit("send_private_message", {
         message: message,
-        username: username,
         targetUser: targetUser.userID,
-        vorname : socket.name
+        sender: socket.id,
+
       });
     } else {
       // else send to all users
@@ -152,54 +150,76 @@ function Chat() {
   }
 
 
+
+
+
   // select user to chat with
   const selectUser = (user) => {
     setTargetUser(user);
-    socket.emit("ask_private_messages", user._id);
   }
 
   const unselectUser = () => {
     setTargetUser(null);
   }
 
-  const clear = () => {
-    setPrivateMessages([]);
-    setMessages([]);
-  }
-
   useEffect(() => {
-    setPrivateMessages([]);
+    setPrivateMessages({
+      ...privateMessages,
+      [targetUser]: [],
+    });
+
+    if(targetUser) {
+      console.log(targetUser.userID);
+      socket.emit("ask_private_messages", {sender: socket.id, targetUser: targetUser.userID});
+    }
+
+    socket.on("get_private_messages", (data) => {
+        setPrivateMessages({
+            ...privateMessages,
+            [targetUser]: data,
+        });
+    });
+
+    return () => {
+        socket.off("get_private_messages");
+    }
   }, [targetUser]);
+
+
 
   // ChatContainer for each user
   function ChatContainer () {
-    // SocketIO Receive Private Message
-    socket.on("receive_private_message", (data) => {
-      setPrivateMessages([...privateMessages, data]);
-      messagesRef.current.scrollIntoView({ behavior: "smooth" });
-    });
 
     // chat container for each user to chat with seperatly key = user._id
     if (targetUser !== null) {
       return (
-        <div className="ChatContainer" key={targetUser.userID}>
+        <div>
           <h4 className="justify-content-center">Chat with {targetUser.vorname}</h4>
+        <div
+          id="text"
+          className="overflow-auto d-flex flex-column justify-content-between rounded" 
+          key={targetUser.userID}>
           <ul className="list-group-item">
-            {privateMessages.map((message, idx) => {
-              return (
-                <li key={idx} className={message.username === username ? "text-end users" : "text-start users"} >
-                  <b>{message.vorname}</b>: {message.message}
-                </li>
-              );
-            })}
+          {privateMessages[targetUser] ? privateMessages[targetUser].map((message, idx) => {
+            return (
+              <li key={idx} className={message.sender === socket._id || message.sender === socket.id ? "text-end users" : "text-start users"} >
+                {message.message}
+              </li>
+            );
+          }) : <li className="justify-conent-center">No messages yet.</li>}
           </ul>
           <div ref={messagesRef}></div>
+          </div>
         </div>
       );
     } else {
       return (
-        <div className="ChatContainer">
+        <div>
           <h4>All Chat</h4>
+        <div
+        id="text"
+        className="overflow-auto  justify-content-between rounded" 
+        >
           <ul className="list-group-item">
             {messages.map((message, idx) => {
               return (
@@ -211,57 +231,113 @@ function Chat() {
           </ul>
           <div ref={messagesRef}></div>
         </div>
+        </div>
       );
     }
   }
+
+  function Search() {
+    const [searchUser, setSearchUser] = useState('');
+    const [searchUserResult, setSearchUserResult] = useState([]);
+    const [showResults, setShowResults] = useState(false);
+  
+    const searchHandler = (e) => {
+      const searchValue = e.target.value;
+      setSearchUser(searchValue);
+      if (searchValue.length > 0) {
+        setShowResults(true);
+        socket.emit("search_user", searchValue);
+      } else {
+        setShowResults(false);
+      }
+    }
+  
+    useEffect(() => {
+      socket.on("get_user", (results) => {
+        setSearchUserResult(results);
+      });
+    }, []);
+  
+    const handleUserClick = (user) => {
+      socket.emit("send_friend_request", { userId: socket._id, friendId: user._id });
+      socket.on("friend_request_response", (data) => {
+        const { success, message } = data;
+        if (success) {
+          alert(message);
+        } else {
+          alert(message);
+        }
+      });
+    }
+    
+  
+    return (
+      <div>
+        <div className="input-group mb-3">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Search"
+          aria-label="Search"
+          aria-describedby="button-addon2"
+          value={searchUser}
+          onChange={searchHandler}
+        />
+        </div>
+        {showResults && (
+          <ListGroup>
+            {searchUserResult.map((result, index) => (
+              <ListGroup.Item action key={index} onClick={() => handleUserClick(result)} variant="light">
+                {result.username} {result.vorname}
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+        )}
+      </div>
+    );
+  }
+
+
 
   return (
     <div>
       <div className="container-md">
         <div className="row">
           <div className="col-md">
-            <div className="">
-              <Button className="" onClick={getMessagesEmit}>Get Messages</Button>
-              <Button className="" onClick={clear}>Clear</Button>
-            </div>
             <div className="mt-1">
               <Button className="" onClick={unselectUser}>All Chat</Button>
+            </div>
+
+            <div>
+              <Search />
             </div>
 
             <div className="UserList">
               <h4>Online</h4>
               <ul className="users">
-              { onlineUsers.map((user, idx) => {
+              { onlineFriends.map((user, idx) => {
                   return (
-                    <li key={idx}>
-                        <Button variant="outline-light" onClick={() => selectUser(user)} >{user.vorname}</Button>
-                    </li>
+                      <li key={idx}>
+                          <Button variant="outline-light" onClick={() => selectUser(user)} >{user.vorname}</Button>
+                      </li>
                   );
-                })
-                }
+              })}
               </ul>
               <h4>Offline</h4>
               <ul className="users">
-              { offlineUsers.map((user, idx) => {
+              { offlineFriends.map((user, idx) => {
                   return (
-                    <li key={idx}>
-                        <Button variant="outline-light" onClick={() => selectUser(user)} >{user.vorname}</Button>
-                    </li>
+                      <li key={idx}>
+                          <Button variant="outline-light" onClick={() => selectUser(user)} >{user.vorname}</Button>
+                      </li>
                   );
-                })
-                }
+              })}
               </ul>
-            </div>
+          </div>
         </div>
 
           <div className="ChatContainer col">
-          <div
-            id="text"
-            className="overflow-auto d-flex flex-column justify-content-between rounded" 
-          >
             <ChatContainer />
-          </div>
-            <div ref={messagesRef}></div>
               <div>
                 <form onSubmit={sendMessage}>
                   <div className="row mt-2 mb-2 d-block ">
