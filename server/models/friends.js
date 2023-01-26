@@ -1,59 +1,13 @@
-// Friendlist model
+// Friends.js
 const mongoose = require("mongoose");
+const User = require('./Users');
 
-// MongoDB Friendlist Tabelle mit User Referenz zwischen welchen Usern die Freundschaft besteht mit request tabelle und blocked tabelle
-const FriendlistSchema = new mongoose.Schema({
-    // User der freunde hat
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true
-    },
-    friends: [
-        {
-            user: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "users"
-            },
-            date: {
-                type: Date,
-                default: Date.now
-            },
-            messages: [
-                {
-                    user: {
-                        type: mongoose.Schema.Types.ObjectId,
-                        ref: "users"
-                    },
-                    message: {
-                        type: String,
-                        required: true
-                    },
-                    date: {
-                        type: Date,
-                        default: Date.now
-                    }
-                }
-            ],
-            request: [
-                {
-                    user: {
-                        type: mongoose.Schema.Types.ObjectId,
-                        ref: "users"
-                    }
-                }
-            ],
-            blocked: [
-                {
-                    user: {
-                        type: mongoose.Schema.Types.ObjectId,
-                        ref: "users"
-                    }
-                }
-            ]
-        }
-    ]
+const FriendSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: User },
+  friends: [{ type: mongoose.Schema.Types.ObjectId, ref: User }],
+  pending: [{ type: mongoose.Schema.Types.ObjectId, ref: User }],
+  blocked: [{ type: mongoose.Schema.Types.ObjectId, ref: User }],
 });
 
-const FriendlistModel = mongoose.model("friendlist", FriendlistSchema);
-module.exports = FriendlistModel;
+const FriendModel = mongoose.model("friends", FriendSchema);
+module.exports = FriendModel;
