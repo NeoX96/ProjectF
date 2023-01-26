@@ -1,0 +1,13 @@
+.fancy-input {
+    margin: 1em 0 1em 0;
+    position: relative;
+  }
+  .fancy-input label {
+    position: absolute;
+    top: .5em;
+    left: .5em;
+    color: #666;
+  }
+  .fancy-input input {
+    padding: .5em;
+  }

@@ -1,8 +1,10 @@
-import me from "./me.png";
-import marker from "./marker.png";
+import me from "./me3.png";
+import marker from "./basketball.png";
+import basketball from "./basketball.png"
 
 const maps_images = {
     me,
-    marker
+    marker,
+    basketball
 }
 export default maps_images;
