@@ -237,10 +237,12 @@ function Chat() {
   }
 
   function Search() {
-    const [searchUser, setSearchUser] = useState('');
+    const [searchUser, setSearchUser] = useState("");
     const [searchUserResult, setSearchUserResult] = useState([]);
     const [showResults, setShowResults] = useState(false);
-  
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [friendRequestSent, setFriendRequestSent] = useState(false);
+
     const searchHandler = (e) => {
       const searchValue = e.target.value;
       setSearchUser(searchValue);
@@ -250,52 +252,76 @@ function Chat() {
       } else {
         setShowResults(false);
       }
-    }
-  
+    };
+
     useEffect(() => {
       socket.on("get_user", (results) => {
         setSearchUserResult(results);
       });
+      return () => {
+        socket.off("get_user");
+      };
     }, []);
-  
+
+    useEffect(() => {
+      if (selectedUser) {
+        socket.emit("send_friend_request", {
+          userId: socket._id,
+          friendId: selectedUser._id,
+        });
+        socket.on("friend_request_response", (data) => {
+          const { success, message } = data;
+          if (success) {
+            alert(message);
+            setSelectedUser(null);
+            setFriendRequestSent(true);
+          } else {
+            alert(message);
+            setSelectedUser(null);
+            setFriendRequestSent(false);
+          }
+        });
+        return () => {
+          socket.off("friend_request_response");
+        };
+      }
+    }, [selectedUser]);
+
     const handleUserClick = (user) => {
-      socket.emit("send_friend_request", { userId: socket._id, friendId: user._id });
-      socket.on("friend_request_response", (data) => {
-        const { success, message } = data;
-        if (success) {
-          alert(message);
-        } else {
-          alert(message);
-        }
-      });
-    }
-    
-  
+      setSelectedUser(user);
+    };
+
     return (
       <div>
         <div className="input-group mb-3">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Search"
-          aria-label="Search"
-          aria-describedby="button-addon2"
-          value={searchUser}
-          onChange={searchHandler}
-        />
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search"
+            aria-label="Search"
+            aria-describedby="button-addon2"
+            value={searchUser}
+            onChange={searchHandler}
+          />
         </div>
         {showResults && (
           <ListGroup>
             {searchUserResult.map((result, index) => (
-              <ListGroup.Item action key={index} onClick={() => handleUserClick(result)} variant="light">
+              <ListGroup.Item
+                action
+                key={index}
+                onClick={() => handleUserClick(result)}
+                variant="light"
+              >
                 {result.username} {result.vorname}
               </ListGroup.Item>
             ))}
           </ListGroup>
         )}
+        {friendRequestSent && <p>Friend request sent</p>}
       </div>
     );
-  }
+  } 
 
 
 
@@ -309,7 +335,7 @@ function Chat() {
             </div>
 
             <div>
-              <Search />
+              <Search  />
             </div>
 
             <div className="UserList">

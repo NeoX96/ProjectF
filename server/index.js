@@ -103,7 +103,7 @@ socketIO.use(async (socket, next) => {
 
 
 socketIO.on("connection", (socket) => {
-    console.log(`Client ${socket.id}: ${socket.username} connected`);
+    console.log(`Client ${socket._id}: ${socket.username} connected`);
     // search username in MongoDB
     const user = UserModel.findOne({username: socket.username});
 
@@ -136,7 +136,7 @@ socketIO.on("connection", (socket) => {
     // SocketIO User Connected Chat Bot
     socket.on("user_connected", (username) => {
         socketIO.emit("user_connected", username);
-        console.log(`Client ${socket.id}: ${socket.username} connected`);
+        console.log(`Client ${socket._id}: ${socket.username} connected`);
     });
 
     // Emit to all clients that someone is disconnected
@@ -150,7 +150,7 @@ socketIO.on("connection", (socket) => {
             if (err) throw err;
             console.log(res);
         });
-        console.log(`Client ${socket.id}: ${socket.username} disconnected`);
+        console.log(`Client ${socket._id}: ${socket.username} disconnected`);
         socketIO.emit("user_disconnected", socket.username);
         socket.disconnect();
     });
@@ -232,39 +232,43 @@ socketIO.on("connection", (socket) => {
     
 
     socket.on("send_friend_request", async (data) => {
-        const { userId, friendId } = data;
-        console.log("request"+ userId + " " + friendId);
+        const { friendId1, friendId } = data;
+        console.log("request: "+ socket._id + " " + friendId);
         try {
             // check if user and friend exist
-            const user = await UserModel.findById(userId);
+            const user = await UserModel.findById(socket._id);
             const friend = await UserModel.findById(friendId);
             if (!user || !friend) {
+                console.log("User or friend not found");
                 socket.emit("friend_request_response", { success: false, message: "User or friend not found" });
                 return;
             }
       
             // check if they are already friends
-            const friendModel = await FriendModel.findOne({ friends: { $all: [userId, friendId] } });
+            const friendModel = await FriendModel.findOne({ friends: { $all: [socket._id, friendId] } });
             if (friendModel) {
+                console.log("You are already friends");
                 socket.emit("friend_request_response", { success: false, message: "You are already friends" });
                 return;
             }
           
             //check if a friend request already sent
-            const friendModelWithPending = await FriendModel.findOne({ pending: { $all: [userId, friendId] } });
+            const friendModelWithPending = await FriendModel.findOne({user:friendId, pending: { $in: [socket._id] } });
             if (friendModelWithPending) {
+                console.log("Friend request already sent");
                 socket.emit("friend_request_response", { success: false, message: "Friend request already sent" });
-                return;
+            return;
             }
       
             // add friendId to user's pending array
-            const updatedFriend = await FriendModel.findOneAndUpdate({ user: userId }, { $push: { pending: friendId } }, { new: true });
+            const updatedFriend = await FriendModel.findOneAndUpdate({ user: friendId }, { $push: { pending: socket._id } },{ new: true, upsert: true });
             
             if (updatedFriend) {
                 console.log(updatedFriend);
                 socket.emit("friend_request_response", { success: true, message: "Friend request sent" });
+                return;
             }
-
+            console.log("empty");
         } catch (error) {
           console.log(error);
           socket.emit("friend_request_response", { success: false, message: "Error sending friend request" });
