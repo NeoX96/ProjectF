@@ -241,7 +241,6 @@ function Chat() {
     const [searchUserResult, setSearchUserResult] = useState([]);
     const [showResults, setShowResults] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
-    const [friendRequestSent, setFriendRequestSent] = useState(false);
 
     const searchHandler = (e) => {
       const searchValue = e.target.value;
@@ -274,11 +273,9 @@ function Chat() {
           if (success) {
             alert(message);
             setSelectedUser(null);
-            setFriendRequestSent(true);
           } else {
             alert(message);
             setSelectedUser(null);
-            setFriendRequestSent(false);
           }
         });
         return () => {
@@ -318,7 +315,6 @@ function Chat() {
             ))}
           </ListGroup>
         )}
-        {friendRequestSent && <p>Friend request sent</p>}
       </div>
     );
   } 
