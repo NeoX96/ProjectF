@@ -264,10 +264,7 @@ function Chat() {
 
     useEffect(() => {
       if (selectedUser) {
-        socket.emit("send_friend_request", {
-          userId: socket._id,
-          friendId: selectedUser._id,
-        });
+        socket.emit("send_friend_request", selectedUser._id);
         socket.on("friend_request_response", (data) => {
           const { success, message } = data;
           if (success) {

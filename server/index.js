@@ -223,7 +223,9 @@ socketIO.on("connection", (socket) => {
                     console.log(err);
                 } else {
                     console.log(result);
-                    socket.emit("get_user", result);
+                    // filter the results to exclude the current user
+                    const filteredResult = result.filter(user => String(user._id) !== String(socket._id));
+                    socket.emit("get_user", filteredResult);
                 }
             });
         }
@@ -231,16 +233,23 @@ socketIO.on("connection", (socket) => {
     
     
 
-    socket.on("send_friend_request", async (data) => {
-        const { friendId1, friendId } = data;
+    socket.on("send_friend_request", async (friendId) => {
         console.log("request: "+ socket._id + " " + friendId);
         try {
             // check if user and friend exist
             const user = await UserModel.findById(socket._id);
             const friend = await UserModel.findById(friendId);
+
             if (!user || !friend) {
                 console.log("User or friend not found");
                 socket.emit("friend_request_response", { success: false, message: "User or friend not found" });
+                return;
+            }
+
+                // check if the friendId is the same as the user's ID
+            if (String(socket._id) === String(friendId)) {
+                console.log("Cannot add yourself as a friend");
+                socket.emit("friend_request_response", { success: false, message: "Cannot add yourself as a friend" });
                 return;
             }
       
