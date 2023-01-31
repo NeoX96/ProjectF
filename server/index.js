@@ -443,6 +443,41 @@ socketIO.on("connection", (socket) => {
         }
     });
 
+    socket.on("decline_request", async (friendId) => {
+        try {
+            // Find the friend model for the current user
+            const friendModel = await FriendModel.findOne({ user: socket._id });
+            if (!friendModel) {
+                // user not found
+                console.log("User not found");
+                socket.emit("decline_request_response", { success: false, message: "User not found" });
+            }
+           
+            // Check if the friend is in the pending array
+            if (!friendModel.pending.includes(friendId)) {
+                console.log("Friend is not in the pending array");
+                socket.emit("decline_request_response", { success: false, message: "Friend is not in the pending array" });
+                return
+            }
+
+            // Remove the friend from the pending array
+            const updatedFriend = await FriendModel.findOneAndUpdate({ user: socket._id }, { $pull: { pending: friendId } });
+            if (!updatedFriend) {
+                console.log("Error while removing friend from pending array");
+                socket.emit("decline_request_response", { success: false, message: "Error while removing friend from pending array" });
+                return
+            }
+
+            // Emit the success message
+            console.log("successDeclineRequest");
+            socket.emit("decline_request_response", { success: true, message: "Friend request declined" });
+            socket.emit("ask_friends");
+
+        } catch (error) {
+            console.error(error);
+            socket.emit("decline_request_response", { success: false, message: "Error while declining friend request" });
+        }
+    });
     
     
     
