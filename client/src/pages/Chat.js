@@ -19,8 +19,11 @@ function Chat() {
   const [onlineFriends, setOnlineFriends] = useState([]);
   const [offlineFriends, setOfflineFriends] = useState([]);
   const [targetUser, setTargetUser] = useState(null);
+  const [showFriendModal, setshowFriendModal] = useState(false);
 
   const sessionID = Cookies.get('sessionID');
+
+  // useEffect zum Verbinden mit SocketIO
   useEffect(() => {
   if (sessionID) {
     socket.auth = { sessionID };
@@ -60,7 +63,7 @@ function Chat() {
   }
 }, [sessionID]);
 
-
+  // useEffect for Messages
   useEffect(() => {
     messagesRef.current.scrollIntoView({ behavior: "smooth" });
 
@@ -85,6 +88,7 @@ function Chat() {
     }
   }, [messages]);
 
+  // useEffect for Friends
   useEffect(() => {
     socket.on("user_connected", () => {
       socket.emit("ask_friends");
@@ -156,8 +160,6 @@ function Chat() {
   }, []);
 
 
-
-
   // Send Message
   const sendMessage = (e) => {
     e.preventDefault();
@@ -177,18 +179,17 @@ function Chat() {
   }
 
 
-
-
-
   // select user to chat with
   const selectUser = (user) => {
     setTargetUser(user);
   }
 
+
   const unselectUser = () => {
     setTargetUser(null);
   }
 
+  // useEffect for private messages
   useEffect(() => {
     setPrivateMessages({
       ...privateMessages,
@@ -263,8 +264,8 @@ function Chat() {
     }
   }
 
-  const [showFriendModal, setshowFriendModal] = useState(false);
-
+  
+// SearchBar Funktion
   function Search() {
     const [searchUser, setSearchUser] = useState("");
     const [searchUserResult, setSearchUserResult] = useState([]);
@@ -348,6 +349,7 @@ function Chat() {
     );
   } 
 
+  // FriendsModal zum akzeptieren von Freundschaftsanfragen
   const FriendsModal = () => {
     const [pendingRequests, setPendingRequests] = useState([]);
   
@@ -428,7 +430,7 @@ function Chat() {
     );
   };
   
-
+  // Return der ChatApp
   return (
     <div>
       <div className="container-md">
