@@ -1,7 +1,7 @@
 import "./css/Chat.css";
 import React, { useEffect, useState, useRef } from "react";
 import socketIO from "socket.io-client";
-import { Button, ListGroup } from "react-bootstrap";
+import { Button, ListGroup, Modal, Table} from "react-bootstrap";
 import Cookies from 'js-cookie'
 const endpoint = "http://localhost:4001";
 
@@ -236,6 +236,8 @@ function Chat() {
     }
   }
 
+  const [showFriendModal, setshowFriendModal] = useState(false);
+
   function Search() {
     const [searchUser, setSearchUser] = useState("");
     const [searchUserResult, setSearchUserResult] = useState([]);
@@ -297,6 +299,9 @@ function Chat() {
             value={searchUser}
             onChange={searchHandler}
           />
+        <Button>
+          <iconify-icon icon="mingcute:contacts-line" onClick={() => setshowFriendModal(true)}/>
+        </Button>
         </div>
         {showResults && (
           <ListGroup>
@@ -316,7 +321,86 @@ function Chat() {
     );
   } 
 
-
+  const FriendsModal = () => {
+    const [pendingRequests, setPendingRequests] = useState([]);
+  
+    const handleClose = () => setshowFriendModal(false);
+  
+    if (showFriendModal) {
+      useEffect(() => {
+        socket.emit("ask_pending_requests", socket._id);
+        socket.on("get_pending_requests", (data) => {
+          if (data.success) {
+            setPendingRequests(data.pendingUsers);
+          }
+        });
+        return () => {
+          socket.off("get_pending_requests");
+        };
+      }, [showFriendModal]);
+    }
+  
+    return (
+      showFriendModal ? (
+        <>
+          <Modal show={showFriendModal} onHide={handleClose} className="text-center" >
+          <Modal.Body>
+            <Table striped hover>
+              <thead>
+              <tr >
+                <th>Username</th>
+                <th>Vorname</th>
+                <th>Aktion</th>
+              </tr>
+              </thead>
+              <tbody className="align-middle">
+              {pendingRequests && pendingRequests.length > 0 ? (
+                pendingRequests.map((request, index) => (
+                <tr key={index}>
+                  <td>{request.username}</td>
+                  <td>{request.vorname}</td>
+                  <td>
+                    <Button
+                      className="mr-2"
+                      variant="success"
+                      onClick={() => {
+                        alert(request.username + " accepted");
+                        socket.emit("accept_request", request._id);
+                        handleClose();
+                      }}
+                    >
+                      Accept
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={() => {
+                        alert(request.username + " declined");
+                        socket.emit("decline_request", request._id);
+                        handleClose();
+                      }}
+                    >
+                      Decline
+                    </Button>
+                  </td>
+                </tr>
+              ))
+              ) : null}
+              </tbody>
+            </Table>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </>
+      ) : (
+        <div />
+      )
+    );
+  };
+  
 
   return (
     <div>
@@ -329,6 +413,7 @@ function Chat() {
 
             <div>
               <Search  />
+              <FriendsModal />
             </div>
 
             <div className="UserList">

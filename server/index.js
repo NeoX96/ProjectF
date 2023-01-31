@@ -340,6 +340,41 @@ socketIO.on("connection", (socket) => {
             socket.emit("error", error.message);
         }
     });
+
+    socket.on("ask_pending_requests", async (user_id) => {
+        try {
+        // Find the friend model for the current user
+        const friendModel = await FriendModel.findOne({ user: user_id });
+        
+        if (!friendModel) {
+            console.log("User has nothing");
+            socket.emit("get_pending_requests", { success: false, message: "User has nothing" });
+            return;
+        }
+
+        // return the pending requests array and search for the users, only return username and vorname
+        const pendingRequests = friendModel.pending;
+        if (pendingRequests.length === 0) {
+            console.log("User has no pending requests");
+            socket.emit("get_pending_requests", { success: false, message: "User has no pending requests" });
+            return;
+        }
+
+        const pendingUsers = await UserModel.find({ _id: { $in: pendingRequests }  }, {username: 1, vorname: 1, _id: 1});
+        console.log("successPendingRequest");
+        socket.emit("get_pending_requests", { success: true, pendingUsers });
+
+    } catch (error) {
+        console.error(error);
+        socket.emit("get_pending_requests", { success: false, message: "Error while getting pending requests" });
+    }
+    });
+
+    
+    socket.on("accept_request", async (friendId) => { 
+
+    });
+
     
     
     
