@@ -133,6 +133,7 @@ socketIO.on("connection", (socket) => {
     });
 
     socketIO.emit("user_connected", socket.username);
+    
     // SocketIO User Connected Chat Bot
     socket.on("user_connected", (username) => {
         socketIO.emit("user_connected", username);
@@ -253,9 +254,10 @@ socketIO.on("connection", (socket) => {
                 return;
             }
       
-            // check if they are already friends
-            const friendModel = await FriendModel.findOne({ friends: { $all: [socket._id, friendId] } });
-            if (friendModel) {
+            // check if they are already friends for both users
+            const friendModel = await FriendModel.findOne({user:socket._id, friends: { $in: [friendId] } });
+            const userModel = await FriendModel.findOne({user:friendId, friends: { $in: [socket._id] } });
+            if (friendModel || userModel) {
                 console.log("You are already friends");
                 socket.emit("friend_request_response", { success: false, message: "You are already friends" });
                 return;
@@ -316,9 +318,16 @@ socketIO.on("connection", (socket) => {
         const offlineUsers = [];
         try {
             // Find the friend model for the current user
-            const friendModel = await FriendModel.findOne({ userID: socket._id });
+            const friendModel = await FriendModel.findOne({ user: socket._id });
             if (!friendModel) {
-                throw new Error("User does not have any friends");
+                // lege ein neues FriendModel an
+                const newFriendModel = new FriendModel({
+                    user: socket._id,
+                    friends: [],
+                    pending: [],
+                    blocked: [],
+                });
+                await newFriendModel.save();
             }
     
             // Iterate through the friends array and find the corresponding user
@@ -371,8 +380,67 @@ socketIO.on("connection", (socket) => {
     });
 
     
-    socket.on("accept_request", async (friendId) => { 
+    socket.on("accept_request", async (friendId) => {
+        console.log(friendId);
+        try {
+            // Find the friend model for the current user
+            const friendModel = await FriendModel.findOne({ user: socket._id });
+            if (!friendModel) {
+                // user not found
+                console.log("User not found");
+                socket.emit("accept_request_response", { success: false, message: "User not found" });
+            }
+            // Find the friend model for the friend
+            const friendModelFriend = await FriendModel.findOne({ user: friendId });
+            if (!friendModelFriend) {
+                // friend not found
+                console.log("Friend not found");
+                socket.emit("accept_request_response", { success: false, message: "Friend not found" });
+                return
+            }
+           
+            // Check if the friend is in the pending array
+            if (!friendModel.pending.includes(friendId)) {
+                console.log("Friend is not in the pending array");
+                socket.emit("accept_request_response", { success: false, message: "Friend is not in the pending array" });
+                return
+            }
 
+            // Remove the friend from the pending array
+            const updatedFriend = await FriendModel.findOneAndUpdate({ user: socket._id }, { $pull: { pending: friendId } });
+            if (!updatedFriend) {
+                console.log("Error while removing friend from pending array");
+                socket.emit("accept_request_response", { success: false, message: "Error while removing friend from pending array" });
+                return
+            }
+
+            // Add the friend to the friends array for both users if they are not already friends
+            if (!friendModel.friends.includes(friendId)) {
+                const updatedFriend = await FriendModel.findOneAndUpdate({ user: socket._id }, { $push: { friends: friendId } });
+                if (!updatedFriend) {
+                    console.log("Error while adding friend to friends array");
+                    socket.emit("accept_request_response", { success: false, message: "Error while adding friend to friends array" });
+                    return
+                }
+            }
+            if (!friendModelFriend?.friends?.includes(socket._id)) {
+                const updatedFriend = await FriendModel.findOneAndUpdate({ user: friendId }, { $push: { friends: socket._id } });
+                if (!updatedFriend) {
+                    console.log("Error while adding friend to friends array");
+                    socket.emit("accept_request_response", { success: false, message: "Error while adding friend to friends array" });
+                    return
+                }
+            }
+
+            // Emit the success message
+            console.log("successAcceptRequest");
+            socket.emit("accept_request_response", { success: true, message: "Friend request accepted" });
+            socket.emit("ask_friends");
+
+        } catch (error) {
+            console.error(error);
+            socket.emit("accept_request_response", { success: false, message: "Error while accepting friend request" });
+        }
     });
 
     
