@@ -21,7 +21,7 @@ function Chat() {
   const [targetUser, setTargetUser] = useState(null);
 
   const sessionID = Cookies.get('sessionID');
-
+  useEffect(() => {
   if (sessionID) {
     socket.auth = { sessionID };
     socket.connect();
@@ -53,8 +53,13 @@ function Chat() {
     });
 
     socket.emit("ask_users");
-    
+
+    return () => {
+      socket.off("session");
+    }
   }
+}, [sessionID]);
+
 
   useEffect(() => {
     messagesRef.current.scrollIntoView({ behavior: "smooth" });
@@ -327,17 +332,12 @@ function Chat() {
     const handleClose = () => setshowFriendModal(false);
   
     if (showFriendModal) {
-      useEffect(() => {
         socket.emit("ask_pending_requests", socket._id);
         socket.on("get_pending_requests", (data) => {
           if (data.success) {
             setPendingRequests(data.pendingUsers);
           }
         });
-        return () => {
-          socket.off("get_pending_requests");
-        };
-      }, [showFriendModal]);
     }
   
     return (
