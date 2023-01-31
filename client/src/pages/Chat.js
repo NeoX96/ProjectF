@@ -2,7 +2,7 @@ import "./css/Chat.css";
 import React, { useEffect, useState, useRef } from "react";
 import socketIO from "socket.io-client";
 import { Button, ListGroup, Modal, Table} from "react-bootstrap";
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
 const endpoint = "http://localhost:4001";
 
 const socket = socketIO(endpoint, { autoConnect: false });
@@ -41,8 +41,8 @@ function Chat() {
     }
     setUsername(user_promt);
     socket.auth = { username: user_promt };
-    socket.connect();
 
+    socket.connect();
 
     socket.on("session", (data) => {
       Cookies.set('sessionID', data.sessionID);
@@ -52,7 +52,7 @@ function Chat() {
       socket.name = data.name;
     });
 
-    socket.emit("ask_users");
+    socket.emit("ask_friends");
 
     return () => {
       socket.off("session");
@@ -87,13 +87,14 @@ function Chat() {
 
   useEffect(() => {
     socket.on("user_connected", () => {
-      socket.emit("ask_users");
+      socket.emit("ask_friends");
     });
 
     socket.on("user_disconnected", () => {
-      socket.emit("ask_users");
+      socket.emit("ask_friends");
     });
   }, [onlineFriends, offlineFriends]);
+
 
   // useEffect for private Messages
   useEffect(() => {
@@ -112,28 +113,39 @@ function Chat() {
   }, [privateMessages, targetUser]);
 
 
+  // initial useEffect
   useEffect(() => {
-// get_friends erstmal auskommentiert
-    socket.on("get_users", (online, offline) => {
+    socket.emit("ask_pending_requests", socket._id);
+
+    // socket.on ask_friends
+    socket.on("ask_friends", () => {
+      socket.emit("ask_friends");
+    });
+
+    // get_friends erstmal auskommentiert
+    socket.on("get_friends", (online, offline) => {
       setOnlineFriends(online);
       setOfflineFriends(offline);
       console.log(online, offline);
     });
 
-    
-    socket.on("session", ({ sessionID, userID }) => {
-      socket.auth = { sessionID };
-      // store it in the localStorage
-      localStorage.setItem("sessionID", sessionID);
-      // save the ID of the user
-      socket.id = userID;
+    // response from server if friend request was accepted
+    socket.on("accept_request_response", (data) => {
+      if (data.success) {
+        alert(data.message);
+      } else {
+        alert(data.message);
+      }
     });
 
     return () => {
       socket.off ("get_friends");
       socket.off ("session");
+      socket.off ("accept_request_response");
     }
   }, []);
+
+
 
 
   // Send Message
@@ -267,7 +279,7 @@ function Chat() {
       return () => {
         socket.off("get_user");
       };
-    }, []);
+    }, [searchUserResult]);
 
     useEffect(() => {
       if (selectedUser) {
@@ -331,14 +343,21 @@ function Chat() {
   
     const handleClose = () => setshowFriendModal(false);
   
+    useEffect(() => {
     if (showFriendModal) {
         socket.emit("ask_pending_requests", socket._id);
+
+        // response from server with pending requests
         socket.on("get_pending_requests", (data) => {
           if (data.success) {
             setPendingRequests(data.pendingUsers);
           }
         });
     }
+    return () => {
+        socket.off("get_pending_requests");
+    }
+    }, [showFriendModal]);
   
     return (
       showFriendModal ? (
@@ -364,7 +383,6 @@ function Chat() {
                       className="mr-2"
                       variant="success"
                       onClick={() => {
-                        alert(request.username + " accepted");
                         socket.emit("accept_request", request._id);
                         handleClose();
                       }}
