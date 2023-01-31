@@ -138,10 +138,20 @@ function Chat() {
       }
     });
 
+    // response from server if friend requst was denied
+    socket.on("decline_request_response", (data) => {
+      if (data.success) {
+        alert(data.message);
+      } else {
+        alert(data.message);
+      }
+    });
+
     return () => {
       socket.off ("get_friends");
       socket.off ("session");
       socket.off ("accept_request_response");
+      socket.off ("decline_request_response");
     }
   }, []);
 
@@ -392,7 +402,6 @@ function Chat() {
                     <Button
                       variant="danger"
                       onClick={() => {
-                        alert(request.username + " declined");
                         socket.emit("decline_request", request._id);
                         handleClose();
                       }}
