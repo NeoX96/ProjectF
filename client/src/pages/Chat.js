@@ -137,6 +137,7 @@ function Chat() {
     socket.on("accept_request_response", (data) => {
       if (data.success) {
         alert(data.message);
+        socket.emit("ask_friends");
       } else {
         alert(data.message);
       }
@@ -377,9 +378,6 @@ function Chat() {
         socket.on("get_pending_requests", (data) => {
           if (data.success) {
             setPendingRequests(data.pendingUsers);
-            socket.emit("ask_friends", socket._id);
-          } else {
-            alert(data.message);
           }
         });
     }
