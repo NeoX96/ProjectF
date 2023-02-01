@@ -191,27 +191,31 @@ function Chat() {
 
   // useEffect for private messages
   useEffect(() => {
-    setPrivateMessages({
-      ...privateMessages,
+    setPrivateMessages(prevPrivateMessages => ({
+      ...prevPrivateMessages,
       [targetUser]: [],
-    });
+    }));
 
-    if(targetUser) {
+    if (targetUser) {
       console.log(targetUser.userID);
-      socket.emit("ask_private_messages", {sender: socket.id, targetUser: targetUser.userID});
+      socket.emit("ask_private_messages", {
+        sender: socket.id,
+        targetUser: targetUser.userID,
+      });
     }
 
     socket.on("get_private_messages", (data) => {
-        setPrivateMessages({
-            ...privateMessages,
-            [targetUser]: data,
-        });
+      setPrivateMessages(prevPrivateMessages => ({
+        ...prevPrivateMessages,
+        [targetUser]: data,
+      }));
     });
 
-    return () => {
-        socket.off("get_private_messages");
-    }
+  return () => {
+    socket.off("get_private_messages");
+  };
   }, [targetUser]);
+
 
 
 
@@ -284,6 +288,14 @@ function Chat() {
     };
 
     useEffect(() => {
+      if(searchUser.length === 0) {
+        setShowResults(false);
+      } else {
+        setShowResults(true);
+      }
+    }, [searchUser]);
+
+    useEffect(() => {
       socket.on("get_user", (results) => {
         setSearchUserResult(results);
       });
@@ -300,9 +312,11 @@ function Chat() {
           if (success) {
             alert(message);
             setSelectedUser(null);
+            setSearchUser("");
           } else {
             alert(message);
             setSelectedUser(null);
+            setSearchUser("");
           }
         });
         return () => {
@@ -369,7 +383,7 @@ function Chat() {
     return () => {
         socket.off("get_pending_requests");
     }
-    }, [showFriendModal]);
+    }, []);
   
     return (
       showFriendModal ? (
@@ -437,7 +451,7 @@ function Chat() {
         <div className="row">
           <div className="col-md">
             <div className="mt-1">
-              <Button className="" onClick={unselectUser}>All Chat</Button>
+              <Button className="mb-2 mt-2" onClick={unselectUser}>All Chat</Button>
             </div>
 
             <div>
