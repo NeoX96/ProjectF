@@ -29,61 +29,79 @@ function Maps() {
 
 
 
-  const buttonRemove = '<h1>Erstelle ein Event</h1><form class="cf"><div class="fancy-input"><input type="text" id="input-name" placeholder="Name"></div><div class="fancy-input"><textarea name="message" type="text" id="input-message" placeholder="Message"></textarea></div> <input type="datetime-local" name="geburtsdatum"><div><input type="submit" value="Submit" id="input-submit"><button type="button" class="remove">delte marker 💔</button></form></div> ';
 
+ const buttonRemove = '<h1>Erstelle ein Event</h1><form class="cf"><div class="fancy-input"><input type="text" id="input-name" placeholder="Name"></div><div class="fancy-input"><textarea name="message" type="text" id="input-message" placeholder="Message"></textarea></div> <input type="datetime-local" name="geburtsdatum"><div><input type="submit" value="Submit" id="input-submit"><button type="button" class="remove">delte marker 💔</button></form></div> ';
 
 
  
-  //Clickevent setzen 
-
-  function Event() {
-    const map = useMapEvents({
-      click: (e) => {
-        const { lat, lng } = e.latlng;
-        const marker= L.marker([lat, lng]).addTo(map)
+ function Event({position, radius}) {
+  const [counter, setCounter] = useState(0);
+  const map = useMapEvents({
+    click: (e) => {
+      const { lat, lng } = e.latlng;
+      const marker = L.marker([lat, lng]).addTo(map)
         .bindPopup(buttonRemove)
         .openPopup()
         .setIcon(GetIcon([20, 20], 'basketball'));
 
-          // Add event listener to buttonRemove
-        const removeBtn = document.querySelector('.remove');
-        removeBtn.addEventListener('click', () => {
-          marker.remove(); // Von der Karte löschen
-        });
-          
+      // Check if marker is within the defined radius
+      if (L.latLng(position).distanceTo(marker.getLatLng()) <= radius) {
+        setCounter(counter + 1);
       }
-    });
-    return null;
-   
-   
-  }
+
+      // Add event listener to buttonRemove
+      const removeBtn = document.querySelector('.remove');
+      removeBtn.addEventListener('click', () => {
+        marker.remove(); // Von der Karte löschen
+        setCounter(counter - 1);
+      });
+    }
+  });
+
+  useEffect(() => {
+    console.log('counter changed:', counter);
+  }, [counter]);
+
+  return (
+    <div style={{ position: 'absolute', zIndex: 999, top: '50px', right: '0px' }}>
+      <div style={{ color: 'black' }}> {counter}</div>
+    </div>
+  );
+}
 
   
   // Standort setzen
   function LocationMarker() {
    
-    const [position, setPosition] = useState(null);
-    const map = useMap();
+  const [position, setPosition] = useState(null);
+  const [radius, setRadius] = useState(100);
+  const map = useMap();
 
-    useEffect(() => {
-      map.locate().on("locationfound", function (e) {
-        setPosition(e.latlng);
-        setZoom(13);
-        map.setView(e.latlng, map.getZoom());
-      });
-    }, [map]);
-    return position === null ? null : (
+  useEffect(() => {
+    map.locate().on("locationfound", function (e) {
+      setPosition(e.latlng);
+      setZoom(13);
+      map.setView(e.latlng, map.getZoom());
+    });
+  }, [map]);
+
+  return position === null ? null : (
+    <div style={{ position: 'absolute', zIndex: 999, top: '10px', right: '10px' }}>
+      <Circle center={position} radius={radius} fillColor={'red'} color={'black'}>
+        <Marker position={position} icon={GetIcon(40, 'me')}>
+          <Popup>
+            Dein Standort
+          </Popup>
+        </Marker>
+      </Circle>
       <div>
-          <Circle center={position} radius={100} fillColor={'red'} color={'black'}>
-              <Marker position={position} icon={GetIcon(40, 'me')}>
-                  <Popup>
-                      Dein Standort
-                  </Popup>
-              </Marker>
-          </Circle>
-          <div><button onClick>&#x1F575;</button></div>
-      </div>
-  );
+      <input type="range" min="1" max="10000" value={radius} onChange={e => setRadius(e.target.value)} />
+      <div style={{ color: 'black' }}>{radius === 0 ? 0 : radius === 10000 ? 15 : ((radius * 0.001) + (radius >= 1 ? 0.1 : 0)).toFixed(1)} Kilometer</div>
+    </div>
+  </div>
+);
+
+
 }
 
   
@@ -99,10 +117,8 @@ function Maps() {
           label="Events erstellen"
           checked={enableEvent} onChange={() => setEnableEvent(!enableEvent)}
         />
-       <div><button onClick>&#x1F575;</button></div>
-
-      
-          
+        
+    
 
         <MapContainer 
           center={[48.777500, 11.431111]}
