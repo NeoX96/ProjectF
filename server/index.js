@@ -432,10 +432,14 @@ socketIO.on("connection", (socket) => {
                 }
             }
 
+            // find user with friendID and store his userID in variable
+            friendSocketID =  await UserModel.findOne({ _id: friendId }, { userID: 1 });
+            console.log("FriendsID: " + friendSocketID);
             // Emit the success message
             console.log("successAcceptRequest");
             socket.emit("accept_request_response", { success: true, message: "Friend request accepted" });
             socket.emit("ask_friends");
+            socket.to(friendSocketID.userID).emit("ask_friends");
 
         } catch (error) {
             console.error(error);

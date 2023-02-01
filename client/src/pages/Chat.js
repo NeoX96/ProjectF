@@ -137,7 +137,6 @@ function Chat() {
     socket.on("accept_request_response", (data) => {
       if (data.success) {
         alert(data.message);
-        socket.emit("ask_friends");
       } else {
         alert(data.message);
       }
