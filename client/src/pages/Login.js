@@ -6,7 +6,6 @@ function LoginNew () {
     const navigate = useNavigate();
     const [email , setemail]= useState('');
     const [password , setPassword] = useState('');
-    
 
     return (
         <div className="justify-content-center d-flex">
@@ -17,11 +16,11 @@ function LoginNew () {
               
               <div className="form-group mt-3">
                 <label>Email address</label>
-                <input type="email" name="" id="email" placeholder='Email' onChange={(e)=>setemail(e.target.value)} className='inputText' />
+                <input className="form-control mt-1" type="email" name="" id="email" placeholder='Email' onChange={(e)=>setemail(e.target.value)} />
               </div>
               <div className="form-group mt-3">
                 <label>Password</label>
-                <input type="password" placeholder='******' name="" onChange={(e)=>setPassword(e.target.value)} id="password" className='inputText' />
+                <input className="form-control mt-1" type="password" placeholder='******' name="" onChange={(e)=>setPassword(e.target.value)} id="password" />
               </div>
               <div className="d-grid gap-2 mt-3">
               <button onClick={() => {navigate("/Home")}} className="btn btn-primary">Submit
