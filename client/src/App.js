@@ -8,7 +8,7 @@ const Home = lazy(() => import('./pages/Home'));
 const Chat = lazy(() => import('./pages/Chat'));
 const Maps = lazy(() => import('./pages/Maps'));
 const Login = lazy(() => import('./pages/register'));
-const Login2 = lazy(() => import('./pages/login'));
+const Login2 = lazy(() => import('./pages/Login'));
 const Settings = lazy(() => import('./pages/settings'));
 const Wait = lazy(() => import('./components/wait'));
 const Forgotpw = lazy(() => import('./pages/Forgotpw'));
