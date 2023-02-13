@@ -7,7 +7,8 @@ import Navbar from './components/navigationbar';
 const Home = lazy(() => import('./pages/Home'));
 const Chat = lazy(() => import('./pages/Chat'));
 const Maps = lazy(() => import('./pages/Maps'));
-const Login = lazy(() => import('./pages/Login'));
+const Login = lazy(() => import('./pages/register'));
+const Login2 = lazy(() => import('./pages/login'));
 const Settings = lazy(() => import('./pages/settings'));
 const Wait = lazy(() => import('./components/wait'));
 const Forgotpw = lazy(() => import('./pages/Forgotpw'));
@@ -24,6 +25,7 @@ function App() {
         <Suspense fallback={<Wait/>}>
           <Routes>
             <Route path="/" element={<Login />} />
+            <Route path="/Login" element={<Login2 />} />
             <Route path="/Home" element={<Home />} />
             <Route path="/Chat" element={<Chat />} />
             <Route path="/Maps" element={<Maps />} />
