@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 const bcrypt = require('bcrypt');
 
+
+
+
 // MongoDB User Tabelle
 const UserSchema = new mongoose.Schema({
   vorname: {
@@ -26,7 +29,7 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: 8
+    minlength: 6
   },
   online: {
     type: Boolean,
@@ -47,12 +50,6 @@ const UserSchema = new mongoose.Schema({
   }
 });
 
-// Passwort Verschlüsselung mit bycript
-UserSchema.pre('save', async function (next) {
-    const salt = await bcrypt.genSalt();
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-});
 
 const UserModel = mongoose.model("users", UserSchema);
 module.exports = UserModel;
