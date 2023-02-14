@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, useEffect, useState } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import axios from 'axios';
 import Navbar from './components/navigationbar';
 
 const Home = lazy(() => import('./pages/Home'));
@@ -18,10 +19,22 @@ function App() {
   // Prüfen, ob der sessionID-Cookie gesetzt ist
   useEffect(() => {
     const sessionID = getCookie('sessionID');
-    if (sessionID) {
-      setIsLoggedIn(true);
+    if (sessionID && !isLoggedIn) {
+      axios.post('http://localhost:4000/validateSession', { sessionID })
+        .then(response => {
+          const isValidSession = response.data.isValid;
+
+          if (isValidSession) {
+            setIsLoggedIn(true);
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          document.cookie = "sessionID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+          setIsLoggedIn(false);
+        });
     }
-  }, []);
+  }, [isLoggedIn]);
 
   // Hilfsfunktion zum Auslesen von Cookies
   const getCookie = (name) => {
@@ -30,21 +43,39 @@ function App() {
     if (parts.length === 2) return parts.pop().split(';').shift();
   };
 
+  // bei jedem Render-Vorgang prüfen, ob der sessionID-Cookie gesetzt ist
+  const cookie = getCookie('sessionID')
+
+  // when cookie is removed and the user changes with useNavigate to another page isloggedin is still true
+  useEffect(() => {
+    if (!cookie && isLoggedIn) {
+      setIsLoggedIn(false);
+    }
+  }, [cookie, isLoggedIn]);
+
+
   return (
     <div className="App">
       <Router>
         {isLoggedIn && <Navbar />}
         <Suspense fallback={<Wait />}>
           <Routes>
-            <Route path="/" element={<Navigate to="/Login" />} />
-            <Route path="/Login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-            <Route path="/Register" element={<Register setIsLoggedIn={setIsLoggedIn} />} />
+            {!isLoggedIn && (
+              <>
+                <Route path="/Login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+                <Route path="/Register" element={<Register setIsLoggedIn={setIsLoggedIn} />} />
+              </>
+            )}
             {isLoggedIn ? (
               <>
                 <Route path="/Home" element={<Home />} />
                 <Route path="/Chat" element={<Chat />} />
                 <Route path="/Maps" element={<Maps />} />
                 <Route path="/Settings" element={<Settings />} />
+                <Route
+                  path="*"
+                  element={<Navigate to="/Home" />}
+                />
               </>
             ) : (
               <Route
@@ -58,6 +89,6 @@ function App() {
       </Router>
     </div>
   );
-}
+  }
 
 export default App;
