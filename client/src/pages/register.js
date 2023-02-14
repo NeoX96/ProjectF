@@ -1,12 +1,12 @@
 import React, { useState } from "react"
 import axios from 'axios';
+import { Button } from 'react-bootstrap';
 import { useNavigate } from "react-router-dom";
 
 
-function Login() {
+function Register() {
   const navigate = useNavigate();
 
-  const [authMode, setAuthMode] = useState("signin");
   const [vorname, setVorname] = useState("");
   const [nickname, setNickname] = useState("");
   const [geburtstag, setGeburtstag] = useState("");
@@ -14,7 +14,7 @@ function Login() {
   const [password, setPassword] = useState("");
 
   const changeAuthMode = () => {
-    setAuthMode(authMode === "signin" ? "signup" : "signin")
+    navigate("/Login");
   }
 
 
@@ -39,63 +39,14 @@ function Login() {
   }
 
 
-        
-
-  if (authMode === "signin") {
-    return (
-      <div className="justify-content-center d-flex">
-      <div className="Auth-form-container w-25">
-      <div className="text-center">
-          <p>Not registered?</p>
-          <span className="link-primary" onClick={changeAuthMode}>
-            Sign UP
-          </span>
-        </div>
-        <form className="Auth-form">
-          <div className="Auth-form-content">
-            <h6 >Welcome to SPORTSCONNECT</h6>
-            
-            <div className="form-group mt-3">
-              <label>Email address</label>
-              <input
-                type="email"
-                className="form-control mt-1"
-                placeholder="Enter email"
-              />
-            </div>
-            <div className="form-group mt-3">
-              <label>Password</label>
-              <input
-                type="password"
-                className="form-control mt-1"
-                placeholder="Enter password"
-              />
-            </div>
-            <div className="d-grid gap-2 mt-3">
-            <button onClick={() => {navigate("/Home")}} className="btn btn-primary">Submit
-            </button>
-            </div>
-            <p className="text-center mt-2">
-              Forgot <a href="/">password?</a>
-            </p>
-          </div>
-        </form>
-      </div>
-      </div>
-      
-
-      
-    )
-  }
-
   return (
     <div className="justify-content-center d-flex">
       <div className="Auth-form-container w-25">
-        <div className="text-center">
-          <p>Already registered?</p>
-          <span className="link-primary" onClick={changeAuthMode}>
-            Sign In
-          </span>
+      <div className="text-center">
+          <h6 >Welcome to SPORTSCONNECT</h6>
+            <Button onClick={changeAuthMode}>
+              Sign Up
+            </Button>
         </div>
 
         <form className="Auth-form" onSubmit={handleRegister}>
@@ -151,4 +102,4 @@ function Login() {
 }
 
 
-export default Login;
+export default Register;
