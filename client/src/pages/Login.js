@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Form  } from 'react-bootstrap';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
@@ -43,34 +43,29 @@ function Login () {
   };
 
   return (
-    <div className="justify-content-center d-flex">
-      <div className="Auth-form-container w-25">
-        <form className="Auth-form">
-          <div className="Auth-form-content">
+    <div className="d-flex justify-content-center">
+        <div className="">
             <div className="text-center">
-              <h6>Welcome to SPORTSCONNECT</h6>
-              <Button onClick={changeAuthMode}>
-                Sign Up
-              </Button>
+                <h6>Welcome to SPORTSCONNECT</h6>
+                <Button onClick={changeAuthMode}>
+                    Sign Up
+                </Button>
             </div>
-            <h3 className="Auth-form-title">Login</h3>
-            <div className="form-group mt-3">
-              <label>Email address</label>
-              <input className="form-control mt-1" type="email" name="" id="email" placeholder='Email' onChange={(e) => setEmail(e.target.value)} />
+            <div className="">
+                <h3>Login</h3>
+                <div className="form-group mt-3">
+                    <Form.Control className="mt-1" type="email" name="" id="email" placeholder='Email' onChange={(e) => setEmail(e.target.value)} />
+                </div>
+                <div className="form-group mt-3">
+                    <Form.Control className="mt-1" type="password" placeholder='Password' name="" onChange={(e) => setPassword(e.target.value)} id="password" />
+                </div>
+                <div className="d-flex justify-content-center mt-3">
+                    <Button onClick={handleLogin}>Submit</Button>
+                </div>
             </div>
-            <div className="form-group mt-3">
-              <label>Password</label>
-              <input className="form-control mt-1" type="password" placeholder='******' name="" onChange={(e) => setPassword(e.target.value)} id="password" />
-            </div>
-            <div className="d-grid gap-2 mt-3">
-              <button onClick={handleLogin} className="btn btn-primary">Submit
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
+        </div>
     </div>
-  )
+);
 }
 
 export default Login
