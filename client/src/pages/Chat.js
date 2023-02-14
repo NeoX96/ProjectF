@@ -38,28 +38,8 @@ function Chat() {
       socket._id = data._id;
     });
   } else {
-    let user_promt = null;
-    while (user_promt === null) {
-      user_promt = prompt("Please enter your username");
-    }
-    setUsername(user_promt);
-    socket.auth = { username: user_promt };
-
-    socket.connect();
-
-    socket.on("session", (data) => {
-      Cookies.set('sessionID', data.sessionID);
-      socket.username = data.username;
-      setUsername(data.username);
-      socket.id = data.userID;
-      socket.name = data.name;
-    });
-
-    socket.emit("ask_friends");
-
-    return () => {
-      socket.off("session");
-    }
+    // redirect to login
+    window.location.href = "/Login";
   }
 }, [sessionID]);
 
