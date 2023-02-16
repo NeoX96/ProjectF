@@ -2,12 +2,15 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const dotenv = require('dotenv');
+const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 dotenv.config();
 const JWTSEC = process.env.JWTSEC;
 
 const UserModel = require('../models/Users');
+const verifyEmailModel = require('../models/Verify');
 const crypto = require('crypto');
+const { generateOTP } = require('./OTP');
 const randomId = () => crypto.randomBytes(16).toString("hex");
 
 
@@ -21,14 +24,99 @@ router.post("/createUser", async (req, res) => {
     const hashedPassword = await bcrypt.hash(user.password, salt);
     user.password = hashedPassword;
 
+    const OTP = generateOTP();
+
+    const verifyToken = await verifyEmailModel.create({
+      user:user._id,
+      token:OTP
+    });
+
+    verifyToken.save();
+
     // Erstellen eines Eintrages in der MongoDB
     const newUser = new UserModel(user);
     await newUser.save();
 
+    // Anpassung des Nodemailers
+    const transport = nodemailer.createTransport({
+      host: "smtp.mailtrap.io",
+      port: 2525,
+      auth: {
+        // .env Datei mit den Zugangsdaten
+        login: process.env.USER,
+        pass: process.env.PASS
+      }
+    });
+
+    // Anpassung des Nodemailers
+    transport.sendMail({
+      from:"sociaMedia@gmail.com",
+      to: user.email,
+      subject: "Email-Verifizierung für Sport-Connect.de",
+      html: `
+        <html>
+          <head>
+            <style>
+              /* Hier können Sie Ihre eigenen Styles definieren */
+            </style>
+          </head>
+          <body>
+            <p>Guten Tag ${user.vorname},</p>
+            <p>Vielen Dank für Ihre Registrierung bei Sport-Connect.de. Zur Verifizierung Ihrer E-Mail-Adresse benötigen wir von Ihnen den folgenden Code:</p>
+            <h1>${OTP}</h1>
+            <p>Bitte geben Sie diesen Code auf der Verifizierungsseite ein oder klicken Sie auf den folgenden Link:</p>
+            <p><a href="https://www.sport-connect.de/verify?code=${OTP}">https://www.sport-connect.de/verify?code=${OTP}</a></p>
+            <p>Vielen Dank und freundliche Grüße</p>
+            <p>Ihr Sport-Connect.de-Team</p>
+          </body>
+        </html>
+      `,
+    })
+
+
     console.log("User created");
-    // Rückgabe des Eintrages zum Vergleichen ob eintrag mit Usereingaben übereinstimmen
+    res.status(200).json({Status:"Pending" , msg:"Code per Email an: " + user.email , user:user._id})
     res.json(user);
 });
+
+//verify email
+router.post("/verifyEmail" , async(req , res)=>{
+  const {user , OTP} = req.body;
+  const mainuser = await UserModel.findById(user);
+  if(!mainuser) return res.status(400).json("User not found");
+  if(mainuser.verifed === true){
+      return res.status(400).json("User already verifed")
+  };
+  const token = await verifyEmailModel.findOne({user:mainuser._id});
+  if(!token){
+      return res.status(400).json("Sorry token not found")
+  }
+  const isMatch = await bcrypt.compareSync(OTP , token.token);
+  if(!isMatch){return res.status(400).json("Token is not valid")};
+
+  mainuser.verifed = true;
+  await verifyEmailModel.findByIdAndDelete(token._id);
+  await mainuser.save();
+
+  // Anpassung des Nodemailers
+  const transport = nodemailer.createTransport({
+      host: "smtp.mailtrap.io",
+      port: 2525,
+      auth: {
+        user: process.env.USER,
+        pass: process.env.PASS
+      }
+    });
+
+    // Anpassung des Nodemailers
+    transport.sendMail({
+      from:"sociaMedia@gmail.com",
+      to:mainuser.email,
+      subject:"Email-Verifizierung für Sport-Connect.de",
+      html:`Erfolgeich verifiziert`
+    })
+    return res.status(200).json("Verifizierung Erfolgreich")
+})
 
 router.post("/login", async (req, res) => {
     try {
@@ -83,5 +171,8 @@ router.post('/validateSession', async (req, res) => {
     }
   });
 
+  
 
-module.exports = router;
+
+
+module.exports = rout
