@@ -171,8 +171,4 @@ router.post('/validateSession', async (req, res) => {
     }
   });
 
-  
-
-
-
-module.exports = rout
+module.exports = router;
