@@ -24,59 +24,64 @@ router.post("/createUser", async (req, res) => {
     const hashedPassword = await bcrypt.hash(user.password, salt);
     user.password = hashedPassword;
 
-    const OTP = generateOTP();
-
-    const verifyToken = await verifyEmailModel.create({
-      user:user._id,
-      token:OTP
-    });
-
-    verifyToken.save();
-
     // Erstellen eines Eintrages in der MongoDB
     const newUser = new UserModel(user);
     await newUser.save();
 
-    // Anpassung des Nodemailers
-    const transport = nodemailer.createTransport({
-      host: "smtp.mailtrap.io",
-      port: 2525,
-      auth: {
-        // .env Datei mit den Zugangsdaten
-        login: process.env.USER,
-        pass: process.env.PASS
-      }
-    });
+    // Create a new token for the user
+    const OTP = generateOTP();
+    const getUser = await UserModel.findOne({email:user.email});
 
-    // Anpassung des Nodemailers
-    transport.sendMail({
-      from:"sociaMedia@gmail.com",
-      to: user.email,
-      subject: "Email-Verifizierung für Sport-Connect.de",
-      html: `
-        <html>
-          <head>
-            <style>
-              /* Hier können Sie Ihre eigenen Styles definieren */
-            </style>
-          </head>
-          <body>
-            <p>Guten Tag ${user.vorname},</p>
-            <p>Vielen Dank für Ihre Registrierung bei Sport-Connect.de. Zur Verifizierung Ihrer E-Mail-Adresse benötigen wir von Ihnen den folgenden Code:</p>
-            <h1>${OTP}</h1>
-            <p>Bitte geben Sie diesen Code auf der Verifizierungsseite ein oder klicken Sie auf den folgenden Link:</p>
-            <p><a href="https://www.sport-connect.de/verify?code=${OTP}">https://www.sport-connect.de/verify?code=${OTP}</a></p>
-            <p>Vielen Dank und freundliche Grüße</p>
-            <p>Ihr Sport-Connect.de-Team</p>
-          </body>
-        </html>
-      `,
+    const newToken = new verifyEmailModel({
+        user:getUser._id,
+        token:OTP
     })
+
+    await newToken.save();
+    
+    try {
+      // Anpassung des Nodemailers
+      const transport = nodemailer.createTransport({
+        host: "smtp.mailtrap.io",
+        port: 2525,
+        auth: {
+          // .env Datei mit den Zugangsdaten
+          login: process.env.USER,
+          pass: process.env.PASS
+        }
+      });
+
+      // Anpassung des Nodemailers
+      transport.sendMail({
+        from:"sociaMedia@gmail.com",
+        to: user.email,
+        subject: "Email-Verifizierung für Sport-Connect.de",
+        html: `
+          <html>
+            <head>
+              <style>
+                /* Hier können Sie Ihre eigenen Styles definieren */
+              </style>
+            </head>
+            <body>
+              <p>Guten Tag ${user.vorname},</p>
+              <p>Vielen Dank für Ihre Registrierung bei Sport-Connect.de. Zur Verifizierung Ihrer E-Mail-Adresse benötigen wir von Ihnen den folgenden Code:</p>
+              <h1>${OTP}</h1>
+              <p>Bitte geben Sie diesen Code auf der Verifizierungsseite ein oder klicken Sie auf den folgenden Link:</p>
+              <p><a href="https://www.sport-connect.de/verify?code=${OTP}">https://www.sport-connect.de/verify?code=${OTP}</a></p>
+              <p>Vielen Dank und freundliche Grüße</p>
+              <p>Ihr Sport-Connect.de-Team</p>
+            </body>
+          </html>
+        `,
+      })
+    } catch (err) {
+      console.log(err);
+    }
 
 
     console.log("User created");
     res.status(200).json({Status:"Pending" , msg:"Code per Email an: " + user.email , user:user._id})
-    res.json(user);
 });
 
 //verify email
@@ -171,4 +176,9 @@ router.post('/validateSession', async (req, res) => {
     }
   });
 
+
 module.exports = router;
+
+
+
+
