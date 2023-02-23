@@ -11,6 +11,7 @@ import intro3 from "./intro3.png";
 import intro4 from "./intro4.png";
 import gonkle from "./gonkle.png";
 import gonkle1 from "./gonkle1.jpg";
+import gonkle2 from "./gonkle2.png";
 
 const images = {
     frisbee,
@@ -24,7 +25,8 @@ const images = {
     intro3,
     intro4,
     gonkle,
-    gonkle1
+    gonkle1,
+    gonkle2
 }
 export default images;
 

@@ -85,7 +85,7 @@ function Login() {
                         </div>
                     </div>
                 </Form>
-                <img src={images.gonkle11} className="photo" />
+                <img src={images.gonkle2} className="photo" />
 
 
 
