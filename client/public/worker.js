@@ -1,4 +1,4 @@
-var CACHE_NAME = 'ProjectF';
+var CACHE_NAME = 'Gonkle';
 var urlsToCache = [
   '/',
   '/completed'
@@ -33,7 +33,7 @@ self.addEventListener('fetch', event => {
 
 // Update a service worker
 self.addEventListener('activate', event => {
-  var cacheWhitelist = ['ProjectF'];
+  var cacheWhitelist = ['Gonkle'];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
