@@ -12,6 +12,7 @@ const Login = lazy(() => import('./pages/Login'));
 const Settings = lazy(() => import('./pages/settings'));
 const Wait = lazy(() => import('./components/wait'));
 const Forgotpw = lazy(() => import('./pages/Forgotpw'));
+const Landing = lazy(() => import('./pages/Landing'));
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -49,9 +50,11 @@ function App() {
   // when cookie is removed and the user changes with useNavigate to another page isloggedin is still true
   useEffect(() => {
     if (!cookie && isLoggedIn) {
-      setIsLoggedIn(false);
+      setIsLoggedIn(false);     // HERE IS THE PROBLEM
     }
   }, [cookie, isLoggedIn]);
+
+  // useEffect(() => {
 
 
   return (
@@ -64,6 +67,7 @@ function App() {
               <>
                 <Route path="/Login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
                 <Route path="/Register" element={<Register setIsLoggedIn={setIsLoggedIn} />} />
+                <Route path="/Landing" element={<Landing setIsLoggedIn={setIsLoggedIn} />} />
               </>
             )}
             {isLoggedIn ? (

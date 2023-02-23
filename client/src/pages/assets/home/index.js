@@ -5,6 +5,12 @@ import volleyball from "./volleyball.png";
 import baskettball from "./baskettball.png";
 import tischtennis from "./tischtennis.png";
 import skateboard from "./skateboard.png";
+import intro1 from "./intro1.png";
+import intro2 from "./intro2.png";
+import intro3 from "./intro3.png";
+import intro4 from "./intro4.png";
+import gonkle from "./gonkle.png";
+import gonkle1 from "./gonkle1.jpg";
 
 const images = {
     frisbee,
@@ -12,7 +18,13 @@ const images = {
     volleyball,
     baskettball,
     tischtennis,
-    skateboard
+    skateboard,
+    intro1,
+    intro2,
+    intro3,
+    intro4,
+    gonkle,
+    gonkle1
 }
 export default images;
 
