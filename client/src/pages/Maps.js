@@ -13,6 +13,19 @@ import L from "leaflet";
 import images from "./assets/map/index.js";
 import "leaflet/dist/leaflet.css";
 import "./css/Maps.css";
+import axios from 'axios';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCog } from "@fortawesome/free-solid-svg-icons";
+
+
+
+
+const MAP_STYLES = [
+  { name: "Standard", url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" },
+  { name: "Schwarz-Weiß", url: "https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" },
+  { name: "Grau", url: "https://tiles.wmflabs.org/bw-mapnik-landuse/{z}/{x}/{y}.png" },
+  { name: "Wasserfarben", url: "https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png" },
+];
 
 // Universelle GetIcon Funktion mit Icongröße und Iconname
 function GetIcon(_iconSize, _iconName) {
@@ -22,9 +35,14 @@ function GetIcon(_iconSize, _iconName) {
   });
 }
 
+
+
 function Maps() {
   const [zoom, setZoom] = useState(15);
 
+  
+
+  
   // Event erstellen Toggle
   const [enableEvent, setEnableEvent] = useState(false);
 
@@ -64,10 +82,31 @@ function Maps() {
       handleClose();
       // Wenn Event erstellt worden ist, dann nochmal Events aus DB holen und in die Map einfügen, da der lokale Marker entfernt wird
       // Eventueller useEffect außerhalb der Funktion, der bei jedem Event erstellen ausgeführt wird
-    };
+    
+
+     // Namen des Events aus dem Formular holen
+     const data = {
+      name: event.target.eventName.value,
+      uhrzeit: event.target.eventTime.value
+      
+      // get SessionID from cookie 
+     }
+
+        axios.post('http://localhost:4000/createEvent', data).then(res => {
+        console.log(res.data);
+      }).catch(err => {
+        console.log(err);
+      });
+
+      console.log(data);
+        
+      }
+
   
     return (
       <>
+
+      
         {markerExists && (
           <Marker
             position={[eventLatLng.lat, eventLatLng.lng]}
@@ -195,7 +234,7 @@ function Maps() {
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-
+       
         <LocationMarker />
 
         {enableEvent === true ? <Event /> : null}
