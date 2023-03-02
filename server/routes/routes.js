@@ -8,6 +8,7 @@ dotenv.config();
 const JWTSEC = process.env.JWTSEC;
 
 const UserModel = require('../models/Users');
+const EventModel = require('../models/Events')
 const verifyEmailModel = require('../models/Verify');
 const crypto = require('crypto');
 const { generateOTP } = require('./OTP');
@@ -175,6 +176,31 @@ router.post('/validateSession', async (req, res) => {
       res.status(500).send('Internal server error');
     }
   });
+
+  router.post('/createEvent', async (req, res) => {
+
+    try {
+      const userEvent = await UserModel.findOne({ sessionID: req.body.sessionID }, { userID: 1, _id: 0 });
+  
+    const data = {
+      user: userEvent,
+      name: req.body.name,
+      uhrzeit: req.body.uhrzeit,
+      // lat
+      // lng
+     }
+
+
+    const newEvent = new EventModel(data);
+    await newEvent.save();
+
+
+  } catch {
+    console.log("err");
+  }
+
+  
+  })
 
 
 module.exports = router;
