@@ -17,14 +17,20 @@ app.use(cors({
     origin: ['http://localhost:3000']
   }));
   
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
+const allowedOrigins = ["https://gonkle.de", "http://gonkle.de", "http://localhost:3000"];
+
+  app.use(function(req, res, next) {
+    const origin = req.headers.origin;
+    if (allowedOrigins.indexOf(origin) > -1) {
+      res.setHeader("Access-Control-Allow-Origin", origin);
+    }
     res.header(
       "Access-Control-Allow-Headers",
       "Origin, X-Requested-With, Content-Type, Accept"
     );
     next();
   });
+  
 
 // MongoDB Connection URL
 mongoose.connect(process.env.DATABASE_ACCESS, () => console.log("Database connected"));
