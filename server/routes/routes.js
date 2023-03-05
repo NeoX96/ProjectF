@@ -100,7 +100,7 @@ router.post("/createUser", async (req, res) => {
             </head>
             <body>
               <div class="container">
-                <img src="https://www.gonkle.de/logo.png" alt="Gonkle Logo" class="logo">
+                <img src="https://www.gonkle.de/logo.png" alt="Gonkle Logo" class="logo"> <br><br>
                 Guten Tag ${user.vorname},<br>
                 Wir heißen Sie herzlich willkommen bei Gonkle<br>
 
