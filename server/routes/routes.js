@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 dotenv.config();
 const JWTSEC = process.env.JWTSEC;
 
+
 const UserModel = require('../models/Users');
 const EventModel = require('../models/Events')
 const verifyEmailModel = require('../models/Verify');
@@ -43,20 +44,22 @@ router.post("/createUser", async (req, res) => {
     try {
       // Anpassung des Nodemailers
       const transport = nodemailer.createTransport({
-        host: "smtp.mailtrap.io",
-        port: 2525,
+        host: "mail.gonkle.de",
+        port: 587,
         auth: {
-          // .env Datei mit den Zugangsdaten
-          login: process.env.USER,
+          user: process.env.USER,
           pass: process.env.PASS
-        }
+        },
+        tls: {
+           rejectUnauthorized: false
+         }
       });
 
       // Anpassung des Nodemailers
       transport.sendMail({
-        from:"sociaMedia@gmail.com",
+        from:"noreply@gonkle.de",
         to: user.email,
-        subject: "Email-Verifizierung für Sport-Connect.de",
+        subject: "Email-Verifizierung für Gonkle",
         html: `
           <html>
             <head>
@@ -66,12 +69,12 @@ router.post("/createUser", async (req, res) => {
             </head>
             <body>
               <p>Guten Tag ${user.vorname},</p>
-              <p>Vielen Dank für Ihre Registrierung bei Sport-Connect.de. Zur Verifizierung Ihrer E-Mail-Adresse benötigen wir von Ihnen den folgenden Code:</p>
+              <p>Vielen Dank für Ihre Registrierung bei Gonkle. Zur Verifizierung Ihrer E-Mail-Adresse benötigen wir von Ihnen den folgenden Code:</p>
               <h1>${OTP}</h1>
               <p>Bitte geben Sie diesen Code auf der Verifizierungsseite ein oder klicken Sie auf den folgenden Link:</p>
-              <p><a href="https://www.sport-connect.de/verify?code=${OTP}">https://www.sport-connect.de/verify?code=${OTP}</a></p>
+              <p><a href="https://www.gonkle.de/verify?code=${OTP}">Verify: ${OTP}</a></p>
               <p>Vielen Dank und freundliche Grüße</p>
-              <p>Ihr Sport-Connect.de-Team</p>
+              <p>Ihr Gonkle-Team</p>
             </body>
           </html>
         `,
@@ -116,9 +119,9 @@ router.post("/verifyEmail" , async(req , res)=>{
 
     // Anpassung des Nodemailers
     transport.sendMail({
-      from:"sociaMedia@gmail.com",
+      from:"noreply@gonkle.de",
       to:mainuser.email,
-      subject:"Email-Verifizierung für Sport-Connect.de",
+      subject:"Email-Verifizierung für Gonkle.de",
       html:`Erfolgeich verifiziert`
     })
     return res.status(200).json("Verifizierung Erfolgreich")
