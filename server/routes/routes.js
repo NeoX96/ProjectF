@@ -63,22 +63,73 @@ router.post("/createUser", async (req, res) => {
         html: `
           <html>
             <head>
+              <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
               <style>
-                /* Hier können Sie Ihre eigenen Styles definieren */
+                body {
+                  font-family: 'Open Sans', sans-serif;
+                  font-size: 16px;
+                  color: #222;
+                  line-height: 1.5;
+                }
+                h1 {
+                  font-size: 48px;
+                  font-weight: 600;
+                  color: #0077c2;
+                  margin: 0 0 32px;
+                }
+                a {
+                  color: #0077c2;
+                }
+                .container {
+                  max-width: 700px;
+                  margin: 0 auto;
+                  padding: 32px;
+                  border: 1px solid #ddd;
+                  border-radius: 4px;
+                }
+                .logo {
+                  display: block;
+                  margin: 0 auto 32px;
+                }
+                .footer {
+                  margin-top: 32px;
+                  text-align: center;
+                  color: #777;
+                }
               </style>
             </head>
             <body>
-              <p>Guten Tag ${user.vorname},</p>
-              <p>Vielen Dank für Ihre Registrierung bei Gonkle. Zur Verifizierung Ihrer E-Mail-Adresse benötigen wir von Ihnen den folgenden Code:</p>
-              <h1>${OTP}</h1>
-              <p>Bitte geben Sie diesen Code auf der Verifizierungsseite ein oder klicken Sie auf den folgenden Link:</p>
-              <p><a href="https://www.gonkle.de/verify?code=${OTP}">Verify: ${OTP}</a></p>
-              <p>Vielen Dank und freundliche Grüße</p>
-              <p>Ihr Gonkle-Team</p>
+              <div class="container">
+                <img src="https://www.gonkle.de/logo.png" alt="Gonkle Logo" class="logo">
+                Guten Tag ${user.vorname},<br>
+                Wir heißen Sie herzlich willkommen bei Gonkle<br>
+
+                Um sicherzustellen, dass Sie der rechtmäßige Inhaber der angegebenen E-Mail-Adresse sind, bitten wir Sie, Ihre Adresse zu verifizieren. Dafür benötigen wir von Ihnen den folgenden Code:<br>
+
+                <h1 style="text-align:center"><a href="https://www.gonkle.de/verify">${OTP}</a></h1>
+          
+                Bitte geben Sie diesen Code auf unserer Verifizierungsseite ein oder klicken Sie auf folgenden Button: <br>
+                <a href="https://www.gonkle.de/verify"https://www.gonkle.de/verify</a><br>
+          
+                <p style="text-align:center"><a href="https://www.gonkle.de/verify?email=${user.email}&code=${OTP}" style="background-color:#007bff;color:#fff;padding:10px;border-radius:5px;text-decoration:none;">E-Mail-Adresse verifizieren</a></p><br><br>
+
+                
+                Bitte beachten Sie, dass Sie Ihre E-Mail-Adresse innerhalb von 24 Stunden verifizieren müssen, damit wir Ihre Registrierung abschließen können. <br>
+                Sollten Sie Probleme bei der Verifizierung haben, können Sie sich jederzeit an unser Support-Team wenden, das Ihnen gerne weiterhilft.<br>
+                Wir bedanken uns für Ihr Vertrauen und freuen uns, Sie bei Gonkle begrüßen zu dürfen.<br>
+                
+                <p>Freundliche Grüße,<br>
+                Ihr Gonkle-Team</p>
+                
+              </div>
+              <div class="footer">
+                <p>Gonkle | AbschlussProjekt | RDF<p>
+              </div>
             </body>
           </html>
         `,
       })
+      console.log("Email sent");
     } catch (err) {
       console.log(err);
     }
