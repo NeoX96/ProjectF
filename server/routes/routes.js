@@ -18,8 +18,6 @@ const randomId = () => crypto.randomBytes(16).toString("hex");
 
 router.post("/createUser", async (req, res) => {
     const user = req.body;
-    user.sessionID = randomId();
-    user.userID = randomId();
 
     // Das Passwort verschlüsseln
     const salt = await bcrypt.genSalt();
