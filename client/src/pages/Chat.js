@@ -434,6 +434,43 @@ function Chat() {
     );
   };
 
+  function FriendsList () {
+    return (
+      <div className="UserList">
+      <h4>Online</h4>
+      <ul className="users">
+        {onlineFriends.map((user, idx) => {
+          return (
+            <li key={idx}>
+              <Button
+                variant="outline-light"
+                onClick={() => selectUser(user)}
+              >
+                {user.vorname}
+              </Button>
+            </li>
+          );
+        })}
+      </ul>
+      <h4>Offline</h4>
+      <ul className="users">
+        {offlineFriends.map((user, idx) => {
+          return (
+            <li key={idx}>
+              <Button
+                variant="outline-light"
+                onClick={() => selectUser(user)}
+              >
+                {user.vorname}
+              </Button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+    )
+  }
+
   return (
     <div className="HoleChatAppContainer container-fluid">
       <div className="row">
@@ -446,38 +483,7 @@ function Chat() {
             <FriendsModal />
           </div>
           <div className="row">
-            <div className="UserList">
-              <h4>Online</h4>
-              <ul className="users">
-                {onlineFriends.map((user, idx) => {
-                  return (
-                    <li key={idx}>
-                      <Button
-                        variant="outline-light"
-                        onClick={() => selectUser(user)}
-                      >
-                        {user.vorname}
-                      </Button>
-                    </li>
-                  );
-                })}
-              </ul>
-              <h4>Offline</h4>
-              <ul className="users">
-                {offlineFriends.map((user, idx) => {
-                  return (
-                    <li key={idx}>
-                      <Button
-                        variant="outline-light"
-                        onClick={() => selectUser(user)}
-                      >
-                        {user.vorname}
-                      </Button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+            <FriendsList />
           </div>
         </div>
         <div className={`Chatting col ${targetUser ? '' : 'd-none d-sm-none d-md-none d-lg-block d-xl-block'}`}>
