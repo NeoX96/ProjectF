@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const dotenv = require('dotenv');
+const cors = require('cors');
 const mongoose = require('mongoose');
 const UserModel = require('./models/Users');
 const MessageModel = require('./models/Messages');
@@ -10,9 +11,12 @@ const mongoPort = 4000;
 
 
 dotenv.config();
-app.use(express.json());
-  
+app.use(express.json());  
 const allowedOrigins = ["https://www.gonkle.de http://www.gonkle.de https://gonkle.de", "http://gonkle.de", "http://localhost:3000"];
+
+    app.use(cors({
+        origin: allowedOrigins
+    }));
 
   app.use(function(req, res, next) {
     const origin = req.headers.origin;
