@@ -1,5 +1,4 @@
 const express = require("express");
-const cors = require("cors");
 const app = express();
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
@@ -12,12 +11,8 @@ const mongoPort = 4000;
 
 dotenv.config();
 app.use(express.json());
-
-app.use(cors({
-    origin: ['http://localhost:3000']
-  }));
   
-const allowedOrigins = ["https://gonkle.de", "http://gonkle.de", "http://localhost:3000"];
+const allowedOrigins = ["https://www.gonkle.de http://www.gonkle.de https://gonkle.de", "http://gonkle.de", "http://localhost:3000"];
 
   app.use(function(req, res, next) {
     const origin = req.headers.origin;
@@ -51,7 +46,7 @@ const socketPort = 4001;
 const http = require('http').Server(app);
 const socketIO = require('socket.io')(http, {
     cors: {
-        origin: "*"
+        origin: allowedOrigins
     }
 });
 
