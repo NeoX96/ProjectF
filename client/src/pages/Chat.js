@@ -480,7 +480,7 @@ function Chat() {
             </div>
           </div>
         </div>
-        <div className={`Chatting col ${targetUser ? 'd-md-none d-lg-block' : 'd-none d-sm-none d-md-none d-lg-block d-xl-block'}`}>
+        <div className={`Chatting col ${targetUser ? '' : 'd-none d-sm-none d-md-none d-lg-block d-xl-block'}`}>
           {targetUser && (
             <div className="row px-3 py-2 border-start border-muted">
               <ChatContainer targetUser={targetUser} />
