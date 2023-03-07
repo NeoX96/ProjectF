@@ -14,6 +14,7 @@ const Settings = lazy(() => import('./pages/settings'));
 const Wait = lazy(() => import('./components/wait'));
 const Forgotpw = lazy(() => import('./pages/Forgotpw'));
 const Landing = lazy(() => import('./pages/Landing'));
+const Verify = lazy(() => import('./pages/Verify'));
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -66,9 +67,10 @@ function App() {
           <Routes>
             {!isLoggedIn && (
               <>
-                <Route path="/Login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-                <Route path="/Register" element={<Register setIsLoggedIn={setIsLoggedIn} />} />
-                <Route path="/Landing" element={<Landing setIsLoggedIn={setIsLoggedIn} />} />
+                <Route path="/Login" element={<Login />} />
+                <Route path="/Register" element={<Register  />} />
+                <Route path="/Landing" element={<Landing  />} />
+                <Route path="/Verify" element={<Verify />} />
               </>
             )}
             {isLoggedIn ? (
