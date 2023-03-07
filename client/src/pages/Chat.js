@@ -12,9 +12,7 @@ function Chat() {
   const messagesRef = useRef(null);
 
   // States
-  const [message, setMessage] = useState("");
   const [privateMessages, setPrivateMessages] = useState({});
-  const [username, setUsername] = useState("");
   const [onlineFriends, setOnlineFriends] = useState([]);
   const [offlineFriends, setOfflineFriends] = useState([]);
   const [targetUser, setTargetUser] = useState(null);
@@ -30,7 +28,6 @@ function Chat() {
 
       // get Username from MongoDB and set to socket
       socket.on("session", (data) => {
-        setUsername(data.username);
         socket.username = data.username;
         socket.id = data.userID;
         socket.name = data.name;
@@ -112,24 +109,23 @@ function Chat() {
   }, []);
 
   // Send Message
-  const sendMessage = (e) => {
-    e.preventDefault();
+  const sendMessage = (event) => {
+    event.preventDefault();
+    const value = event.target.elements.message.value;
+    console.log(event.target.elements.message.value);
+    if (value === "") return;
+
+    console.log(value);
     // if private message send to target user
     if (targetUser !== null) {
       socket.emit("send_private_message", {
-        message: message,
+        message: value,
         targetUser: targetUser.userID,
         sender: socket.id,
       });
     } else {
-      // else send to all users
-      socket.emit("send_message", {
-        username: username,
-        message: message,
-        vorname: socket.name,
-      });
+      return;
     }
-    setMessage("");
   };
 
   // select user to chat with
@@ -333,12 +329,9 @@ function Chat() {
               <input
                 placeholder="Message ..."
                 required
-                value={message}
-                onChange={(event) => {
-                  setMessage(event.target.value);
-                }}
                 className="form-control"
                 type="text"
+                name = "message"
               />
               <button className="btn btn-primary" type="submit">
                 <iconify-icon icon="ic:round-send"></iconify-icon>
