@@ -30,10 +30,11 @@ function Login() {
       });
 
       if (data.accessToken) {
+        var isSecure = window.location.protocol === "https:" ? true : false;
         Cookies.set("sessionID", data.accessToken, {
           expires: 1,
-          sameSite: "none",
-          secure: true,
+          secure: isSecure,
+          sameSite: isSecure ? "none" : "lax",
         });
 
         window.location.href = "/Home";
