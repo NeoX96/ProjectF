@@ -14,19 +14,24 @@ import images from "./assets/map/index.js";
 import "leaflet/dist/leaflet.css";
 import "./css/Maps.css";
 import axios from 'axios';
+
+import { DOMAIN } from "../index";
+
+
+/*
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCog } from "@fortawesome/free-solid-svg-icons";
+*/
 
 
-
-
+/*
 const MAP_STYLES = [
   { name: "Standard", url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" },
   { name: "Schwarz-Weiß", url: "https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" },
   { name: "Grau", url: "https://tiles.wmflabs.org/bw-mapnik-landuse/{z}/{x}/{y}.png" },
   { name: "Wasserfarben", url: "https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png" },
 ];
-
+*/
 // Universelle GetIcon Funktion mit Icongröße und Iconname
 function GetIcon(_iconSize, _iconName) {
   return L.icon({
@@ -92,7 +97,7 @@ function Maps() {
       // get SessionID from cookie 
      }
 
-        axios.post('http://localhost:4000/createEvent', data).then(res => {
+      axios.post(`${DOMAIN}/createEvent`, data).then(res => {
         console.log(res.data);
       }).catch(err => {
         console.log(err);

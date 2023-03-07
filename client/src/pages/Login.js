@@ -4,6 +4,9 @@ import { Button, Form } from "react-bootstrap";
 import Cookies from "js-cookie";
 import axios from "axios";
 
+import { DOMAIN } from "../index";
+
+
 function Login() {
   const navigate = useNavigate();
 
@@ -21,7 +24,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const { data } = await axios.post("http://localhost:4000/login", {
+      const { data } = await axios.post(`${DOMAIN}/login`, {
         email,
         password,
       });

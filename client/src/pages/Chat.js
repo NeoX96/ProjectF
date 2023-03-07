@@ -1,9 +1,9 @@
 import "./css/Chat.css";
 import React, { useEffect, useState, useRef } from "react";
 import socketIO from "socket.io-client";
-import { Button, ListGroup, Modal, Table} from "react-bootstrap";
-import Cookies from 'js-cookie';
-const endpoint = "http://localhost:4001";
+import { Button, ListGroup, Modal, Table } from "react-bootstrap";
+import Cookies from "js-cookie";
+import { endpoint } from "../index";
 
 const socket = socketIO(endpoint, { autoConnect: false });
 
@@ -12,7 +12,6 @@ function Chat() {
   const messagesRef = useRef(null);
 
   // States
-  const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [privateMessages, setPrivateMessages] = useState({});
   const [username, setUsername] = useState("");
@@ -21,52 +20,27 @@ function Chat() {
   const [targetUser, setTargetUser] = useState(null);
   const [showFriendModal, setshowFriendModal] = useState(false);
 
-  const sessionID = Cookies.get('sessionID');
+  const sessionID = Cookies.get("sessionID");
 
   // useEffect zum Verbinden mit SocketIO
   useEffect(() => {
-  if (sessionID) {
-    socket.auth = { sessionID };
-    socket.connect();
+    if (sessionID) {
+      socket.auth = { sessionID };
+      socket.connect();
 
-    // get Username from MongoDB and set to socket
-    socket.on("session", (data) => {
-      setUsername(data.username);
-      socket.username = data.username;
-      socket.id = data.userID;
-      socket.name = data.name;
-      socket._id = data._id;
-    });
-  } else {
-    // redirect to login
-    window.location.href = "/Login";
-  }
-}, [sessionID]);
-
-  // useEffect for Messages
-  useEffect(() => {
-    messagesRef.current.scrollIntoView({ behavior: "smooth" });
-
-    // SocketIO Receive Message and store in MongoDB
-    socket.on("receive_message", (data) => {
-      setMessages([...messages, data]);
-      messagesRef.current.scrollIntoView({ behavior: "smooth" });
-    });
-
-    socket.on("user_disconnected", (username) => {
-      setMessages([...messages,{ vorname: "Chat Bot", message: `${username} disconnected` }]);
-    });
-  
-    socket.on("user_connected", (username) => {
-      setMessages([...messages,{ vorname: "Chat Bot", message: `${username} connected` }]);
-    });
-
-    return () => {
-      socket.off ("receive_message");
-      socket.off ("user_disconnected");
-      socket.off ("user_connected");
+      // get Username from MongoDB and set to socket
+      socket.on("session", (data) => {
+        setUsername(data.username);
+        socket.username = data.username;
+        socket.id = data.userID;
+        socket.name = data.name;
+        socket._id = data._id;
+      });
+    } else {
+      // redirect to login
+      window.location.href = "/Login";
     }
-  }, [messages]);
+  }, [sessionID]);
 
   // useEffect for Friends
   useEffect(() => {
@@ -79,10 +53,8 @@ function Chat() {
     });
   }, [onlineFriends, offlineFriends]);
 
-
   // useEffect for private Messages
   useEffect(() => {
-    messagesRef.current.scrollIntoView({ behavior: "smooth" });
     socket.on("receive_private_message", (data) => {
       setPrivateMessages({
         ...privateMessages,
@@ -95,7 +67,6 @@ function Chat() {
       socket.off("receive_private_message");
     };
   }, [privateMessages, targetUser]);
-
 
   // initial useEffect
   useEffect(() => {
@@ -132,13 +103,13 @@ function Chat() {
     });
 
     return () => {
-      socket.off ("get_friends");
-      socket.off ("session");
-      socket.off ("accept_request_response");
-      socket.off ("decline_request_response");
-    }
+      socket.off("get_friends");
+      socket.off("session");
+      socket.off("accept_request_response");
+      socket.off("decline_request_response");
+      socket.disconnect();
+    };
   }, []);
-
 
   // Send Message
   const sendMessage = (e) => {
@@ -149,29 +120,30 @@ function Chat() {
         message: message,
         targetUser: targetUser.userID,
         sender: socket.id,
-
       });
     } else {
       // else send to all users
-      socket.emit("send_message", { username: username, message: message, vorname : socket.name });
+      socket.emit("send_message", {
+        username: username,
+        message: message,
+        vorname: socket.name,
+      });
     }
     setMessage("");
-  }
-
+  };
 
   // select user to chat with
   const selectUser = (user) => {
     setTargetUser(user);
-  }
-
+  };
 
   const unselectUser = () => {
     setTargetUser(null);
-  }
+  };
 
   // useEffect for private messages
   useEffect(() => {
-    setPrivateMessages(prevPrivateMessages => ({
+    setPrivateMessages((prevPrivateMessages) => ({
       ...prevPrivateMessages,
       [targetUser]: [],
     }));
@@ -185,71 +157,77 @@ function Chat() {
     }
 
     socket.on("get_private_messages", (data) => {
-      setPrivateMessages(prevPrivateMessages => ({
+      setPrivateMessages((prevPrivateMessages) => ({
         ...prevPrivateMessages,
         [targetUser]: data,
       }));
     });
 
-  return () => {
-    socket.off("get_private_messages");
-  };
+    return () => {
+      socket.off("get_private_messages");
+    };
   }, [targetUser]);
 
-
-
-
   // ChatContainer for each user
-  function ChatContainer () {
-
+  function ChatContainer() {
     // chat container for each user to chat with seperatly key = user._id
     if (targetUser !== null) {
       return (
         <div>
-          <h4 className="justify-content-center">Chat with {targetUser.vorname}</h4>
-        <div
-          id="text"
-          className="overflow-auto d-flex flex-column justify-content-between rounded" 
-          key={targetUser.userID}>
-          <ul className="list-group-item">
-          {privateMessages[targetUser] ? privateMessages[targetUser].map((message, idx) => {
-            return (
-              <li key={idx} className={message.sender === socket._id || message.sender === socket.id ? "text-end users" : "text-start users"} >
-                {message.message}
-              </li>
-            );
-          }) : <li className="justify-conent-center">No messages yet.</li>}
-          </ul>
-          <div ref={messagesRef}></div>
+          <div className="d-flex ">
+            <Button variant="" className="d-flex align-items-center">
+              <iconify-icon 
+              icon="eva:arrow-ios-back-fill"
+              onClick={() => unselectUser()}/> 
+            </Button>
+            <h4 className="justify-content-center">
+              Chat with {targetUser.vorname}
+            </h4>
+          </div>
+          <div
+            id="text"
+            className="overflow-auto d-flex flex-column justify-content-between rounded"
+            key={targetUser.userID}
+          >
+            <ul className="list-group-item">
+              {privateMessages[targetUser] ? (
+                privateMessages[targetUser].map((message, idx) => {
+                  return (
+                    <li
+                      key={idx}
+                      className={
+                        message.sender === socket._id ||
+                        message.sender === socket.id
+                          ? "text-end users"
+                          : "text-start users"
+                      }
+                    >
+                      {message.message}
+                    </li>
+                  );
+                })
+              ) : (
+                <li className="justify-conent-center">No messages yet.</li>
+              )}
+            </ul>
+            <div ref={messagesRef}></div>
           </div>
         </div>
       );
     } else {
       return (
         <div>
-          <h4>All Chat</h4>
-        <div
-        id="text"
-        className="overflow-auto  justify-content-between rounded" 
-        >
-          <ul className="list-group-item">
-            {messages.map((message, idx) => {
-              return (
-                <li key={idx} className={message.username === username ? "text-end users" : "text-start users"} >
-                  <b>{message.vorname}</b>: {message.message}
-                </li>
-              );
-            })}
-          </ul>
-          <div ref={messagesRef}></div>
-        </div>
+          <h4>Select User</h4>
+          <div
+            id="text"
+            className="overflow-auto  justify-content-between rounded"
+          ></div>
         </div>
       );
     }
   }
 
-  
-// SearchBar Funktion
+  // SearchBar Funktion
   function Search() {
     const [searchUser, setSearchUser] = useState("");
     const [searchUserResult, setSearchUserResult] = useState([]);
@@ -268,7 +246,7 @@ function Chat() {
     };
 
     useEffect(() => {
-      if(searchUser.length === 0) {
+      if (searchUser.length === 0) {
         setShowResults(false);
       } else {
         setShowResults(true);
@@ -321,9 +299,12 @@ function Chat() {
             value={searchUser}
             onChange={searchHandler}
           />
-        <Button>
-          <iconify-icon icon="mingcute:contacts-line" onClick={() => setshowFriendModal(true)}/>
-        </Button>
+          <Button>
+            <iconify-icon
+              icon="mingcute:contacts-line"
+              onClick={() => setshowFriendModal(true)}
+            />
+          </Button>
         </div>
         {showResults && (
           <ListGroup>
@@ -341,16 +322,43 @@ function Chat() {
         )}
       </div>
     );
-  } 
+  }
+
+  function InputMessage() {
+    return (
+      <div>
+        <form onSubmit={sendMessage}>
+          <div className="row mt-2 mb-2 d-block ">
+            <div className="col-md input-group">
+              <input
+                placeholder="Message ..."
+                required
+                value={message}
+                onChange={(event) => {
+                  setMessage(event.target.value);
+                }}
+                className="form-control"
+                type="text"
+              />
+              <button className="btn btn-primary" type="submit">
+                <iconify-icon icon="ic:round-send"></iconify-icon>
+              </button>
+            </div>
+            <div className="col-sm" id="SocketID"></div>
+          </div>
+        </form>
+      </div>
+    );
+  }
 
   // FriendsModal zum akzeptieren von Freundschaftsanfragen
   const FriendsModal = () => {
     const [pendingRequests, setPendingRequests] = useState([]);
-  
+
     const handleClose = () => setshowFriendModal(false);
-  
+
     useEffect(() => {
-    if (showFriendModal) {
+      if (showFriendModal) {
         socket.emit("ask_pending_requests", socket._id);
 
         // response from server with pending requests
@@ -359,138 +367,137 @@ function Chat() {
             setPendingRequests(data.pendingUsers);
           }
         });
-    }
-    return () => {
+      }
+      return () => {
         socket.off("get_pending_requests");
-    }
+      };
     }, []);
-  
-    return (
-      showFriendModal ? (
-        <>
-          <Modal show={showFriendModal} onHide={handleClose} className="text-center" >
+
+    return showFriendModal ? (
+      <>
+        <Modal
+          show={showFriendModal}
+          onHide={handleClose}
+          className="text-center"
+        >
           <Modal.Body>
             <Table striped hover>
               <thead>
-              <tr >
-                <th>Username</th>
-                <th>Vorname</th>
-                <th>Aktion</th>
-              </tr>
+                <tr>
+                  <th>Username</th>
+                  <th>Vorname</th>
+                  <th>Aktion</th>
+                </tr>
               </thead>
               <tbody className="align-middle">
-              {pendingRequests && pendingRequests.length > 0 ? (
-                pendingRequests.map((request, index) => (
-                <tr key={index}>
-                  <td>{request.username}</td>
-                  <td>{request.vorname}</td>
-                  <td>
-                    <Button
-                      className="mr-2"
-                      variant="success"
-                      onClick={() => {
-                        socket.emit("accept_request", request._id);
-                        handleClose();
-                      }}
-                    >
-                      Accept
-                    </Button>
-                    <Button
-                      variant="danger"
-                      onClick={() => {
-                        socket.emit("decline_request", request._id);
-                        handleClose();
-                      }}
-                    >
-                      Decline
-                    </Button>
-                  </td>
-                </tr>
-              ))
-              ) : null}
+                {pendingRequests && pendingRequests.length > 0
+                  ? pendingRequests.map((request, index) => (
+                      <tr key={index}>
+                        <td>{request.username}</td>
+                        <td>{request.vorname}</td>
+                        <td>
+                          <Button
+                            className="mr-2"
+                            variant="success"
+                            onClick={() => {
+                              socket.emit("accept_request", request._id);
+                              handleClose();
+                            }}
+                          >
+                            Accept
+                          </Button>
+                          <Button
+                            variant="danger"
+                            onClick={() => {
+                              socket.emit("decline_request", request._id);
+                              handleClose();
+                            }}
+                          >
+                            Decline
+                          </Button>
+                        </td>
+                      </tr>
+                    ))
+                  : null}
               </tbody>
             </Table>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Close
-              </Button>
-            </Modal.Footer>
-          </Modal>
-        </>
-      ) : (
-        <div />
-      )
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </>
+    ) : (
+      <div />
     );
   };
-  
-  // Return der ChatApp
+
+  function FriendsList () {
+    return (
+      <div className="UserList">
+      <h4>Online</h4>
+      <ul className="users">
+        {onlineFriends.map((user, idx) => {
+          return (
+            <li key={idx}>
+              <Button
+                variant="outline-light"
+                onClick={() => selectUser(user)}
+              >
+                {user.vorname}
+              </Button>
+            </li>
+          );
+        })}
+      </ul>
+      <h4>Offline</h4>
+      <ul className="users">
+        {offlineFriends.map((user, idx) => {
+          return (
+            <li key={idx}>
+              <Button
+                variant="outline-light"
+                onClick={() => selectUser(user)}
+              >
+                {user.vorname}
+              </Button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+    )
+  }
+
   return (
-    <div>
-      <div className="container-md">
-        <div className="row">
-          <div className="col-md">
-            <div className="mt-1">
-              <Button className="mb-2 mt-2" onClick={unselectUser}>All Chat</Button>
-            </div>
-
-            <div>
-              <Search  />
-              <FriendsModal />
-            </div>
-
-            <div className="UserList">
-              <h4>Online</h4>
-              <ul className="users">
-              { onlineFriends.map((user, idx) => {
-                  return (
-                      <li key={idx}>
-                          <Button variant="outline-light" onClick={() => selectUser(user)} >{user.vorname}</Button>
-                      </li>
-                  );
-              })}
-              </ul>
-              <h4>Offline</h4>
-              <ul className="users">
-              { offlineFriends.map((user, idx) => {
-                  return (
-                      <li key={idx}>
-                          <Button variant="outline-light" onClick={() => selectUser(user)} >{user.vorname}</Button>
-                      </li>
-                  );
-              })}
-              </ul>
+    <div className="HoleChatAppContainer container-fluid">
+      <div className="row">
+        <div className={`UserSelection col-lg-4 col-xl-4 ${targetUser ? 'd-none d-sm-none d-md-none d-lg-block d-xl-block' : ''}`}>
+          <div className="row text-center">
+            <h4>Gonkle - {socket.username}</h4>
+          </div>
+          <div className="row px-3 py-2">
+            <Search />
+            <FriendsModal />
+          </div>
+          <div className="row">
+            <FriendsList />
           </div>
         </div>
-
-          <div className="ChatContainer col">
-            <ChatContainer />
-              <div>
-                <form onSubmit={sendMessage}>
-                  <div className="row mt-2 mb-2 d-block ">
-                    <div className="col-md input-group">
-                      <input
-                        placeholder="Message ..."
-                        required
-                        value={message}
-                        onChange={(event) => {
-                          setMessage(event.target.value);
-                        }}
-                        className="form-control"
-                        type="text"
-                      />
-                      <button className="btn btn-primary" type="submit">
-                        <iconify-icon icon="ic:round-send"></iconify-icon>
-                      </button>
-                    </div>
-                    <div className="col-sm" id="SocketID"></div>
-                  </div>
-                </form>
-              </div>
-              </div>
-            <div className="connection">
-              <p>Connected as: {socket.name}</p>
+        <div className={`Chatting col ${targetUser ? '' : 'd-none d-sm-none d-md-none d-lg-block d-xl-block'}`}>
+          {targetUser && (
+            <div className="row px-3 py-2 border-start border-muted">
+              <ChatContainer targetUser={targetUser} />
+              <InputMessage />
             </div>
+          )}
+          {targetUser === null && (
+            <div className="row px-3 py-2 border-start border-muted">
+              <ChatContainer />
+            </div>
+          )}
         </div>
       </div>
     </div>

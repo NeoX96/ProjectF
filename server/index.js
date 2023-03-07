@@ -1,7 +1,7 @@
 const express = require("express");
-const cors = require("cors");
 const app = express();
 const dotenv = require('dotenv');
+const cors = require('cors');
 const mongoose = require('mongoose');
 const UserModel = require('./models/Users');
 const MessageModel = require('./models/Messages');
@@ -11,13 +11,12 @@ const mongoPort = 4000;
 
 
 dotenv.config();
-app.use(express.json());
+app.use(express.json());  
+const allowedOrigins = ["https://www.gonkle.de http://www.gonkle.de https://gonkle.de", "http://gonkle.de", "http://localhost:3000"];
 
-app.use(cors({
-    origin: ['http://localhost:3000']
-  }));
-  
-const allowedOrigins = ["https://gonkle.de", "http://gonkle.de", "http://localhost:3000"];
+    app.use(cors({
+        origin: allowedOrigins
+    }));
 
   app.use(function(req, res, next) {
     const origin = req.headers.origin;
@@ -51,7 +50,7 @@ const socketPort = 4001;
 const http = require('http').Server(app);
 const socketIO = require('socket.io')(http, {
     cors: {
-        origin: "*"
+        origin: allowedOrigins
     }
 });
 
@@ -212,14 +211,6 @@ socketIO.on("connection", (socket) => {
     
     });
 
-    // Store Message in MongoDB when sending and emit to all client
-    socket.on("send_message", (message) => {
-        console.log(message);
-        socketIO.emit("receive_message", message);
-        const newMessage = new MessageModel(message);
-        newMessage.save();
-    });
-
 
     // search for users when someone wants to add a friend
     socket.on("search_user", (username) => {
@@ -292,31 +283,6 @@ socketIO.on("connection", (socket) => {
         }
       });
 
-
-      socket.on("ask_users", () => {
-        const onlineUsers = [];
-        const offlineUsers = [];
-
-        UserModel.find({}, (err, result) => {
-            if(err) {
-                console.log(err);
-            } else {
-                // compare the Name with the all connected users
-
-                // push the users in the right array
-                result.forEach((user) => {
-                    if(user.online === true) {
-                        onlineUsers.push(user);
-                    } else {
-                        offlineUsers.push(user);
-                    }
-                });
-
-                // emit the arrays to the client
-                socket.emit("get_users", onlineUsers, offlineUsers);
-            }
-        });
-    });
 
 
     socket.on("ask_friends", async () => {

@@ -3,6 +3,8 @@ import axios from 'axios';
 import { Button } from 'react-bootstrap';
 import { useNavigate } from "react-router-dom";
 
+import { DOMAIN } from "../index";
+
 
 function Register() {
   const navigate = useNavigate();
@@ -28,7 +30,7 @@ function Register() {
         password: password
     };
 
-    axios.post('http://localhost:4000/createUser', registered).then(res => {
+    axios.post(`${DOMAIN}/createUser`, registered).then(res => {
         console.log(res.data);
         navigate("/Home");
     }).catch(err => {
