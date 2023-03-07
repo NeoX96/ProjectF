@@ -15,7 +15,7 @@ app.use(express.json());
 const allowedOrigins = ["https://www.gonkle.de http://www.gonkle.de https://gonkle.de", "http://gonkle.de", "http://localhost:3000"];
 
     app.use(cors({
-        origin: allowedOrigins
+        origins: allowedOrigins
     }));
 
   app.use(function(req, res, next) {
