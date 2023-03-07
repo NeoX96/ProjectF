@@ -16,7 +16,12 @@ const { generateOTP } = require('./OTP');
 const randomId = () => crypto.randomBytes(16).toString("hex");
 
 
-router.post("/createUser", async (req, res) => {
+router.get("/test", (req, res) => {
+  console.log("Test");
+  res.json({message: "Test"})
+});
+
+router.post("/api/createUser", async (req, res) => {
     const user = req.body;
 
     // Das Passwort verschlüsseln
@@ -138,7 +143,7 @@ router.post("/createUser", async (req, res) => {
 });
 
 //verify email
-router.post("/verifyEmail" , async(req , res)=>{
+router.post("/api/verifyEmail" , async(req , res)=>{
   const {user , OTP} = req.body;
   const mainuser = await UserModel.findById(user);
   if(!mainuser) return res.status(400).json("User not found");
@@ -176,8 +181,8 @@ router.post("/verifyEmail" , async(req , res)=>{
     return res.status(200).json("Verifizierung Erfolgreich")
 })
 
-router.post("/login", async (req, res) => {
-    try {
+router.post("/api/login", async (req, res) => {
+  try {
         const user = await UserModel.findOne({ email: req.body.email });
         if (!user) {
             console.log("User not found");
@@ -208,7 +213,7 @@ router.post("/login", async (req, res) => {
 
 
 
-router.post('/validateSession', async (req, res) => {
+router.post("/api/validateSession", async (req, res) => {
     const sessionID = req.body.sessionID;
   
     try {
@@ -229,7 +234,7 @@ router.post('/validateSession', async (req, res) => {
     }
   });
 
-  router.post('/createEvent', async (req, res) => {
+  router.post("/api/createEvent", async (req, res) => {
 
     try {
       const userEvent = await UserModel.findOne({ sessionID: req.body.sessionID }, { userID: 1, _id: 0 });
