@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Button } from 'react-bootstrap';
 import { useNavigate } from "react-router-dom";
 
-const DOMAIN = "http://localhost:4000";
+import { DOMAIN } from "../index";
 
 
 function Register() {

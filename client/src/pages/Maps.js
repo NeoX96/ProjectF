@@ -15,7 +15,7 @@ import "leaflet/dist/leaflet.css";
 import "./css/Maps.css";
 import axios from 'axios';
 
-const DOMAIN = "http://localhost:4000";
+import { DOMAIN } from "../index";
 
 
 /*

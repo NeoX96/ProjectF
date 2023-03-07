@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import socketIO from "socket.io-client";
 import { Button, ListGroup, Modal, Table } from "react-bootstrap";
 import Cookies from "js-cookie";
-const endpoint = "http://localhost:4001";
+import { endpoint } from "../index";
 
 const socket = socketIO(endpoint, { autoConnect: false });
 

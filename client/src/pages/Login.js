@@ -4,7 +4,7 @@ import { Button, Form } from "react-bootstrap";
 import Cookies from "js-cookie";
 import axios from "axios";
 
-const DOMAIN = "http://localhost:4000";
+import { DOMAIN } from "../index";
 
 
 function Login() {
