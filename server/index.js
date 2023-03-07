@@ -48,11 +48,13 @@ app.listen(mongoPort, () => {
 // SocketIO Chat
 const socketPort = 4001;
 const http = require('http').Server(app);
-const socketIO = require('socket.io')(http, {
+const io = require('socket.io')(http, {
     cors: {
         origin: allowedOrigins
     }
 });
+
+socketIO = io.of('/socket');
 
 // when server starts set all users to offline in MongoDB
 UserModel.updateMany({
@@ -462,9 +464,8 @@ socketIO.on("connection", (socket) => {
 
 
 app.get("/api", (req, res) => {
-    res.json({message: "Socket Test"})
+    res.json({message: "API Test"})
 });
-
 
 
 http.listen(socketPort, () => {
