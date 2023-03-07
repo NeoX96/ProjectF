@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import axios from 'axios';
 import Navbar from './components/navigationbar';
 
+import { DOMAIN } from "./index";
+
 const Home = lazy(() => import('./pages/Home'));
 const Chat = lazy(() => import('./pages/Chat'));
 const Maps = lazy(() => import('./pages/Maps'));
@@ -20,7 +22,7 @@ function App() {
   useEffect(() => {
     const sessionID = getCookie('sessionID');
     if (sessionID && !isLoggedIn) {
-      axios.post('http://localhost:4000/validateSession', { sessionID })
+      axios.post(`${DOMAIN}/validateSession`, { sessionID })
         .then(response => {
           const isValidSession = response.data.isValid;
 
