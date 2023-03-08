@@ -17,8 +17,18 @@ uhrzeit: {
     type: Date,
     maxlength: 30
 },
-// lat
-// lng
+lat: {
+    type: Number,
+    maxlength: 30
+},
+lng: {
+    type: Number,
+    maxlength: 30
+},
+equipment: {
+    type: Boolean,
+    default: false
+},
 
 teilnehmer: [{ type: mongoose.Schema.Types.ObjectId, ref: User }]
 });
