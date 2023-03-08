@@ -13,16 +13,14 @@ import L from "leaflet";
 import images from "./assets/map/index.js";
 import "leaflet/dist/leaflet.css";
 import "./css/Maps.css";
-import axios from 'axios';
+import axios from "axios";
 
 import { DOMAIN } from "../index";
-
 
 /*
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCog } from "@fortawesome/free-solid-svg-icons";
 */
-
 
 /*
 const MAP_STYLES = [
@@ -40,26 +38,18 @@ function GetIcon(_iconSize, _iconName) {
   });
 }
 
-
-
 function Maps() {
   const [zoom, setZoom] = useState(15);
-
-  
-
-  
-  // Event erstellen Toggle
   const [enableEvent, setEnableEvent] = useState(false);
+  const [eventLatLng, setEventLatLng] = useState({ lat: 0, lng: 0 });
+  const [showModal, setShowModal] = useState(false);
+  const [markerExists, setMarkerExists] = useState(false);
+  const [position, setPosition] = useState(null);
+  const [radius, setRadius] = useState(100);
 
+  const [events, setEvents] = useState([]);
 
   function Event() {
-    // längen und breitengrad des Events
-    const [eventLatLng, setEventLatLng] = useState({ lat: 0, lng: 0 });
-
-    // Modal für Event erstellen
-    const [showModal, setShowModal] = useState(false);
-    const [markerExists, setMarkerExists] = useState(false);
-  
     // Event erstellen
     useMapEvents({
       click: (e) => {
@@ -68,13 +58,13 @@ function Maps() {
         setMarkerExists(true);
       },
     });
-  
+
     // Modal schließen
     const handleClose = () => {
       setShowModal(false);
       setMarkerExists(false);
     };
-  
+
     // Formular abschicken
     const submitForm = (event) => {
       event.preventDefault();
@@ -83,35 +73,38 @@ function Maps() {
 
       console.log("Formular wurde gesendet!");
       console.log(eventLatLng);
-      console.log("Name " + event.target.eventName.value + ", Uhrzeit " + event.target.eventTime.value);
+      console.log(
+        "Name " +
+          event.target.eventName.value +
+          ", Uhrzeit " +
+          event.target.eventTime.value
+      );
       handleClose();
       // Wenn Event erstellt worden ist, dann nochmal Events aus DB holen und in die Map einfügen, da der lokale Marker entfernt wird
       // Eventueller useEffect außerhalb der Funktion, der bei jedem Event erstellen ausgeführt wird
-    
 
-     // Namen des Events aus dem Formular holen
-     const data = {
-      name: event.target.eventName.value,
-      uhrzeit: event.target.eventTime.value
-      
-      // get SessionID from cookie 
-     }
+      // Namen des Events aus dem Formular holen
+      const data = {
+        name: event.target.eventName.value,
+        uhrzeit: event.target.eventTime.value,
 
-      axios.post(`${DOMAIN}/createEvent`, data).then(res => {
-        console.log(res.data);
-      }).catch(err => {
-        console.log(err);
-      });
+        // get SessionID from cookie
+      };
+
+      axios
+        .post(`${DOMAIN}/createEvent`, data)
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
 
       console.log(data);
-        
-      }
+    };
 
-  
     return (
       <>
-
-      
         {markerExists && (
           <Marker
             position={[eventLatLng.lat, eventLatLng.lng]}
@@ -124,7 +117,7 @@ function Maps() {
           onHide={handleClose}
           centered
           dialogClassName="modal-90w"
-          style={{color: "black"}}
+          style={{ color: "black" }}
         >
           <Modal.Header closeButton>
             <Modal.Title className="text-center">Events erstellen</Modal.Title>
@@ -145,7 +138,10 @@ function Maps() {
                   placeholder="Geben Sie die Uhrzeit des Events ein"
                 />
               </Form.Group>
-              <Form.Group controlId="eventTool" className="justify-content-center d-flex">
+              <Form.Group
+                controlId="eventTool"
+                className="justify-content-center d-flex"
+              >
                 <Form.Check
                   type="checkbox"
                   label="Sportgerät"
@@ -167,8 +163,6 @@ function Maps() {
 
   // Standort setzen
   function LocationMarker() {
-    const [position, setPosition] = useState(null);
-    const [radius, setRadius] = useState(100);
     const map = useMap();
 
     useEffect(() => {
@@ -219,6 +213,37 @@ function Maps() {
     );
   }
 
+  useEffect(() => {
+    axios
+      .post(`${DOMAIN}/getEvents`)
+      .then((res) => {
+        setEvents(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  function EventsData() {
+    console.log(events);
+
+    if (events.length === 0) {
+      return <div></div>;
+    }
+
+    return (
+      <div>
+        {events.map((event) => (
+          <Marker
+            key={event._id}
+            position={{ lat: [event.lat], lng: [event.lng] }}
+            icon={GetIcon([30, 40], "marker")}
+          ></Marker>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div>
       <Form.Check
@@ -239,8 +264,9 @@ function Maps() {
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-       
+
         <LocationMarker />
+        <EventsData />
 
         {enableEvent === true ? <Event /> : null}
       </MapContainer>
