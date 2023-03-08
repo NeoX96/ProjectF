@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 dotenv.config();
 const JWTSEC = process.env.JWTSEC;
 
+const mongoose = require("mongoose");
 const UserModel = require("../models/Users");
 const EventModel = require("../models/Events");
 const verifyEmailModel = require("../models/Verify");
@@ -250,10 +251,12 @@ router.post("/api/validateSession", async (req, res) => {
 router.post('/api/createEvent', async (req, res) => {
 
   try {
-      const userEvent = await UserModel.findOne({ sessionID: req.body.sessionID }, { userID: 1, _id: 0 });
+      const userID = await UserModel.findOne({ sessionID: req.body.sessionID }, { userID: 1, _id: 0 });
+
+      const ObjectID = mongoose.Types.ObjectId(userID);
 
       const data = {
-          user: userEvent,
+          user: ObjectID,
           name: req.body.name,
           uhrzeit: req.body.uhrzeit,
           equipment: req.body.equipment,
@@ -277,7 +280,7 @@ router.post('/api/createEvent', async (req, res) => {
 router.post('/api/getEvents', async (req, res) => {
   try {
     const event = await EventModel.find(); // Veranstaltung anhand der ID abrufen
-    console.log ("fetched");
+    console.log ("fetchedEvents");
 
     if (!event) {
       return res.status(404).json({ msg: 'Event not found' });
