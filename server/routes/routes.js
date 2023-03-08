@@ -12,7 +12,6 @@ const EventModel = require("../models/Events");
 const verifyEmailModel = require("../models/Verify");
 const crypto = require("crypto");
 const { generateOTP } = require("./OTP");
-const randomId = () => crypto.randomBytes(16).toString("hex");
 
 router.get("/test", (req, res) => {
   console.log("Test");
@@ -248,25 +247,47 @@ router.post("/api/validateSession", async (req, res) => {
   }
 });
 
-router.post("/api/createEvent", async (req, res) => {
+router.post('/api/createEvent', async (req, res) => {
+
   try {
-    const userEvent = await UserModel.findOne(
-      { sessionID: req.body.sessionID },
-      { userID: 1, _id: 0 }
-    );
+      const userEvent = await UserModel.findOne({ sessionID: req.body.sessionID }, { userID: 1, _id: 0 });
 
-    const data = {
-      user: userEvent,
-      name: req.body.name,
-      uhrzeit: req.body.uhrzeit,
-      // lat
-      // lng
-    };
+      const data = {
+          user: userEvent,
+          name: req.body.name,
+          uhrzeit: req.body.uhrzeit,
+          equipment: req.body.equipment,
+          lat: req.body.lat,
+          lng: req.body.lng
+      }
 
-    const newEvent = new EventModel(data);
-    await newEvent.save();
-  } catch {
-    console.log("err");
+      const newEvent = new EventModel(data);
+      await newEvent.save();
+
+
+
+
+
+  } catch (error) {
+      console.log(error);
+      res.status(500).send(error);
+  }
+});
+
+router.post('/api/getEvents', async (req, res) => {
+  try {
+    const event = await EventModel.find(); // Veranstaltung anhand der ID abrufen
+    console.log ("fetched");
+
+    if (!event) {
+      return res.status(404).json({ msg: 'Event not found' });
+    }
+
+    res.status(200).json(event);
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
   }
 });
 
