@@ -1,4 +1,4 @@
-import me from "./me3.png";
+import me from "./me.png";
 import marker from "./marker.png";
 import basketball from "./basketball.png"
 
