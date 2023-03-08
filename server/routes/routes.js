@@ -19,6 +19,19 @@ router.get("/test", (req, res) => {
   res.json({ message: "Test" });
 });
 
+const transport = nodemailer.createTransport({
+  host: "mail.gonkle.de",
+  port: 587,
+  auth: {
+    user: process.env.USER,
+    pass: process.env.PASS,
+  },
+  tls: {
+    rejectUnauthorized: false,
+  },
+});
+
+
 router.post("/api/createUser", async (req, res) => {
   const user = req.body;
 
@@ -44,17 +57,7 @@ router.post("/api/createUser", async (req, res) => {
 
   try {
     // Anpassung des Nodemailers
-    const transport = nodemailer.createTransport({
-      host: "mail.gonkle.de",
-      port: 587,
-      auth: {
-        user: process.env.USER,
-        pass: process.env.PASS,
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
+
 
     // Anpassung des Nodemailers
     transport.sendMail({
@@ -102,17 +105,17 @@ router.post("/api/createUser", async (req, res) => {
             <body>
               <div class="container">
                 <img src="https://www.gonkle.de/logo.png" alt="Gonkle Logo" class="logo"> <br><br>
-                Guten Tag ${user.vorname},<br>
+                Guten Tag ${getUser.vorname},<br>
                 Wir heißen Sie herzlich willkommen bei Gonkle<br>
 
                 Um sicherzustellen, dass Sie der rechtmäßige Inhaber der angegebenen E-Mail-Adresse sind, bitten wir Sie, Ihre Adresse zu verifizieren. Dafür benötigen wir von Ihnen den folgenden Code:<br>
 
-                <h1 style="text-align:center"><a href="https://www.gonkle.de/Verify?id=${user._id}">${OTP}</a></h1>
+                <h1 style="text-align:center"><a href="https://www.gonkle.de/Verify?id=${getUser._id}">${OTP}</a></h1>
           
                 Bitte geben Sie diesen Code auf unserer Verifizierungsseite ein oder klicken Sie auf folgenden Button: <br>
-                <a href="https://www.gonkle.de/Verify?id=${user._id}"https://www.gonkle.de/Verify?id=${user._id}</a><br>
+                <a href="https://www.gonkle.de/Verify?id=${getUser._id}"https://www.gonkle.de/Verify?id=${getUser._id}</a><br>
           
-                <p style="text-align:center"><a href="https://www.gonkle.de/Verify?id=${user._id}&code=${OTP}" style="background-color:#007bff;color:#fff;padding:10px;border-radius:5px;text-decoration:none;">E-Mail-Adresse verifizieren</a></p><br><br>
+                <p style="text-align:center"><a href="https://www.gonkle.de/Verify?id=${getUser._id}&code=${OTP}" style="background-color:#007bff;color:#fff;padding:10px;border-radius:5px;text-decoration:none;">E-Mail-Adresse verifizieren</a></p><br><br>
 
                 
                 Bitte beachten Sie, dass Sie Ihre E-Mail-Adresse innerhalb von 24 Stunden verifizieren müssen, damit wir Ihre Registrierung abschließen können. <br>
@@ -148,9 +151,9 @@ router.post("/api/createUser", async (req, res) => {
 //verify email
 router.post("/api/verifyEmail", async (req, res) => {
   try {
-    const { user, OTP } = req.body;
+    const { ID, OTP } = req.body;
 
-    const mainuser = await UserModel.findById(user);
+    const mainuser = await UserModel.findById(ID);
     if (!mainuser) return res.status(400).json("User not found");
 
     if (mainuser.verifed === true) {
@@ -171,15 +174,6 @@ router.post("/api/verifyEmail", async (req, res) => {
     await verifyEmailModel.findByIdAndDelete(token._id);
     await mainuser.save();
 
-    // Anpassung des Nodemailers
-    const transport = nodemailer.createTransport({
-      host: "smtp.mailtrap.io",
-      port: 2525,
-      auth: {
-        user: process.env.USER,
-        pass: process.env.PASS,
-      },
-    });
 
     // Anpassung des Nodemailers
     transport.sendMail({
