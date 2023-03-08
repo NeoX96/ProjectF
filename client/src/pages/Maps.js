@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Modal } from "react-bootstrap";
+import Cookies from "js-cookie";
 import {
   MapContainer,
   TileLayer,
@@ -39,7 +40,6 @@ function GetIcon(_iconSize, _iconName) {
 }
 
 function Maps() {
-  const [zoom, setZoom] = useState(15);
   const [enableEvent, setEnableEvent] = useState(false);
   const [eventLatLng, setEventLatLng] = useState({ lat: 0, lng: 0 });
   const [showModal, setShowModal] = useState(false);
@@ -48,8 +48,26 @@ function Maps() {
   const [radius, setRadius] = useState(100);
 
   const [events, setEvents] = useState([]);
+  const sessionID = Cookies.get("sessionID");
 
-  function Event() {
+
+  // Funktion zum holen der Events aus der DB
+  const getEvents = async () => {
+    const res = await axios.post(`${DOMAIN}/getEvents`);
+
+    if (res.data) {
+      setEvents(res.data);
+    } 
+  };
+
+  // Rendert nur einmal, wenn die Seite geladen wird
+  useEffect(() => {
+    getEvents();
+  }, []);
+
+  
+  // Funktion zum erstellen eines Events
+  function CreateEvent() {
     // Event erstellen
     useMapEvents({
       click: (e) => {
@@ -72,7 +90,7 @@ function Maps() {
       // Axios Post ans Backend - Event erstellen
 
       console.log("Formular wurde gesendet!");
-      console.log(eventLatLng);
+      console.log("eventlatlng " + eventLatLng.lat + " " + eventLatLng.lng);
       console.log(
         "Name " +
           event.target.eventName.value +
@@ -85,8 +103,14 @@ function Maps() {
 
       // Namen des Events aus dem Formular holen
       const data = {
+        
+        // sessionID in user dokument.get cookie
+        user: sessionID,
         name: event.target.eventName.value,
         uhrzeit: event.target.eventTime.value,
+        lat: eventLatLng.lat,
+        lng: eventLatLng.lng,
+    //  equipment: event.target.eventTool.value,
 
         // get SessionID from cookie
       };
@@ -100,7 +124,6 @@ function Maps() {
           console.log(err);
         });
 
-      console.log(data);
     };
 
     return (
@@ -161,73 +184,43 @@ function Maps() {
     );
   }
 
+
   // Standort setzen
-  function LocationMarker() {
+  function UserPostionMarker() {
     const map = useMap();
-
+    const [position, setPosition] = useState(null);
+  
     useEffect(() => {
-      map.locate().on("locationfound", function (e) {
+      map.locate();
+      map.on("locationfound", (e) => {
         setPosition(e.latlng);
-        setZoom(13);
-        map.setView(e.latlng, map.getZoom());
+        map.flyTo(e.latlng, map.getZoom());
       });
+  
+      return () => {
+        map.off("locationfound");
+      };
     }, [map]);
-
-    return position === null ? null : (
-      <div
-        style={{
-          position: "absolute",
-          zIndex: 999,
-          top: "10px",
-          right: "10px",
-        }}
-      >
-        <Circle
-          center={position}
-          radius={radius}
-          fillColor={"red"}
-          color={"black"}
-        >
-          <Marker position={position} icon={GetIcon(40, "me")}>
-            <Popup>Dein Standort</Popup>
-          </Marker>
-        </Circle>
-        <div>
-          <input
-            type="range"
-            min="1"
-            max="10000"
-            value={radius}
-            onChange={(e) => setRadius(e.target.value)}
-          />
-          <div style={{ color: "black" }}>
-            {radius === 0
-              ? 0
-              : radius === 10000
-              ? 15
-              : (radius * 0.001 + (radius >= 1 ? 0.1 : 0)).toFixed(1)}{" "}
-            Kilometer
-          </div>
-        </div>
-      </div>
+  
+    if (position === null) {
+      return null;
+    }
+  
+    return (
+      <Marker icon={GetIcon(40, "me")} position={position}>
+        <Popup>
+          <span>Dein Standort</span>
+        </Popup>
+      </Marker>
     );
   }
+  
 
-  useEffect(() => {
-    axios
-      .post(`${DOMAIN}/getEvents`)
-      .then((res) => {
-        setEvents(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
-  function EventsData() {
-    console.log(events);
+  // Events auf Map anzeigen
+  function SetEventsMap() {
 
     if (events.length === 0) {
+      console.log("Keine Events vorhanden");
       return <div></div>;
     }
 
@@ -256,7 +249,7 @@ function Maps() {
 
       <MapContainer
         center={[48.7775, 11.431111]}
-        zoom={zoom}
+        zoom={14}
         scrollWheelZoom
         style={{ height: "100vh" }}
       >
@@ -265,10 +258,11 @@ function Maps() {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <LocationMarker />
-        <EventsData />
+        <UserPostionMarker />
+        <SetEventsMap />
 
-        {enableEvent === true ? <Event /> : null}
+
+        {enableEvent === true ? <CreateEvent /> : null}
       </MapContainer>
     </div>
   );
