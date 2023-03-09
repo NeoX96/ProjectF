@@ -7,7 +7,7 @@ import {
   Marker,
   Popup,
   useMap,
-  Circle,
+ // Circle,
   useMapEvents,
 } from "react-leaflet";
 import L from "leaflet";
@@ -44,8 +44,10 @@ function Maps() {
   const [eventLatLng, setEventLatLng] = useState({ lat: 0, lng: 0 });
   const [showModal, setShowModal] = useState(false);
   const [markerExists, setMarkerExists] = useState(false);
+/*
   const [position, setPosition] = useState(null);
   const [radius, setRadius] = useState(100);
+  */
 
   const [events, setEvents] = useState([]);
   const sessionID = Cookies.get("sessionID");
