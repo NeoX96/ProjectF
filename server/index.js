@@ -50,7 +50,7 @@ const socketPort = 4001;
 const http = require('http').Server(app);
 const io = require('socket.io')(http, {
     cors: {
-        origin: allowedOrigins
+        origins: allowedOrigins
     }
 });
 
