@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, {  useContext } from "react";
 import images from './assets/home/index';
 import { useNavigate } from "react-router-dom";
 import { Carousel } from 'react-bootstrap';
 import "./css/Home.css";
+import {IndexContext} from "../App";
 
 function Home() {
     const navigate = useNavigate();
 
-    const [index, setIndex] = useState(0);
+    const {index, setIndex} = useContext(IndexContext);
 
     const handleSelect = (selectedIndex, e) => {
       setIndex(selectedIndex);
     };
+
+    console.log("index: " + index);
 
     return (
         <div >
