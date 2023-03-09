@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Form, Button, Modal } from "react-bootstrap";
 import Cookies from "js-cookie";
 import {
@@ -15,6 +15,7 @@ import images from "./assets/map/index.js";
 import "leaflet/dist/leaflet.css";
 import "./css/Maps.css";
 import axios from "axios";
+import {IndexContext} from "../App";
 
 import { DOMAIN } from "../index";
 
@@ -44,6 +45,12 @@ function Maps() {
   const [eventLatLng, setEventLatLng] = useState({ lat: 0, lng: 0 });
   const [showModal, setShowModal] = useState(false);
   const [markerExists, setMarkerExists] = useState(false);
+
+  const {index, setIndex} = useContext(IndexContext);
+
+  console.log("index: " + index);
+
+
 /*
   const [position, setPosition] = useState(null);
   const [radius, setRadius] = useState(100);
@@ -233,7 +240,11 @@ function Maps() {
             key={event._id}
             position={{ lat: [event.lat], lng: [event.lng] }}
             icon={GetIcon([30, 40], "marker")}
-          ></Marker>
+          >
+            <Popup>
+              <span>{event.name}</span>
+            </Popup>
+          </Marker>
         ))}
       </div>
     );
