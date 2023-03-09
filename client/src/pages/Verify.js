@@ -9,6 +9,8 @@ export default function Verify() {
   const [otp, setOtp] = useState("");
   const [user_id, setUserId] = useState("");
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get("id");
@@ -35,6 +37,12 @@ export default function Verify() {
 
     axios.post(`${DOMAIN}/verifyEmail`, verification).then(res => {
       console.log(res.data);
+      // if status 200
+      if (res.status === 200) {
+        alert("Email verified successfully");
+        navigate("/Login");
+      }
+
   }).catch(err => {
       switch (err.response.status) {
         case 400:
