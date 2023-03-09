@@ -50,6 +50,7 @@ router.post("/api/createUser", async (req, res) => {
     const transport = nodemailer.createTransport({
       host: "mail.gonkle.de",
       port: 587,
+      secure: false,
       auth: {
         user: process.env.USER,
         pass: process.env.PASS,
@@ -177,6 +178,7 @@ router.post("/api/verifyEmail", async (req, res) => {
     const transport = nodemailer.createTransport({
       host: "mail.gonkle.de",
       port: 587,
+      secure: false,
       auth: {
         user: process.env.USER,
         pass: process.env.PASS,
@@ -213,6 +215,11 @@ router.post("/api/login", async (req, res) => {
     if (!isPasswordMatch) {
       console.log("Password is incorrect");
       return res.status(400).json({ error: "Password is incorrect" });
+    }
+
+    if (!user.verifed) {
+      console.log("User not verifed");
+      return res.status(400).json({ error: "User not verifed" });
     }
 
     const accessToken = jwt.sign(
