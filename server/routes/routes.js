@@ -296,12 +296,10 @@ router.post("/api/validateSession", async (req, res) => {
 router.post('/api/createEvent', async (req, res) => {
 
   try {
-      const userID = await UserModel.findOne({ sessionID: req.body.sessionID }, { userID: 1, _id: 0 });
-
-      const ObjectID = mongoose.Types.ObjectId(userID);
+      const userID = await UserModel.findOne({ sessionID: req.body.sessionID }, { _id: 1 });
 
       const data = {
-          user: ObjectID,
+          user: userID,
           name: req.body.name,
           uhrzeit: req.body.uhrzeit,
           equipment: req.body.equipment,
@@ -311,6 +309,7 @@ router.post('/api/createEvent', async (req, res) => {
 
       const newEvent = new EventModel(data);
       await newEvent.save();
+      console.log("Event created");
 
 
 
