@@ -19,17 +19,7 @@ router.get("/test", (req, res) => {
   res.json({ message: "Test" });
 });
 
-const transport = nodemailer.createTransport({
-  host: "mail.gonkle.de",
-  port: 587,
-  auth: {
-    user: process.env.USER,
-    pass: process.env.PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
+
 
 
 router.post("/api/createUser", async (req, res) => {
@@ -57,7 +47,17 @@ router.post("/api/createUser", async (req, res) => {
 
   try {
     // Anpassung des Nodemailers
-
+    const transport = nodemailer.createTransport({
+      host: "mail.gonkle.de",
+      port: 587,
+      auth: {
+        user: process.env.USER,
+        pass: process.env.PASS,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
+    });
 
     // Anpassung des Nodemailers
     transport.sendMail({
@@ -174,6 +174,17 @@ router.post("/api/verifyEmail", async (req, res) => {
     await verifyEmailModel.findByIdAndDelete(token._id);
     await mainuser.save();
 
+    const transport = nodemailer.createTransport({
+      host: "mail.gonkle.de",
+      port: 587,
+      auth: {
+        user: process.env.USER,
+        pass: process.env.PASS,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
+    });
 
     // Anpassung des Nodemailers
     transport.sendMail({
