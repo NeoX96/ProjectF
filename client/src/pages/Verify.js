@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useNavigate } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import OtpInput from "react18-input-otp";
 import axios from "axios";
