@@ -42,8 +42,19 @@ function Login() {
         alert("Access token is not returned");
       }
     } catch (error) {
-      console.log(error.response);
-      alert("Error logging in. Please try again.");
+      // switch case for error.response.data
+      switch (error.response.status) {
+        case 400:
+          alert("Email oder Passwort falsch");
+          break;
+        case 401:
+          alert("User nicht verifiziert");
+          break;
+
+        default:
+          alert("Fehler", error.response);
+      }
+
       Cookies.remove("sessionID");
     }
   };
