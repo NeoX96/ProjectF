@@ -46,7 +46,7 @@ function Maps() {
   const [showModal, setShowModal] = useState(false);
   const [markerExists, setMarkerExists] = useState(false);
 
-  const {index, setIndex} = useContext(IndexContext);
+  const {index} = useContext(IndexContext);
 
   console.log("index: " + index);
 
