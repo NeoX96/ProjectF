@@ -21,6 +21,7 @@ router.get("/test", (req, res) => {
 
 // api get  to send mail
 router.get("/api/sendMail", async (req, res) => {
+  
 const transport = nodemailer.createTransport({
   host: "mail.gonkle.de",
   port: 587,
@@ -41,7 +42,10 @@ try {
     subject: "Test Email API Call",
     html: `Test Email`,
   });
+
   console.log("Email sent");
+  res.json({message: "Email sent"})
+
 } catch (err) {
   console.log(err);
 }
