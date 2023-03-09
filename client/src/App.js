@@ -1,8 +1,7 @@
-import React, { Suspense, lazy, useEffect, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useState, createContext } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from './components/navigationbar';
-
 import { DOMAIN } from "./index";
 
 const Home = lazy(() => import('./pages/Home'));
@@ -16,8 +15,11 @@ const Forgotpw = lazy(() => import('./pages/Forgotpw'));
 const Landing = lazy(() => import('./pages/Landing'));
 const Verify = lazy(() => import('./pages/Verify'));
 
+export const IndexContext = createContext();
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [index, setIndex] = useState(0);
 
   // Prüfen, ob der sessionID-Cookie gesetzt ist
   useEffect(() => {
@@ -61,6 +63,7 @@ function App() {
 
   return (
     <div className="App">
+      <IndexContext.Provider value={{index, setIndex}}>
       <Router>
         {isLoggedIn && <Navbar />}
         <Suspense fallback={<Wait />}>
@@ -94,6 +97,7 @@ function App() {
           </Routes>
         </Suspense>
       </Router>
+      </IndexContext.Provider>
     </div>
   );
   }
