@@ -42,18 +42,21 @@ router.post("/api/createUser", async (req, res) => {
   user.sessionID = randomId();
   user.userID = randomId();
 
+  console.log(user);
+
   // Check if mail already exists
   const findMail = UserModel.findOne({ email: user.email });
-  if (findMail) {
+  if (!findMail) {
     return res.status(401).json({ message: "Email already exists" });
   }
 
   // Check if username already exists
   const findUsername = UserModel.findOne({ username: user.username });
-  if(findUsername) {
+  if(!findUsername) {
   return res.status(402).json({ message: "Username already exists" });
   }
 
+  
   // Das Passwort verschlüsseln
   const salt = await bcrypt.genSalt();
   const hashedPassword = await bcrypt.hash(user.password, salt);
@@ -151,6 +154,7 @@ router.post("/api/createUser", async (req, res) => {
         `,
     });
     console.log("Email sent");
+    return res.status(200).json({ message: "Email sent" });
   } catch (err) {
     console.log(err);
   }
