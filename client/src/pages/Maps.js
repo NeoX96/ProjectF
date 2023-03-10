@@ -281,7 +281,12 @@ function Maps() {
           
           >
             <Popup>
-              <span>{event.name}</span>
+            <p class="event-name"><strong>{event.name}</strong></p>
+            <p class="event--datum">Datum: {event.date}</p>
+            <p class="event-equipment">{event.equipment ? 'Sportgerät' : 'Sportgerät'}<span class="event-equipment-icon">{event.equipment ? '✓' : '✘'}</span></p>
+            <button class="event-participate-button">&#43; teilnehmen</button>
+
+
             </Popup>
           </Marker>
         ))}
