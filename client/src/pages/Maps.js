@@ -307,6 +307,7 @@ function Maps() {
       <MapContainer
         center={[48.7775, 11.431111]}
         zoom={14}
+        minZoom={10}
         scrollWheelZoom
         style={{ height: "100vh" }}
       >
