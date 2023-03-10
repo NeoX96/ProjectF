@@ -2,6 +2,7 @@ import React, { Suspense, lazy, useEffect, useState, createContext } from 'react
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from './components/navigationbar';
+import Logout from './components/logout'; 
 import { DOMAIN } from "./index";
 
 const Home = lazy(() => import('./pages/Home'));
@@ -65,12 +66,13 @@ function App() {
     <div className="App">
       <IndexContext.Provider value={{index, setIndex}}>
       <Router>
-        {isLoggedIn && <Navbar />}
+        {isLoggedIn && <> <Navbar />  <Logout /> </>}
         <Suspense fallback={<Wait />}>
+          
           <Routes>
             {!isLoggedIn && (
               <>
-                <Route path="/Login" element={<Login />} />
+                <Route path="/Login" element={<Login /> } />
                 <Route path="/Register" element={<Register  />} />
                 <Route path="/Landing" element={<Landing  />} />
                 <Route path="/Verify" element={<Verify />} />

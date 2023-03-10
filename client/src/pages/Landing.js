@@ -77,14 +77,14 @@ function Login() {
                                 />
                             </div>
                             <div class="d-flex justify-content-center align-items-center border-box">
-                                <Button className="btn btn-primary mx-3 h-25"
+                                <Button className="btn btn-primary mx-3 h-50"
                                     variant={isDisabled ? "secondary" : "primary"}
                                     type="submit"
                                     disabled={isDisabled}
                                 >
                                     Login
                                 </Button>
-                                <Button className="btn btn-primary h-25" onClick={changeAuthMode}>Signup</Button>
+                                <Button className="btn btn-primary h-25" onClick={changeAuthMode}>SignUp</Button>
                             </div>
                            
                         </div>
