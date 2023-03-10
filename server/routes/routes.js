@@ -220,7 +220,7 @@ router.post("/api/login", async (req, res) => {
     user.sessionID = accessToken;
     await user.save();
 
-    res.status(200).json({ accessToken });
+    res.status(200).json({ token: accessToken, user: user.vorname });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal error occurred" });
