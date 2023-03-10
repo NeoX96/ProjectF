@@ -1,67 +1,205 @@
-import React, {  useContext } from "react";
-import images from './assets/home/index';
+import React, { useContext, useEffect, useState } from "react";
+import images from "./assets/home/index";
 import { useNavigate } from "react-router-dom";
-import { Carousel } from 'react-bootstrap';
+import { Carousel } from "react-bootstrap";
 import "./css/Home.css";
-import {IndexContext} from "../App";
+import { IndexContext } from "../App";
+import Cookies from "js-cookie";
+import { Box, Container, Fab, Grid } from "@mui/material";
+import NavigationIcon from "@mui/icons-material/Navigation";
+
+const FadeInBox = ({ children }) => {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    setShow(true);
+  }, []);
+
+  return (
+    <Box
+      sx={{
+        backdropFilter: "blur(5px)",
+        backgroundColor: "rgba(255, 255, 255, 0.7)",
+        borderRadius: 5,
+        p: 2,
+        boxShadow: 20,
+        opacity: show ? 1 : 0,
+        transform: show ? "translateY(0)" : "translateY(300px)",
+        transition: "opacity 0.5s ease, transform 0.5s ease",
+      }}
+    >
+      {children}
+    </Box>
+  );
+};
+
+const HoverGrowFab = () => {
+  const [hovered, setHovered] = useState(false);
+  const navigate = useNavigate();
+
+  const handleMouseEnter = () => {
+    setHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setHovered(false);
+  };
+
+  return (
+    <Fab
+      variant="extended"
+      aria-label="Go"
+      onClick={() => navigate("/Maps")}
+      sx={{
+        fontSize: "1.2rem",
+        borderRadius: 5,
+        backgroundColor: "rgba(0, 255, 255, 0.1)",
+        boxShadow: 5,
+        transition: "transform 0.2s ease",
+        transform: hovered ? "scale(1.1)" : "scale(1)",
+        "&:hover": {
+          backgroundColor: "rgba(0, 255, 255, 0.3)",
+          transform: "scale(1.1)",
+        },
+      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <NavigationIcon sx={{ mr: 1 }} />
+      Gonkle
+    </Fab>
+  );
+};
+
+
 
 function Home() {
-    const navigate = useNavigate();
+  
 
-    const {index, setIndex} = useContext(IndexContext);
+  const { index, setIndex } = useContext(IndexContext);
+  const vorname = Cookies.get("vorname");
 
-    const handleSelect = (selectedIndex, e) => {
-      setIndex(selectedIndex);
-    };
+  const handleSelect = (selectedIndex, e) => {
+    setIndex(selectedIndex);
+  };
 
-    console.log("index: " + index);
+  console.log("index: " + index);
 
-    return (
-        <div >
-          <div className="justify-content-center d-flex">
-            <h6>Wähle deine Sportart aus</h6>
-          </div>
 
-          <div className="justify-content-center d-flex">
-            <Carousel wrap={true} touch={true} keyboard={true} activeIndex={index} onSelect={handleSelect}>
-                <Carousel.Item>
-                  <img src={images.frisbee} alt="Frisbee" className="photo"/>
-                  <Carousel.Caption><h6>NR 1 Frisbee</h6></Carousel.Caption>
-                </Carousel.Item>
 
-                <Carousel.Item>
-                  <img src={images.fussball} alt="Fußball" className="photo"/>
-                  <Carousel.Caption><h6>NR 2 Fußball</h6></Carousel.Caption>
-                </Carousel.Item>
+  return (
+    <div
+      style={{
+        height: "calc(100vh - 150px)",
+        minWidth: "360px",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Container>
+        <FadeInBox>
+          <Grid container justifyContent="center" mb={3}>
+            <Grid item>
+              <Box
+                sx={{
+                  p: 2,
+                  borderRadius: 5,
+                  backgroundColor: "rgba(0, 255, 255, 0.08)",
+                  boxShadow: 3,
+                }}
+              >
+                <h1>Hey, {vorname}</h1>
+              </Box>
+            </Grid>
+          </Grid>
 
-                <Carousel.Item>
-                  <img src={images.volleyball} alt="Volleyball" className="photo"/>
-                  <Carousel.Caption><h6>NR 3 Volleyball</h6></Carousel.Caption>
-                </Carousel.Item>
+          <Grid container justifyContent="center" >
+            <Grid item>
+              <h6>Wähle deine Sportart aus:</h6>
+            </Grid>
+          </Grid>
 
-                <Carousel.Item>
-                  <img src={images.baskettball} alt="Baskettball" className="photo"/>
-                  <Carousel.Caption><h6>NR 4 Baskettball</h6></Carousel.Caption>
-                </Carousel.Item>
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            className="mb-3 "
+          >
+            <Grid item>
+              <Box
+                sx={{
+                  borderRadius: 5,
+                  backgroundColor: "rgba(0, 150, 255, 0.15)",
+                  boxShadow: 3,
+                  border: "2px dashed grey",
+                }}
+              >
+                <Carousel
+                  interval={null}
+                  touch={true}
+                  keyboard={true}
+                  activeIndex={index}
+                  onSelect={handleSelect}
+                  style={{ width: "300px" }}
+                >
+                  <Carousel.Item>
+                    <img src={images.frisbee} alt="Frisbee" className="photo" />
+                  </Carousel.Item>
 
-                <Carousel.Item>
-                  <img src={images.tischtennis} alt="Tischtennis" className="photo"/>
-                  <Carousel.Caption><h6>NR 5 Tischtennis</h6></Carousel.Caption>
-                </Carousel.Item>
+                  <Carousel.Item>
+                    <img
+                      src={images.fussball}
+                      alt="Fußball"
+                      className="photo"
+                    />
+                  </Carousel.Item>
 
-                <Carousel.Item>
-                  <img src={images.skateboard} alt="Skateboard" className="photo"/>
-                  <Carousel.Caption><h6>NR 6 Skateboard</h6></Carousel.Caption>
-                </Carousel.Item>
-            </Carousel>
-          </div>
-            
-            <div className="justify-content-center d-flex mt-5">
-              <button  onClick={() => {navigate("/Maps")}} className="btn btn-secondary justify-content-center d-flex" >LET´S PLAY !</button>
-            </div>
-        </div>
-      
-    );
+                  <Carousel.Item>
+                    <img
+                      src={images.volleyball}
+                      alt="Volleyball"
+                      className="photo"
+                    />
+                  </Carousel.Item>
+
+                  <Carousel.Item>
+                    <img
+                      src={images.baskettball}
+                      alt="Baskettball"
+                      className="photo"
+                    />
+                  </Carousel.Item>
+
+                  <Carousel.Item>
+                    <img
+                      src={images.tischtennis}
+                      alt="Tischtennis"
+                      className="photo"
+                    />
+                  </Carousel.Item>
+
+                  <Carousel.Item>
+                    <img
+                      src={images.skateboard}
+                      alt="Skateboard"
+                      className="photo"
+                    />
+                  </Carousel.Item>
+                </Carousel>
+              </Box>
+            </Grid>
+          </Grid>
+
+          <Grid container justifyContent="center" mt={4}>
+            <Grid item>
+              <HoverGrowFab />
+            </Grid>
+          </Grid>
+        </FadeInBox>
+      </Container>
+    </div>
+  );
 }
 
 export default Home;

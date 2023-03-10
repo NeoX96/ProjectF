@@ -7,56 +7,40 @@ const jwt = require("jsonwebtoken");
 dotenv.config();
 const JWTSEC = process.env.JWTSEC;
 
-const mongoose = require("mongoose");
 const UserModel = require("../models/Users");
 const EventModel = require("../models/Events");
 const verifyEmailModel = require("../models/Verify");
-const crypto = require("crypto");
 const { generateOTP } = require("./OTP");
+
+const crypto = require('crypto');
+const randomId = () => crypto.randomBytes(16).toString("hex");
+
 
 router.get("/test", (req, res) => {
   console.log("Test");
   res.json({ message: "Test" });
 });
 
-// api get  to send mail
-router.get("/api/sendMail", async (req, res) => {
   
 const transport = nodemailer.createTransport({
   host: "mail.gonkle.de",
   port: 587,
-  auth: {
-    user: process.env.USER,
-    pass: process.env.PASS,
-  },
+    auth: {
+      user: process.env.USER,
+      pass: process.env.PASS,
+    },
   tls: {
-    rejectUnauthorized: false,
-  },
-});
-
-try {
-  // Anpassung des Nodemailers
-  await transport.sendMail({
-    from: "noreply@gonkle.de",
-    to: "valentin@wuerfelmail.de",
-    subject: "Test Email API Call",
-    html: `Test Email`,
+      rejectUnauthorized: false,
+    },
   });
-
-  console.log("Email sent");
-  res.json({message: "Email sent"})
-
-} catch (err) {
-  console.log(err);
-}
-});
-
 
 
 
 
 router.post("/api/createUser", async (req, res) => {
   const user = req.body;
+  user.sessionID = randomId();
+  user.userID = randomId();
 
   // Das Passwort verschlüsseln
   const salt = await bcrypt.genSalt();
@@ -79,18 +63,6 @@ router.post("/api/createUser", async (req, res) => {
   await newToken.save();
 
   try {
-
-    const transport = nodemailer.createTransport({
-      host: "mail.gonkle.de",
-      port: 587,
-      auth: {
-        user: process.env.USER,
-        pass: process.env.PASS,
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
 
     // Anpassung des Nodemailers
     await transport.sendMail({
@@ -207,19 +179,6 @@ router.post("/api/verifyEmail", async (req, res) => {
     await verifyEmailModel.findByIdAndDelete(token._id);
     await mainuser.save();
 
-    // await transport login
-    const transport = nodemailer.createTransport({
-      host: "mail.gonkle.de",
-      port: 587,
-      auth: {
-        user: process.env.USER,
-        pass: process.env.PASS,
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
-
 
     // Anpassung des Nodemailers
     await transport.sendMail({
@@ -252,7 +211,7 @@ router.post("/api/login", async (req, res) => {
 
     if (!user.verifed) {
       console.log("User not verifed");
-      return res.status(400).json({ error: "User not verifed" });
+      return res.status(401).json({ error: "User not verifed" });
     }
 
     const accessToken = jwt.sign(
@@ -266,7 +225,7 @@ router.post("/api/login", async (req, res) => {
     user.sessionID = accessToken;
     await user.save();
 
-    res.status(200).json({ accessToken });
+    res.status(200).json({ token: accessToken, user: user.vorname });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal error occurred" });
