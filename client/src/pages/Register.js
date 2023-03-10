@@ -18,7 +18,7 @@ function Register() {
     navigate("/Login");
   };
 
-  const handleRegister = (event) => {
+  const handleRegister = async (event) => {
     event.preventDefault();
     const registered = {
       vorname: vorname,
@@ -28,17 +28,28 @@ function Register() {
       password: password,
     };
 
-    axios
-      .post(`${DOMAIN}/createUser`, registered)
-      .then((res) => {
-        console.log(res.data);
-        navigate("/Home");
-      })
-      .catch((err) => {
-       alert(err.data);
-      });
-
-    console.log(registered);
+    try {
+      const response = await axios.post(`${DOMAIN}/createUser`, registered);
+      switch (response.status) {
+        case 200:
+          console.log(response.data);
+          navigate("/Home");
+          break;
+        case 401:
+          alert("Email already exists");
+          break;
+        case 402:
+          alert("Username already exists");
+          break;
+        default:
+          // handle other response codes
+          break;
+      }
+    } catch (error) {
+      // handle errors
+      alert(error.message);
+    }
+    
   };
   
 
