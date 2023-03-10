@@ -92,7 +92,7 @@ function App() {
             ) : (
               <Route
                 path="*"
-                element={<Navigate to="/Login" />}
+                element={<Navigate to="/Landing" />}
               />
             )}
             <Route path="/Forgotpw" element={<Forgotpw />} />
