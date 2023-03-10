@@ -45,13 +45,13 @@ router.post("/api/createUser", async (req, res) => {
   // Check if mail already exists
   const findMail = UserModel.findOne({ email: user.email });
   if (findMail) {
-    return res.status(400).json({ message: "Email already exists" });
+    return res.status(401).json({ message: "Email already exists" });
   }
 
   // Check if username already exists
   const findUsername = UserModel.findOne({ username: user.username });
   if(findUsername) {
-  return res.status(400).json({ message: "Username already exists" });
+  return res.status(402).json({ message: "Username already exists" });
   }
 
   // Das Passwort verschlüsseln
