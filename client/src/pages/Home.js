@@ -75,7 +75,9 @@ const HoverGrowFab = () => {
 function Home() {
   const { index, setIndex } = useContext(IndexContext);
   const vorname = Cookies.get("vorname");
+  
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const handleSelect = (selectedIndex, e) => {
     setIndex(selectedIndex);
