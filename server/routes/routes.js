@@ -12,6 +12,9 @@ const EventModel = require("../models/Events");
 const verifyEmailModel = require("../models/Verify");
 const { generateOTP } = require("./OTP");
 
+const crypto = require('crypto');
+const randomId = () => crypto.randomBytes(16).toString("hex");
+
 
 router.get("/test", (req, res) => {
   console.log("Test");
@@ -36,6 +39,8 @@ const transport = nodemailer.createTransport({
 
 router.post("/api/createUser", async (req, res) => {
   const user = req.body;
+  user.sessionID = randomId();
+  user.userID = randomId();
 
   // Das Passwort verschlüsseln
   const salt = await bcrypt.genSalt();
