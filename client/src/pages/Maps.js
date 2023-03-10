@@ -265,7 +265,7 @@ function Maps() {
             position={{ lat: [event.lat], lng: [event.lng] }}
           icon={
             event.index === 0
-          ? GetIcon([30, 30], "basketball") 
+          ? GetIcon([30, 30], "frisbee") 
           : event.index === 1 
             ? GetIcon([30, 30], "fussball") 
             : event.index === 2
