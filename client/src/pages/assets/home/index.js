@@ -10,8 +10,10 @@ import intro2 from "./intro2.png";
 import intro3 from "./intro3.png";
 import intro4 from "./intro4.png";
 import gonkle from "./gonkle.png";
-import gonkle1 from "./gonkle1.jpg";
+
 import gonkle2 from "./gonkle2.png";
+import sportsgif from "./sportsgif.gif";
+import okbutton from "./okbutton.jpg";
 
 const images = {
     frisbee,
@@ -25,8 +27,10 @@ const images = {
     intro3,
     intro4,
     gonkle,
-    gonkle1,
-    gonkle2
+    
+    gonkle2,
+    sportsgif,
+    okbutton
 }
 export default images;
 
