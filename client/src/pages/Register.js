@@ -1,10 +1,11 @@
 import { styled } from "@mui/material/styles";
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, TextField, Fab } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { DOMAIN } from "../index";
 import Title from "../components/title";
+import HowToRegIcon from "@mui/icons-material/HowToReg";
 
 const MainContainer = styled(Box)({
   display: "flex",
@@ -18,7 +19,7 @@ const GridContainer = styled(Box)({
   gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
   gap: "30px",
   width: "100%",
-  maxWidth: "800px",
+  maxWidth: "80vh",
   padding: "50px",
   borderRadius: "10px",
   backgroundColor: "rgba(255, 255, 255, 0.8)",
@@ -115,11 +116,12 @@ const RegisterForm = () => {
             required
             onChange={(event) => setPassword(event.target.value)}
           />
-          <Button variant="contained" type="submit">
+          <Fab variant="extended" color="primary" type="submit" aria-label="register">
+            <HowToRegIcon sx={{ mr: 1 }} />
             Registrieren
-          </Button>
-          <Button variant="contained" onClick={changeAuthMode}>
-            Login
+          </Fab>
+          <Button variant="text" color="primary" onClick={changeAuthMode} aria-label="login">
+            Bereits Registriert? Login
           </Button>
         </GridContainer>
       </form>
