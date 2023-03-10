@@ -35,11 +35,12 @@ function Register() {
         navigate("/Home");
       })
       .catch((err) => {
-        console.log(err);
+       alert(err.data);
       });
 
     console.log(registered);
   };
+  
 
   return (
 <div className="d-flex justify-content-center text-center vh-100">
