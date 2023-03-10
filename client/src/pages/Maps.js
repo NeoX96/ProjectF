@@ -139,10 +139,27 @@ function Maps() {
       <>
         {markerExists && (
           <Marker
-            position={[eventLatLng.lat, eventLatLng.lng]}
-            icon={GetIcon([30, 40], "marker")}
-          />
-        )}
+          
+          position={[eventLatLng.lat, eventLatLng.lng]}
+          icon={
+            index === 0
+          ? GetIcon([30, 30], "frisbee") 
+          : index === 1 
+            ? GetIcon([30, 30], "fussball") 
+            : index === 2 
+              ? GetIcon([30, 30], "volleyball")
+              : index === 3 
+                ? GetIcon([30, 30], "basketball") 
+                : index === 4 
+                  ? GetIcon([50, 50], "tischtennis") 
+                  : index === 5 
+                    ? GetIcon([30, 40], "skateboard")
+                    : GetIcon([30, 40], "marker")
+            }
+          
+        />
+      )}
+
         <Modal
           size="lg"
           show={showModal}
