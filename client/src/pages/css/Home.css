@@ -1,18 +1,4 @@
-
-  .photo {
+.photo {
     height: 300px;
     width: 300px;
-  }
-
-
-
-  .home {
-    height: calc(100vh - 150px);
-    max-height: calc(100vh - 150px);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-  }
+}
