@@ -13,7 +13,7 @@ import gonkle from "./gonkle.png";
 
 import gonkle2 from "./gonkle2.png";
 import sportsgif from "./sportsgif.gif";
-import okbutton from "./okbutton.jpg";
+import okbutton from "./okbutton.png";
 
 const images = {
     frisbee,
