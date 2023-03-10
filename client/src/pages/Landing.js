@@ -4,8 +4,7 @@ import { Button, Form } from "react-bootstrap";
 import Cookies from "js-cookie";
 import axios from "axios";
 import images from './assets/home/index';
-import Navbar from '../components/navigationbar';
-//öimport "./css/Landing.css";
+
 
 function Login() {
     const navigate = useNavigate();
@@ -49,12 +48,14 @@ function Login() {
 
     return (
 
+        
 
         <div className="d-flex justify-content-center mt-5">
             <div className="">
+                
               
                 <header class="bg-primary-subtle d-flex justify-content-center mt-5 rounded">
-                    <Form className="w-75" onSubmit={handleLogin}>
+                    <Form className="w-100" onSubmit={handleLogin}>
                         <div className="d-flex justify-content-center align-items-center">
                             <div>
                                 <Form.Control
@@ -85,15 +86,16 @@ function Login() {
                                 </Button>
                                 <Button className="btn btn-primary h-25" onClick={changeAuthMode}>Signup</Button>
                             </div>
+                           
                         </div>
                     </Form>
                 </header>
                 <div class="d-flex flex-column align-items-center">
-                    <img class="w-75 mt-5 rounded" src={images.gonkle} alt="erklärung"/>
-                    <img class="w-25 mt-5 rounded" src={images.frisbee} alt="sportart"/>
+                    <img class="w-50 mt-5 rounded" src={images.sportsgif} alt="erklärung"/>
+                    <img class="w-50 mt-5 rounded" src={images.okbutton} alt="gonklelogo"/>
                 </div>
             </div>
-            <Navbar />
+   
         </div>
     );
 }
