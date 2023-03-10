@@ -91,10 +91,10 @@ function Home() {
     <div
       style={{
         height: "calc(100vh - 150px)",
+        minWidth: "360px",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        padding: "30px",
       }}
     >
       <Container>
@@ -124,7 +124,7 @@ function Home() {
             container
             justifyContent="center"
             alignItems="center"
-            className="mb-3"
+            className="mb-3 "
           >
             <Grid item>
               <Box
