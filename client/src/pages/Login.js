@@ -29,13 +29,15 @@ function Login() {
         password,
       });
 
-      if (data.accessToken) {
+      if (data.token) {
         var isSecure = window.location.protocol === "https:" ? true : false;
-        Cookies.set("sessionID", data.accessToken, {
+        Cookies.set("sessionID", data.token, {
           expires: 1,
           secure: isSecure,
           sameSite: isSecure ? "none" : "lax",
         });
+
+        Cookies.set("vorname", data.user)
 
         window.location.href = "/Home";
       } else {
