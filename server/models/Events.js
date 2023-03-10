@@ -30,6 +30,12 @@ equipment: {
     default: false
 },
 
+index: {
+    type: Number,
+    maxlength: 30
+
+},
+
 teilnehmer: [{ type: mongoose.Schema.Types.ObjectId, ref: User }]
 });
 

@@ -46,10 +46,14 @@ function Maps() {
   const [showModal, setShowModal] = useState(false);
   const [markerExists, setMarkerExists] = useState(false);
 
+
+  
   const {index} = useContext(IndexContext);
+  
 
   console.log("index: " + index);
 
+  
 
 /*
   const [position, setPosition] = useState(null);
@@ -63,7 +67,8 @@ function Maps() {
   // Funktion zum holen der Events aus der DB
   const getEvents = async () => {
     const res = await axios.post(`${DOMAIN}/getEvents`);
-
+    console.log(res.data);
+    
     if (res.data) {
       setEvents(res.data);
     } 
@@ -119,6 +124,7 @@ function Maps() {
         uhrzeit: event.target.eventTime.value,
         lat: eventLatLng.lat,
         lng: eventLatLng.lng,
+        index: index,
     //  equipment: event.target.eventTool.value,
 
         // get SessionID from cookie
@@ -127,14 +133,14 @@ function Maps() {
       axios
         .post(`${DOMAIN}/createEvent`, data)
         .then((res) => {
-          console.log(res.data);
+        
         })
         .catch((err) => {
           console.log(err);
         });
 
     };
-
+    
     return (
       <>
         {markerExists && (
@@ -142,7 +148,7 @@ function Maps() {
           
           position={[eventLatLng.lat, eventLatLng.lng]}
           icon={
-            index === 0
+          index === 0
           ? GetIcon([30, 30], "frisbee") 
           : index === 1 
             ? GetIcon([30, 30], "fussball") 
@@ -249,6 +255,7 @@ function Maps() {
       console.log("Keine Events vorhanden");
       return <div></div>;
     }
+    console.log()
 
     return (
       <div>
@@ -256,7 +263,22 @@ function Maps() {
           <Marker
             key={event._id}
             position={{ lat: [event.lat], lng: [event.lng] }}
-            icon={GetIcon([30, 40], "marker")}
+          icon={
+            event.index === 0
+          ? GetIcon([30, 30], "basketball") 
+          : event.index === 1 
+            ? GetIcon([30, 30], "fussball") 
+            : event.index === 2
+              ? GetIcon([30, 30], "volleyball")
+              : event.index === 3 
+                ? GetIcon([30, 30], "basketball") 
+                : event.index === 4 
+                  ? GetIcon([50, 50], "tischtennis") 
+                  : event.index === 5 
+                    ? GetIcon([30, 40], "skateboard")
+                    : GetIcon([30, 40], "marker")
+            }
+          
           >
             <Popup>
               <span>{event.name}</span>

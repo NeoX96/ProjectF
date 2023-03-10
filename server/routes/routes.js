@@ -275,7 +275,8 @@ router.post('/api/createEvent', async (req, res) => {
           uhrzeit: req.body.uhrzeit,
           equipment: req.body.equipment,
           lat: req.body.lat,
-          lng: req.body.lng
+          lng: req.body.lng,
+          index: req.body.index,
       }
 
       const newEvent = new EventModel(data);
