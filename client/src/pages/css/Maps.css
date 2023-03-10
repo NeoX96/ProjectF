@@ -11,3 +11,20 @@
   .fancy-input input {
     padding: .5em;
   }
+
+  .event-box {
+    background-color: black;
+    display: inline-block;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  .event-name {
+    text-align: center;
+  }
+  
+  .event-equipment {
+    text-align: center;
+    margin-top: 10px;
+    display: flex;
+  }  
