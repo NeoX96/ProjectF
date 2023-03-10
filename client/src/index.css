@@ -5,8 +5,8 @@ body,
 #root,
 .app,
 .content {
-    background: #757575;
-    color: white;
+    background: #FFFFFF url(bg.svg) center center/cover no-repeat;
+    color: black;
     height: 100%;
     width: 100%;
     margin: 0;
