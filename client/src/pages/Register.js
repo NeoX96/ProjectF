@@ -30,26 +30,26 @@ function Register() {
 
     try {
       const response = await axios.post(`${DOMAIN}/createUser`, registered);
-      switch (response.status) {
-        case 200:
-          console.log(response.data);
-          navigate("/Home");
-          break;
-        case 401:
-          alert("Email already exists");
-          break;
-        case 402:
-          alert("Username already exists");
-          break;
-        default:
-          // handle other response codes
-          break;
+      if (response.status === 200) {
+        alert("Registrierung erfolgreich");
+        navigate("/Login");
       }
     } catch (error) {
-      // handle errors
-      alert(error.message);
+      
+      switch (error.response.status) {
+        case 401:
+          alert("Bereits Registriert");
+          break;
+
+        case 402:
+          alert("Fehler bei der Registrierung");
+          break;
+
+        default:
+          alert("Fehler bei der Registrierung");
+          break;
     }
-    
+  }
   };
   
 
@@ -133,6 +133,7 @@ function Register() {
       </div>
     </div>
   );
+
 }
 
 export default Register;
