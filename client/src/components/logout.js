@@ -1,38 +1,16 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
-import axios from 'axios';
 
-const LogoutButton = ({ navigation }) => {
-  const handleLogout = async () => {
-    try {
-      const response = await axios.post('/logout');
-      if (response.data.success) {
-        navigation.navigate('Login');
-      }
-    } catch (error) {
-      console.log(error);
-    }
+const LogoutButton = () => {
+  const handleLogout = () => {
+    document.cookie = "sessionID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    // replace "token" with the name of your cookie
+    // set the expires date to the past to make the cookie expire immediately
+    window.location.reload(); // reload the page to clear any remaining data
   };
 
   return (
-    <TouchableOpacity style={styles.button} onPress={handleLogout}>
-      <Text style={styles.text}>Logout</Text>
-    </TouchableOpacity>
+    <button onClick={handleLogout}>Logout</button>
   );
 };
-
-const styles = StyleSheet.create({
-  button: {
-    backgroundColor: 'red',
-    borderRadius: 5,
-    padding: 10,
-    marginTop: 20,
-  },
-  text: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-});
 
 export default LogoutButton;
