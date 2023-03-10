@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import images from "./assets/home/index";
 import { useNavigate } from "react-router-dom";
 import { Carousel } from "react-bootstrap";
@@ -8,8 +8,73 @@ import Cookies from "js-cookie";
 import { Box, Container, Fab, Grid } from "@mui/material";
 import NavigationIcon from "@mui/icons-material/Navigation";
 
-function Home() {
+const FadeInBox = ({ children }) => {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    setShow(true);
+  }, []);
+
+  return (
+    <Box
+      sx={{
+        backdropFilter: "blur(5px)",
+        backgroundColor: "rgba(255, 255, 255, 0.7)",
+        borderRadius: 5,
+        p: 2,
+        boxShadow: 20,
+        opacity: show ? 1 : 0,
+        transform: show ? "translateY(0)" : "translateY(300px)",
+        transition: "opacity 0.5s ease, transform 0.5s ease",
+      }}
+    >
+      {children}
+    </Box>
+  );
+};
+
+const HoverGrowFab = () => {
+  const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
+
+  const handleMouseEnter = () => {
+    setHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setHovered(false);
+  };
+
+  return (
+    <Fab
+      variant="extended"
+      aria-label="Go"
+      onClick={() => navigate("/Maps")}
+      sx={{
+        fontSize: "1.2rem",
+        borderRadius: 5,
+        backgroundColor: "rgba(0, 255, 255, 0.1)",
+        boxShadow: 5,
+        transition: "transform 0.2s ease",
+        transform: hovered ? "scale(1.1)" : "scale(1)",
+        "&:hover": {
+          backgroundColor: "rgba(0, 255, 255, 0.3)",
+          transform: "scale(1.1)",
+        },
+      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <NavigationIcon sx={{ mr: 1 }} />
+      Gonkle
+    </Fab>
+  );
+};
+
+
+
+function Home() {
+  
 
   const { index, setIndex } = useContext(IndexContext);
   const vorname = Cookies.get("vorname");
@@ -19,6 +84,8 @@ function Home() {
   };
 
   console.log("index: " + index);
+
+
 
   return (
     <div
@@ -31,23 +98,14 @@ function Home() {
       }}
     >
       <Container>
-        <Box
-          sx={{
-            backdropFilter: "blur(5px)",
-            backgroundColor: "rgba(255, 255, 255, 0.7)",
-            borderRadius: 5,
-            p: 2,
-            boxShadow: 20,
-          }}
-        >
+        <FadeInBox>
           <Grid container justifyContent="center" mb={3}>
             <Grid item>
               <Box
                 sx={{
                   p: 2,
-                  border: "1px dashed grey",
                   borderRadius: 5,
-                  backgroundColor: "rgba(0, 255, 255, 0.15)",
+                  backgroundColor: "rgba(0, 255, 255, 0.08)",
                   boxShadow: 3,
                 }}
               >
@@ -56,9 +114,9 @@ function Home() {
             </Grid>
           </Grid>
 
-          <Grid container justifyContent="center" className="mb-3">
+          <Grid container justifyContent="center" >
             <Grid item>
-              <h6>Wähle deine Sportart aus</h6>
+              <h6>Wähle deine Sportart aus:</h6>
             </Grid>
           </Grid>
 
@@ -72,8 +130,9 @@ function Home() {
               <Box
                 sx={{
                   borderRadius: 5,
-                  backgroundColor: "rgba(0, 255, 255, 0.1)",
+                  backgroundColor: "rgba(0, 150, 255, 0.15)",
                   boxShadow: 3,
+                  border: "2px dashed grey",
                 }}
               >
                 <Carousel
@@ -134,18 +193,10 @@ function Home() {
 
           <Grid container justifyContent="center" mt={4}>
             <Grid item>
-              <Fab
-                color="primary"
-                variant="extended"
-                aria-label="Go"
-                onClick={() => navigate("/Maps")}
-              >
-                <NavigationIcon sx={{ mr: 1 }} />
-                Gonkle
-              </Fab>
+              <HoverGrowFab />
             </Grid>
           </Grid>
-        </Box>
+        </FadeInBox>
       </Container>
     </div>
   );
