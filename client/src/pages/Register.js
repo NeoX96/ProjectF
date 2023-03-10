@@ -22,9 +22,9 @@ const GridContainer = styled(Box)({
   maxWidth: "80vh",
   padding: "50px",
   borderRadius: "10px",
-  backgroundColor: "rgba(255, 255, 255, 0.8)",
-  backdropFilter: "blur(10px)",
-  boxShadow: "0px 0px 20px rgba(0, 0, 0, 0.3)",
+  backgroundColor: "rgba(255, 255, 255, 0.65)",
+  backdropFilter: "blur(4px)",
+  boxShadow: "0px 0px 20px rgba(0, 0, 0, 0.35)",
 });
 
 const RegisterForm = () => {

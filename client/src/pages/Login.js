@@ -17,9 +17,10 @@ const MainContainer = styled(Box)({
 });
 
 const LoginContainer = styled(Container)({
-  backgroundColor: "rgba(255, 255, 255, 0.8)",
+  backgroundColor: "rgba(255, 255, 255, 0.65)",
   borderRadius: "10px",
-  boxShadow: "0px 0px 10px 5px rgba(0,0,0,0.2)",
+  boxShadow: "0px 0px 20px rgba(0, 0, 0, 0.35)",
+  backdropFilter: "blur(4px)",
   paddingTop: "30px",
   paddingBottom: "30px",
 });
