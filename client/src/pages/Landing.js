@@ -4,6 +4,9 @@ import images from "./assets/home";
 import { useNavigate } from "react-router-dom";
 import Title from "../components/title";
 
+import LoginIcon from "@mui/icons-material/Login";
+import HowToRegIcon from "@mui/icons-material/HowToReg";
+
 
 const MainContainer = styled(Container)({
   display: "flex",
@@ -43,25 +46,27 @@ const LandingPage = () => {
         </Box>
         <StyledBox sx={{ mb: 5 }}>
           <StyledImg src={images.sportsgif} alt="my" />
-          <Box sx={{ display: "flex", gap: "40px" }}>
+          <Box sx={{ display: "flex", gap: "25px" }}>
             <Button
               variant="contained"
               size="large"
               onClick={() => navigate("/Register")}
+              boxShadow={3}
               sx={{
-                borderRadius: "50px",
+                borderRadius: "20px",
               }}
-            >
+            ><HowToRegIcon sx={{ mr: 1 }} />
               Sign Up
             </Button>
             <Button
               variant="contained"
               size="large"
               onClick={() => navigate("/Login")}
+              boxShadow={3}
               sx={{
-                borderRadius: "50px",
+                borderRadius: "20px",
               }}
-            >
+            ><LoginIcon sx={{ mr: 1 }} />
               Login
             </Button>
           </Box>
