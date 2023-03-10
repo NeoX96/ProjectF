@@ -46,12 +46,13 @@ router.post("/api/createUser", async (req, res) => {
   const findMail = UserModel.findOne({ email: user.email });
   if (findMail) {
     return res.status(400).json({ message: "Email already exists" });
+  }
 
   // Check if username already exists
   const findUsername = UserModel.findOne({ username: user.username });
-  if(findUsername)
+  if(findUsername) {
   return res.status(400).json({ message: "Username already exists" });
-
+  }
 
   // Das Passwort verschlüsseln
   const salt = await bcrypt.genSalt();
