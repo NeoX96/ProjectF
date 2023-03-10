@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState, View, Image } from "react";
+import { useState, } from "react";
 import { Button, Form } from "react-bootstrap";
 import Cookies from "js-cookie";
 import axios from "axios";
