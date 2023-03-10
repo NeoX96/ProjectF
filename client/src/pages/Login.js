@@ -6,6 +6,7 @@ import axios from "axios";
 import { DOMAIN } from "../index";
 import Cookies from "js-cookie";
 import Title from "../components/title";
+import LoginIcon from "@mui/icons-material/Login";
 
 
 const MainContainer = styled(Box)({
@@ -112,6 +113,7 @@ const Login = () => {
                     type="submit"
                     disabled={isDisabled}
                   >
+                    <LoginIcon sx={{ mr: 1 }} />
                     Login
                   </Button>
                 </Box>
