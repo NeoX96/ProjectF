@@ -1,4 +1,12 @@
-import { Box, Button, Container, TextField, Grid } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  TextField,
+  Grid,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -7,7 +15,7 @@ import { DOMAIN } from "../index";
 import Cookies from "js-cookie";
 import Title from "../components/title";
 import LoginIcon from "@mui/icons-material/Login";
-
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const MainContainer = styled(Box)({
   display: "flex",
@@ -25,15 +33,16 @@ const LoginContainer = styled(Container)({
   paddingBottom: "30px",
 });
 
-
 const Login = () => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  const isDisabled =
-    email.trim() === "" || password.trim() === "" || !email.includes("@") || password.length < 5 || !email.includes(".");
+  const toggleShowPassword = () => setShowPassword(!showPassword);
+
+  const isDisabled = email.trim() === "" || password.trim() === "" || !email.includes("@") || password.length < 6 || !email.includes(".");
 
   const changeAuthMode = () => {
     navigate("/Register");
@@ -56,7 +65,7 @@ const Login = () => {
           sameSite: isSecure ? "none" : "lax",
         });
 
-        Cookies.set("vorname", data.user)
+        Cookies.set("vorname", data.user);
 
         window.location.href = "/Home";
       } else {
@@ -98,12 +107,23 @@ const Login = () => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
+                  label="Passwort"
                   fullWidth
-                  label="Password"
                   variant="outlined"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  onChange={(event) => setPassword(event.target.value)}
+                  inputProps={{ minLength: 6 }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={toggleShowPassword} edge="end">
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -122,7 +142,6 @@ const Login = () => {
               <Grid item xs={12}>
                 <Box sx={{ display: "flex", justifyContent: "center" }}>
                   <Button
-
                     variant="text"
                     color="primary"
                     onClick={changeAuthMode}

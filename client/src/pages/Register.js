@@ -1,11 +1,19 @@
 import { styled } from "@mui/material/styles";
-import { Box, Button, TextField, Fab } from "@mui/material";
-import { useState } from "react";
+import {
+  Box,
+  Button,
+  TextField,
+  Fab,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { DOMAIN } from "../index";
 import Title from "../components/title";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const MainContainer = styled(Box)({
   display: "flex",
@@ -35,6 +43,9 @@ const RegisterForm = () => {
   const [geburtstag, setGeburtstag] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const toggleShowPassword = () => setShowPassword(!showPassword);
 
   const changeAuthMode = () => {
     navigate("/Login");
@@ -111,16 +122,36 @@ const RegisterForm = () => {
           <TextField
             label="Passwort"
             variant="outlined"
-            type="password"
+            type={showPassword ? "text" : "password"}
             value={password}
             required
             onChange={(event) => setPassword(event.target.value)}
+            inputProps={{ minLength: 6 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={toggleShowPassword} edge="end">
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
-          <Fab variant="extended" color="primary" type="submit" aria-label="register">
+          <Fab
+            variant="extended"
+            color="primary"
+            type="submit"
+            aria-label="register"
+          >
             <HowToRegIcon sx={{ mr: 1 }} />
             Registrieren
           </Fab>
-          <Button variant="text" color="primary" onClick={changeAuthMode} aria-label="login">
+          <Button
+            variant="text"
+            color="primary"
+            onClick={changeAuthMode}
+            aria-label="login"
+          >
             Bereits Registriert? Login
           </Button>
         </GridContainer>
