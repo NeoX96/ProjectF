@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useTheme } from "@mui/material/styles";
 import images from "./assets/home/index";
 import { useNavigate } from "react-router-dom";
 import { Carousel } from "react-bootstrap";
 import "./css/Home.css";
 import { IndexContext } from "../App";
 import Cookies from "js-cookie";
-import { Box, Container, Fab, Grid } from "@mui/material";
+import { Box, Container, Fab, Grid, Typography } from "@mui/material";
 import NavigationIcon from "@mui/icons-material/Navigation";
 
 const FadeInBox = ({ children }) => {
@@ -71,21 +72,18 @@ const HoverGrowFab = () => {
   );
 };
 
-
-
 function Home() {
-  
-
   const { index, setIndex } = useContext(IndexContext);
   const vorname = Cookies.get("vorname");
+  
+  const theme = useTheme();
+  const navigate = useNavigate();
 
   const handleSelect = (selectedIndex, e) => {
     setIndex(selectedIndex);
   };
 
   console.log("index: " + index);
-
-
 
   return (
     <div
@@ -104,17 +102,54 @@ function Home() {
               <Box
                 sx={{
                   p: 2,
+                  [theme.breakpoints.down("sm")]: {
+                    p: 1,
+                  },
                   borderRadius: 5,
                   backgroundColor: "rgba(0, 255, 255, 0.08)",
                   boxShadow: 3,
+                  display: "flex",
+                  gap: "0.5rem",
                 }}
               >
-                <h1>Hey, {vorname}</h1>
+                <Typography
+                  onClick={() => navigate("/Home")}
+                  sx={{
+                    fontSize: "3rem",
+                    [theme.breakpoints.down("sm")]: {
+                      fontSize: "2rem",
+                    },
+                    color: "red",
+                    fontWeight: "bold",
+                    fontFamily: "Montserrat, sans-serif",
+                    textShadow: "4px 4px 4px rgba(100, 0, 0, 0.95)",
+                    textDecoration: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Hey,
+                </Typography>
+                <Typography
+                  onClick={() => navigate("/Home")}
+                  sx={{
+                                        fontSize: "3rem",
+                    [theme.breakpoints.down("sm")]: {
+                      fontSize: "2rem",
+                    },
+                    fontWeight: "bold",
+                    fontFamily: "Montserrat, sans-serif",
+                    textShadow: "4px 4px 4px rgba(30, 30, 30, 0.6)",
+                    textDecoration: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                   {vorname}
+                </Typography>
               </Box>
             </Grid>
           </Grid>
 
-          <Grid container justifyContent="center" >
+          <Grid container justifyContent="center">
             <Grid item>
               <h6>Wähle deine Sportart aus:</h6>
             </Grid>

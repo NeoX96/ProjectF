@@ -1,11 +1,33 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { Button } from "react-bootstrap";
+import { styled } from "@mui/material/styles";
+import { Box, Button, TextField, Fab } from "@mui/material";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import axios from "axios";
 import { DOMAIN } from "../index";
+import Title from "../components/title";
+import HowToRegIcon from "@mui/icons-material/HowToReg";
 
-function Register() {
+const MainContainer = styled(Box)({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  height: "100vh",
+});
+
+const GridContainer = styled(Box)({
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+  gap: "30px",
+  width: "100%",
+  maxWidth: "80vh",
+  padding: "50px",
+  borderRadius: "10px",
+  backgroundColor: "rgba(255, 255, 255, 0.65)",
+  backdropFilter: "blur(4px)",
+  boxShadow: "0px 0px 20px rgba(0, 0, 0, 0.35)",
+});
+
+const RegisterForm = () => {
   const navigate = useNavigate();
 
   const [vorname, setVorname] = useState("");
@@ -35,7 +57,6 @@ function Register() {
         navigate("/Login");
       }
     } catch (error) {
-      
       switch (error.response.status) {
         case 401:
           alert("Bereits Registriert");
@@ -48,92 +69,64 @@ function Register() {
         default:
           alert("Fehler bei der Registrierung");
           break;
+      }
     }
-  }
   };
-  
 
   return (
-<div className="d-flex justify-content-center text-center vh-100">
-  <div className="d-flex flex-column align-items-center justify-content-center" style={{ minWidth: '600px' }}>
-        <div className="text-center mb-3">
-          <h2>Welcome to Gonkle</h2>
-          <Button onClick={changeAuthMode}>Sign In</Button>
-        </div>
-
-        <form className="Auth-form" onSubmit={handleRegister}>
-          <h3 className="Auth-form-title">Registrieren</h3>
-          <div className="Auth-form-content">
-            <div className="form-group mt-3">
-              <label>Email address</label>
-              <input
-                type="email"
-                className="form-control mt-1"
-                placeholder="Email Addresse"
-                required
-                onChange={(event) => {
-                  setEmail(event.target.value);
-                }}
-              />
-            </div>
-            <div className="form-group mt-3">
-              <label>Vorname</label>
-              <input
-                type="text"
-                className="form-control mt-1"
-                placeholder="Vorname"
-                required
-                onChange={(event) => {
-                  setVorname(event.target.value);
-                }}
-              />
-            </div>
-            <div className="form-group mt-3">
-              <label>Benutzername</label>
-              <input
-                type="text"
-                className="form-control mt-1"
-                placeholder="Nickname"
-                required
-                onChange={(event) => {
-                  setNickname(event.target.value);
-                }}
-              />
-            </div>
-            <div className="form-group mt-3">
-              <label>Geburtstag</label>
-              <input
-                type="date"
-                className="form-control mt-1"
-                placeholder="Geburstag"
-                required
-                onChange={(event) => {
-                  setGeburtstag(event.target.value);
-                }}
-              />
-            </div>
-            <div className="form-group mt-3">
-              <label>Password</label>
-              <input
-                type="password"
-                className="form-control mt-1"
-                placeholder="Passwort"
-                onChange={(event) => {
-                  setPassword(event.target.value);
-                }}
-              />
-            </div>
-            <div className="d-grid gap-2 mt-3">
-              <button type="submit" className="btn btn-primary">
-                Submit
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
+    <MainContainer>
+      <form onSubmit={handleRegister}>
+        <GridContainer>
+          <Title />
+          <TextField
+            label="Vorname"
+            variant="outlined"
+            value={vorname}
+            required
+            onChange={(event) => setVorname(event.target.value)}
+          />
+          <TextField
+            label="Nickname"
+            variant="outlined"
+            value={nickname}
+            required
+            onChange={(event) => setNickname(event.target.value)}
+          />
+          <TextField
+            label="Geburtstag"
+            variant="outlined"
+            type="date"
+            value={geburtstag}
+            required
+            onChange={(event) => setGeburtstag(event.target.value)}
+          />
+          <TextField
+            label="Email"
+            variant="outlined"
+            type="email"
+            value={email}
+            required
+            onChange={(event) => setEmail(event.target.value)}
+          />
+          <TextField
+            label="Passwort"
+            variant="outlined"
+            type="password"
+            value={password}
+            required
+            onChange={(event) => setPassword(event.target.value)}
+          />
+          <Fab variant="extended" color="primary" type="submit" aria-label="register">
+            <HowToRegIcon sx={{ mr: 1 }} />
+            Registrieren
+          </Fab>
+          <Button variant="text" color="primary" onClick={changeAuthMode} aria-label="login">
+            Bereits Registriert? Login
+          </Button>
+        </GridContainer>
+      </form>
+    </MainContainer>
   );
+};
 
-}
-
-export default Register;
+export default RegisterForm;
