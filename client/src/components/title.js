@@ -9,7 +9,7 @@ const Title = () => {
     <Container sx={{ display: "flex", justifyContent: "center", mb: 1}} >
       <Box>
         <Typography
-          onClick={() => navigate("/Home")}
+          onClick={() => navigate("/")}
           sx={{
             fontSize: "4rem",
             color: "red",
@@ -24,7 +24,7 @@ const Title = () => {
       </Box>
       <Box>
         <Typography
-          onClick={() => navigate("/Home")}
+          onClick={() => navigate("/")}
           sx={{
             fontSize: "4rem",
             fontWeight: "bold",
