@@ -74,7 +74,7 @@ function App() {
               <>
                 <Route path="/Login" element={<Login /> } />
                 <Route path="/Register" element={<Register  />} />
-                <Route path="/Landing" element={<Landing  />} />
+                <Route path="/" element={<Landing  />} />
                 <Route path="/Verify" element={<Verify />} />
               </>
             )}
@@ -92,7 +92,7 @@ function App() {
             ) : (
               <Route
                 path="*"
-                element={<Navigate to="/Landing" />}
+                element={<Navigate to="/" />}
               />
             )}
             <Route path="/Forgotpw" element={<Forgotpw />} />
