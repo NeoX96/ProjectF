@@ -45,9 +45,10 @@ function Maps() {
   const [eventLatLng, setEventLatLng] = useState({ lat: 0, lng: 0 });
   const [showModal, setShowModal] = useState(false);
   const [markerExists, setMarkerExists] = useState(false);
-
-
   
+
+
+  const vorname = Cookies.get("vorname");
   const {index} = useContext(IndexContext);
   
 
@@ -62,8 +63,9 @@ function Maps() {
 
   const [events, setEvents] = useState([]);
   const sessionID = Cookies.get("sessionID");
+  
 
-
+ 
   // Funktion zum holen der Events aus der DB
   const getEvents = async () => {
     const res = await axios.post(`${DOMAIN}/getEvents`);
@@ -79,7 +81,23 @@ function Maps() {
     getEvents();
   }, []);
 
-  
+  function handleClick() {
+    const data = { anzahl: 1, vorname: vorname };
+    console.log(data)
+    axios.post(`${DOMAIN}/createTeilnehmer`, data)
+    .then(response => {
+      // Erfolgreiche Antwort vom Server
+      console.log(response.data);
+    })
+    .catch(error => {
+      // Fehler aufgetreten
+      console.log(error.response.status);
+      console.log(error.response.data);
+    });
+  }
+
+
+
   // Funktion zum erstellen eines Events
   function CreateEvent() {
     // Event erstellen
@@ -125,7 +143,8 @@ function Maps() {
         lat: eventLatLng.lat,
         lng: eventLatLng.lng,
         index: index,
-    //  equipment: event.target.eventTool.value,
+        vorname: vorname,
+        //equipment: event.target.eventTool.value,
 
         // get SessionID from cookie
       };
@@ -283,8 +302,11 @@ function Maps() {
             <Popup>
             <p class="event-name"><strong>{event.name}</strong></p>
             <p class="event--datum">Datum: {event.date}</p>
-            <p class="event-equipment">{event.equipment ? 'Sportgerät' : 'Sportgerät'}<span class="event-equipment-icon">{event.equipment ? '✓' : '✘'}</span></p>
-            <button class="event-participate-button">&#43; teilnehmen</button>
+            <p class="event-equipment">{event.equipment ? 'Sportgerät ✓' : 'Kein Sportgerät ✘'}</p>
+
+            <p> Dieses Event wurde von {event.vorname} erstellt</p>
+            <button onClick={handleClick}>Teilnehmen</button>
+             <button class="event-Chat-button"> chat</button>
 
 
             </Popup>
