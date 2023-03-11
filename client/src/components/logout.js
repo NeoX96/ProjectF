@@ -1,15 +1,34 @@
 import React from 'react';
+import { Button } from "@mui/material";
+import LogoutIcon from '@mui/icons-material/Logout';
+
 
 const LogoutButton = () => {
+
+
   const handleLogout = () => {
     document.cookie = "sessionID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    // replace "token" with the name of your cookie
-    // set the expires date to the past to make the cookie expire immediately
-    window.location.reload(); // reload the page to clear any remaining data
+    window.location.reload();
   };
 
   return (
-    <button onClick={handleLogout}>Logout</button>
+    <Button
+    variant={"contained"}
+    color="primary"
+    onClick={handleLogout}
+    sx={{ 
+      backdropFilter: "blur(2px)",
+      backgroundColor: "rgba(0, 0, 0, 0.6)",
+      zIndex: 401,
+      position: "fixed",
+      top: 10,
+      right: 10,
+      borderRadius: 5,
+      boxShadow: 6,
+    }}
+  >
+    <LogoutIcon sx={{ mr: 1 }} />
+  </Button>
   );
 };
 
