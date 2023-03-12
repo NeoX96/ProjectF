@@ -588,6 +588,13 @@ function Chat() {
                     variant="outlined"
                     color="primary"
                     onClick={() => selectUser(user)}
+                    sx={{
+                      boxShadow: 3,
+                      width: "100%",
+                      padding: "10px",
+   
+                      
+                    }}
                   >
                     {user.vorname}
                   </Button>
