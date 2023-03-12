@@ -10,7 +10,7 @@ const EventSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    maxlength: 30
+    maxlength: 200
   },
 
 uhrzeit: {
