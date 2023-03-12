@@ -261,7 +261,17 @@ function Maps() {
       console.log("Keine Events vorhanden");
       return <div></div>;
     }
-  
+     
+
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      return `${day}.${month}.${year} ${hours}:${minutes}`;
+    }
     function showInfo(event) {
       const popupContent = event.target.closest('.leaflet-popup-content');
       const createdBy = popupContent.querySelector('.created-by');
@@ -291,22 +301,21 @@ function Maps() {
             }
           >
             <Popup onOpen={() => showInfo(event)}>
-          <div class="event-info-container">
-            <p class="event-name blue-bg">
-              <strong class="name">{event.name}</strong>
-              <span class="info-button">i</span>
-            </p>
-            <p class="event--datum">Datum: {event.date}</p>
-            <p class="event-equipment">
-              {event.equipment ? "Sportgerät ✓" : "Kein Sportgerät ✘"}
-            </p>
-            <div class="button-container">
-              <button class="play-button" onclick="joinEvent()">+ Mitspielen</button>
-              <button class="chat-button" onclick="joinEvent()">+ Chat</button>
+            <div class="event-info-container">
+              <p class="event-name blue-bg">
+                <strong class="name">{event.name}</strong>
+                <span class="info-button">i</span>
+              </p>
+              <p class="event--datum">Datum: {formatDate(event.uhrzeit)}</p>
+              <p class="event-equipment">
+                {event.equipment ? "Sportgerät ✓" : "Kein Sportgerät ✘"}
+              </p>
+              <div class="button-container">
+                <button class="play-button" onclick="joinEvent()">+ Mitspielen</button>
+                <button class="chat-button" onclick="joinEvent()">+ Chat</button>
+              </div>
             </div>
-          </div>
-        </Popup>
-
+          </Popup>
 
           </Marker>
         ))}
@@ -315,7 +324,7 @@ function Maps() {
   }
 
   return (
-    <div>
+    <div >
       <Form.Check
         type="switch"
         id="custom-switch"
