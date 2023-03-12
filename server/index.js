@@ -166,6 +166,8 @@ socketIO.on("connection", (socket) => {
 
     // send private message to target user 
     socket.on("send_private_message", async (data) => {
+        data.date = new Date();
+
         socket.to(data.targetUser).emit("receive_private_message", data);
         socket.emit("receive_private_message", data);
 
@@ -176,7 +178,7 @@ socketIO.on("connection", (socket) => {
             sender: sender._id,
             receiver: target._id,
             message: data.message,
-            date: new Date()
+            date: data.date
         });
         try {
             await message.save();
