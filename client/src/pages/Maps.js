@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Form, Button, Modal } from "react-bootstrap";
+import { Form, Modal } from "react-bootstrap";
+import Control from "react-leaflet-custom-control";
+import { Button, ToggleButton } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import Cookies from "js-cookie";
 import {
   MapContainer,
@@ -7,7 +10,6 @@ import {
   Marker,
   Popup,
   useMap,
- // Circle,
   useMapEvents,
 } from "react-leaflet";
 import L from "leaflet";
@@ -15,7 +17,7 @@ import images from "./assets/map/index.js";
 import "leaflet/dist/leaflet.css";
 import "./css/Maps.css";
 import axios from "axios";
-import {IndexContext} from "../App";
+import { IndexContext } from "../App";
 
 import { DOMAIN } from "../index";
 
@@ -45,35 +47,28 @@ function Maps() {
   const [eventLatLng, setEventLatLng] = useState({ lat: 0, lng: 0 });
   const [showModal, setShowModal] = useState(false);
   const [markerExists, setMarkerExists] = useState(false);
-  
-
 
   const vorname = Cookies.get("vorname");
-  const {index} = useContext(IndexContext);
-  
+  const { index } = useContext(IndexContext);
 
   console.log("index: " + index);
 
-  
-
-/*
+  /*
   const [position, setPosition] = useState(null);
   const [radius, setRadius] = useState(100);
   */
 
   const [events, setEvents] = useState([]);
   const sessionID = Cookies.get("sessionID");
-  
 
- 
   // Funktion zum holen der Events aus der DB
   const getEvents = async () => {
     const res = await axios.post(`${DOMAIN}/getEvents`);
     console.log(res.data);
-    
+
     if (res.data) {
       setEvents(res.data);
-    } 
+    }
   };
 
   // Rendert nur einmal, wenn die Seite geladen wird
@@ -81,13 +76,10 @@ function Maps() {
     getEvents();
   }, []);
 
- 
-
-
-
   // Funktion zum erstellen eines Events
   function CreateEvent() {
     // Event erstellen
+
     useMapEvents({
       click: (e) => {
         setEventLatLng({ lat: e.latlng.lat, lng: e.latlng.lng });
@@ -118,14 +110,11 @@ function Maps() {
       );
       handleClose();
 
-      
-      
       // Wenn Event erstellt worden ist, dann nochmal Events aus DB holen und in die Map einfügen, da der lokale Marker entfernt wird
       // Eventueller useEffect außerhalb der Funktion, der bei jedem Event erstellen ausgeführt wird
 
       // Namen des Events aus dem Formular holen
       const data = {
-        
         // sessionID in user dokument.get cookie
         user: sessionID,
         name: event.target.eventName.value,
@@ -141,39 +130,34 @@ function Maps() {
 
       axios
         .post(`${DOMAIN}/createEvent`, data)
-        .then((res) => {
-        
-        })
+        .then((res) => {})
         .catch((err) => {
           console.log(err);
         });
-
     };
-    
+
     return (
       <>
         {markerExists && (
           <Marker
-          
-          position={[eventLatLng.lat, eventLatLng.lng]}
-          icon={
-          index === 0
-          ? GetIcon([30, 30], "frisbee") 
-          : index === 1 
-            ? GetIcon([30, 30], "fussball") 
-            : index === 2 
-              ? GetIcon([30, 30], "volleyball")
-              : index === 3 
-                ? GetIcon([30, 30], "basketball") 
-                : index === 4 
-                  ? GetIcon([50, 50], "tischtennis") 
-                  : index === 5 
-                    ? GetIcon([30, 40], "skateboard")
-                    : GetIcon([30, 40], "marker")
+            position={[eventLatLng.lat, eventLatLng.lng]}
+            icon={
+              index === 0
+                ? GetIcon([30, 30], "frisbee")
+                : index === 1
+                ? GetIcon([30, 30], "fussball")
+                : index === 2
+                ? GetIcon([30, 30], "volleyball")
+                : index === 3
+                ? GetIcon([30, 30], "basketball")
+                : index === 4
+                ? GetIcon([50, 50], "tischtennis")
+                : index === 5
+                ? GetIcon([30, 40], "skateboard")
+                : GetIcon([30, 40], "marker")
             }
-          
-        />
-      )}
+          />
+        )}
 
         <Modal
           size="lg"
@@ -215,7 +199,7 @@ function Maps() {
               </Form.Group>
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="primary" type="submit">
+              <Button variant="contained" type="submit">
                 Submit
               </Button>
             </Modal.Footer>
@@ -225,28 +209,27 @@ function Maps() {
     );
   }
 
-
   // Standort setzen
   function UserPostionMarker() {
     const map = useMap();
     const [position, setPosition] = useState(null);
-  
+
     useEffect(() => {
       map.locate();
       map.on("locationfound", (e) => {
         setPosition(e.latlng);
         map.flyTo(e.latlng, map.getZoom());
       });
-  
+
       return () => {
         map.off("locationfound");
       };
     }, [map]);
-  
+
     if (position === null) {
       return null;
     }
-  
+
     return (
       <Marker icon={GetIcon(40, "me")} position={position}>
         <Popup>
@@ -255,7 +238,6 @@ function Maps() {
       </Marker>
     );
   }
-  
 
   // Events auf Map anzeigen
   function SetEventsMap() {
@@ -263,23 +245,21 @@ function Maps() {
       console.log("Keine Events vorhanden");
       return <div></div>;
     }
-     
 
     function formatDate(dateString) {
       const date = new Date(dateString);
-      const day = date.getDate().toString().padStart(2, '0');
-      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, "0");
+      const month = (date.getMonth() + 1).toString().padStart(2, "0");
       const year = date.getFullYear();
       return `${day}.${month}.${year}`;
     }
 
     function formatTime(dateString) {
       const date = new Date(dateString);
-      const hours = date.getHours().toString().padStart(2, '0');
-      const minutes = date.getMinutes().toString().padStart(2, '0');
+      const hours = date.getHours().toString().padStart(2, "0");
+      const minutes = date.getMinutes().toString().padStart(2, "0");
       return `${hours}:${minutes}`;
     }
-
 
     function showInfo(event) {
       const popupContainer = document.getElementById("popup-container");
@@ -298,7 +278,6 @@ function Maps() {
       }
     }
 
-  
     return (
       <div>
         {events.map((event) => (
@@ -307,45 +286,56 @@ function Maps() {
             position={{ lat: [event.lat], lng: [event.lng] }}
             icon={
               event.index === 0
-                ? GetIcon([30, 30], "frisbee") 
-                : event.index === 1 
-                  ? GetIcon([30, 30], "fussball") 
-                  : event.index === 2
-                    ? GetIcon([30, 30], "volleyball")
-                    : event.index === 3 
-                      ? GetIcon([30, 30], "basketball") 
-                      : event.index === 4 
-                        ? GetIcon([50, 50], "tischtennis") 
-                        : event.index === 5 
-                          ? GetIcon([30, 40], "skateboard")
-                          : GetIcon([30, 40], "marker")
+                ? GetIcon([30, 30], "frisbee")
+                : event.index === 1
+                ? GetIcon([30, 30], "fussball")
+                : event.index === 2
+                ? GetIcon([30, 30], "volleyball")
+                : event.index === 3
+                ? GetIcon([30, 30], "basketball")
+                : event.index === 4
+                ? GetIcon([50, 50], "tischtennis")
+                : event.index === 5
+                ? GetIcon([30, 40], "skateboard")
+                : GetIcon([30, 40], "marker")
             }
           >
             <Popup>
-            <div class="event-info-container">
-              <p class="event-name blue-bg">
-                <strong class="name">{event.name}</strong>
-                <span class="info-button" onClick={showInfo}>i</span>
-                <div id="popup-container"></div>
-                <div id="info-box" class="hidden">
-                  <p id="info-content"></p>
+              <div class="event-info-container">
+                <p class="event-name blue-bg">
+                  <strong class="name">{event.name}</strong>
+                  <span class="info-button" onClick={showInfo}>
+                    i
+                  </span>
+                  <div id="popup-container"></div>
+                  <div id="info-box" class="hidden">
+                    <p id="info-content"></p>
+                  </div>
+                </p>
+                <p class="event--datum">
+                  <strong>Datum:</strong> {formatDate(event.uhrzeit)}
+                </p>
+                <p class="event--uhrzeit">
+                  <strong>Uhrzeit:</strong> {formatTime(event.uhrzeit)}
+                </p>
+                <p class="event-equipment">
+                  {event.equipment ? (
+                    <>
+                      <strong>Sportgerät:</strong> ✓
+                    </>
+                  ) : (
+                    <>
+                      <strong>Sportgerät:</strong> ✘
+                    </>
+                  )}
+                </p>
+
+                <div class="button-container">
+                  <button class="play-button">+ Mitspielen</button>
+                  <button class="chat-button">&#9993; Chat</button>
                 </div>
-              </p>
-              <p class="event--datum"><strong>Datum:</strong> {formatDate(event.uhrzeit)}</p>
-              <p class="event--uhrzeit"><strong>Uhrzeit:</strong> {formatTime(event.uhrzeit)}</p>
-              <p class="event-equipment">
-              {event.equipment ? <><strong>Sportgerät:</strong> ✓</> : <><strong>Sportgerät:</strong> ✘</>}
-            </p>
-
-              <div class="button-container">
-                <button class="play-button" >+ Mitspielen</button>
-                <button class="chat-button">&#9993; Chat</button>
               </div>
-            </div>
-          </Popup>
-
-
-
+            </Popup>
           </Marker>
         ))}
       </div>
@@ -353,15 +343,7 @@ function Maps() {
   }
 
   return (
-    <div >
-      <Form.Check
-        type="switch"
-        id="custom-switch"
-        label="Events erstellen"
-        checked={enableEvent}
-        onChange={() => setEnableEvent(!enableEvent)}
-      />
-
+    <div>
       <MapContainer
         center={[48.7775, 11.431111]}
         zoom={14}
@@ -374,11 +356,25 @@ function Maps() {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <UserPostionMarker />
-        <SetEventsMap />
+        <Control>
+          <UserPostionMarker />
+          <SetEventsMap />
+          {enableEvent === true ? <CreateEvent /> : null}
+        </Control>
 
+        <Control prepend position="bottomright">
+            <ToggleButton
+              value="check"
+              selected={enableEvent}
+              onChange={() => setEnableEvent(!enableEvent)}
+              selectedColor="red"
+              sx={{ color: "white", bgcolor: "primary.main", mb: 10, mr: 3, borderRadius: 10, boxShadow: 5}}
+            >
+              <AddIcon />
+            </ToggleButton>
+        </Control>
 
-        {enableEvent === true ? <CreateEvent /> : null}
+        
       </MapContainer>
     </div>
   );
