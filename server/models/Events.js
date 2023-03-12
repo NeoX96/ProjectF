@@ -15,7 +15,8 @@ const EventSchema = new mongoose.Schema({
 
 uhrzeit: {
     type: Date,
-    maxlength: 30
+    maxlength: 30,
+    required: true,
 },
 lat: {
     type: Number,
