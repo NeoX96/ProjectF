@@ -301,20 +301,23 @@ router.post('/api/createEvent', async (req, res) => {
 router.post('/api/getEvents', async (req, res) => {
   try {
     const event = await EventModel.find(); // Veranstaltung anhand der ID abrufen
-    console.log ("fetchedEvents");
+
+    // map Events and add to all the username out of user Object ID
+    const events = await Promise.all(
+      event.map(async (event) => {
+        // find the user by id and get the username
+        const user = await UserModel.findById(event.user);
+        return { ...event._doc, owner: user.username };
+      })
+    );
+
+    console.log(events);
 
     if (!event) {
       return res.status(404).json({ msg: 'Event not found' });
     }
 
-    // find username of the creator of the event.user object ID in Usermodel
-    const username = await UserModel.findById(event.user, { username: 1 });
-
-    // add username to event object
-    event.username = username;
-
-    
-    res.status(200).json(event);
+    res.status(200).json(events);
 
   } catch (error) {
     console.log(error);
