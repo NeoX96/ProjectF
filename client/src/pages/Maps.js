@@ -311,7 +311,7 @@ function Maps() {
                 {event.equipment ? "Sportgerät ✓" : "Kein Sportgerät ✘"}
               </p>
               <div class="button-container">
-                <button class="play-button" onclick="joinEvent()">+ Mitspielen</button>
+                <button class="play-button" onclick="joinEvent()">+ mitspielen</button>
                 <button class="chat-button" onclick="joinEvent()">+ Chat</button>
               </div>
             </div>
