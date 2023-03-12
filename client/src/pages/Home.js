@@ -124,7 +124,7 @@ function Home() {
                     fontFamily: "Montserrat, sans-serif",
                     textShadow: "4px 4px 4px rgba(100, 0, 0, 0.95)",
                     textDecoration: "none",
-                    cursor: "pointer",
+                    cursor: "default",
                   }}
                 >
                   Hey,
@@ -140,7 +140,7 @@ function Home() {
                     fontFamily: "Montserrat, sans-serif",
                     textShadow: "4px 4px 4px rgba(30, 30, 30, 0.6)",
                     textDecoration: "none",
-                    cursor: "pointer",
+                    cursor: "default",
                   }}
                 >
                    {vorname}
