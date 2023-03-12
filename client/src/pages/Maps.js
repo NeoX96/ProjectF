@@ -263,6 +263,9 @@ function Maps() {
 
     function showInfo(event) {
       const popupContainer = document.getElementById("popup-container");
+
+      if (!popupContainer) return;
+
       const popupContent = document.createElement("div");
       popupContent.classList.add("popup-content");
       popupContainer.appendChild(popupContent);
@@ -270,7 +273,7 @@ function Maps() {
       var infoContent = document.getElementById("info-content");
       if (infoBox.classList.contains("hidden")) {
         // Box öffnen
-        infoContent.innerHTML = "<strong>Organisator:</strong> " + vorname;
+        infoContent.innerHTML = "<strong>Organisator:</strong> " + event.owner;
         infoBox.classList.remove("hidden");
       } else {
         // Box schließen
@@ -304,7 +307,7 @@ function Maps() {
               <div class="event-info-container">
                 <p class="event-name blue-bg">
                   <strong class="name">{event.name}</strong>
-                  <span class="info-button" onClick={showInfo}>
+                  <span class="info-button" onClick={() => showInfo(event)}>
                     i
                   </span>
                   <div id="popup-container"></div>
