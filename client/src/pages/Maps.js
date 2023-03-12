@@ -117,6 +117,8 @@ function Maps() {
           event.target.eventTime.value
       );
       handleClose();
+
+      
       
       // Wenn Event erstellt worden ist, dann nochmal Events aus DB holen und in die Map einfügen, da der lokale Marker entfernt wird
       // Eventueller useEffect außerhalb der Funktion, der bei jedem Event erstellen ausgeführt wird
@@ -280,10 +282,22 @@ function Maps() {
 
 
     function showInfo(event) {
-      const popupContent = event.target.closest('.leaflet-popup-content');
-      const createdBy = popupContent.querySelector('.created-by');
-      createdBy.insertAdjacentHTML('beforeend', `<p>Vorname: ${event.vorname}</p>`);
+      const popupContainer = document.getElementById("popup-container");
+      const popupContent = document.createElement("div");
+      popupContent.classList.add("popup-content");
+      popupContainer.appendChild(popupContent);
+      var infoBox = document.getElementById("info-box");
+      var infoContent = document.getElementById("info-content");
+      if (infoBox.classList.contains("hidden")) {
+        // Box öffnen
+        infoContent.innerHTML = "<strong>Organisator:</strong> " + vorname;
+        infoBox.classList.remove("hidden");
+      } else {
+        // Box schließen
+        infoBox.classList.add("hidden");
+      }
     }
+
   
     return (
       <div>
@@ -307,23 +321,30 @@ function Maps() {
                           : GetIcon([30, 40], "marker")
             }
           >
-            <Popup onOpen={() => showInfo(event)}>
+            <Popup>
             <div class="event-info-container">
               <p class="event-name blue-bg">
                 <strong class="name">{event.name}</strong>
-                <span class="info-button">i</span>
+                <span class="info-button" onClick={showInfo}>i</span>
+                <div id="popup-container"></div>
+                <div id="info-box" class="hidden">
+                  <p id="info-content"></p>
+                </div>
               </p>
-              <p class="event--datum">Datum: {formatDate(event.uhrzeit)}</p>
-              <p class="event--Uhrzeit">Uhrzeit: {formatTime(event.uhrzeit)}</p>
+              <p class="event--datum"><strong>Datum:</strong> {formatDate(event.uhrzeit)}</p>
+              <p class="event--uhrzeit"><strong>Uhrzeit:</strong> {formatTime(event.uhrzeit)}</p>
               <p class="event-equipment">
-                {event.equipment ? "Sportgerät ✓" : "Kein Sportgerät ✘"}
-              </p>
+              {event.equipment ? <><strong>Sportgerät:</strong> ✓</> : <><strong>Sportgerät:</strong> ✘</>}
+            </p>
+
               <div class="button-container">
-                <button class="play-button" onclick="joinEvent()">+ mitspielen</button>
-                <button class="chat-button" onclick="joinEvent()">&#9993; Chat</button>
+                <button class="play-button" >+ Mitspielen</button>
+                <button class="chat-button">&#9993; Chat</button>
               </div>
             </div>
           </Popup>
+
+
 
           </Marker>
         ))}
