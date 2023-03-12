@@ -1,15 +1,22 @@
 import "./css/Chat.css";
 import React, { useEffect, useState, useRef } from "react";
 import socketIO from "socket.io-client";
-import { Button, ListGroup, Modal, Table } from "react-bootstrap";
+import { ListGroup, Modal, Table } from "react-bootstrap";
 import Cookies from "js-cookie";
 import { endpoint } from "../index";
+import { Box, Container, Grid, Typography, useMediaQuery, useTheme, IconButton, ListItemText, ListItem , List, Button, TextField, InputAdornment, Paper, Divider } from "@mui/material";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import AddIcon from '@mui/icons-material/Add';
 
 const socket = socketIO(endpoint, { autoConnect: false });
 
 function Chat() {
   // Messages Ref to scroll down
   const messagesRef = useRef(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   // States
   const [privateMessages, setPrivateMessages] = useState({});
@@ -18,7 +25,11 @@ function Chat() {
   const [targetUser, setTargetUser] = useState(null);
   const [showFriendModal, setshowFriendModal] = useState(false);
 
+  
+
   const sessionID = Cookies.get("sessionID");
+
+
 
   // useEffect zum Verbinden mit SocketIO
   useEffect(() => {
@@ -57,13 +68,21 @@ function Chat() {
         ...privateMessages,
         [targetUser]: [...privateMessages[targetUser], data],
       });
-      messagesRef.current.scrollIntoView({ behavior: "smooth" });
     });
+
+    if (messagesRef.current) {
+        messagesRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+
 
     return () => {
       socket.off("receive_private_message");
     };
   }, [privateMessages, targetUser]);
+
+
+
+
 
   // initial useEffect
   useEffect(() => {
@@ -157,6 +176,7 @@ function Chat() {
         ...prevPrivateMessages,
         [targetUser]: data,
       }));
+
     });
 
     return () => {
@@ -164,61 +184,142 @@ function Chat() {
     };
   }, [targetUser]);
 
+
   // ChatContainer for each user
   function ChatContainer() {
     // chat container for each user to chat with seperatly key = user._id
     if (targetUser !== null) {
       return (
-        <div>
-          <div className="d-flex ">
-            <Button variant="" className="d-flex align-items-center">
-              <iconify-icon 
-              icon="eva:arrow-ios-back-fill"
-              onClick={() => unselectUser()}/> 
-            </Button>
-            <h4 className="justify-content-center">
-              Chat with {targetUser.vorname}
-            </h4>
-          </div>
-          <div
-            id="text"
-            className="overflow-auto d-flex flex-column justify-content-between rounded"
-            key={targetUser.userID}
+        <Box sx={{ height: "100%" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              backdropFilter: "blur(5px)",
+              borderRadius: 2,
+              padding: 1,
+              boxShadow: 3,
+              height: "10%",
+              maxWidth: "100%",
+            }}
           >
-            <ul className="list-group-item">
-              {privateMessages[targetUser] ? (
-                privateMessages[targetUser].map((message, idx) => {
-                  return (
-                    <li
-                      key={idx}
-                      className={
-                        message.sender === socket._id ||
-                        message.sender === socket.id
-                          ? "text-end users"
-                          : "text-start users"
-                      }
-                    >
-                      {message.message}
-                    </li>
-                  );
-                })
-              ) : (
-                <li className="justify-conent-center">No messages yet.</li>
+            <Box>
+              <IconButton onClick={() => unselectUser()}>
+                <ArrowBackIcon />
+              </IconButton>
+            </Box>
+            <Box
+              sx={{
+                marginLeft: 1,
+              }}
+            >
+              <Typography
+                variant="h5"
+                sx={{
+                  fontFamily: "Montserrat, sans-serif",
+                  textShadow: "4px 4px 4px rgba(30, 30, 30, 0.6)",
+                  textDecoration: "none",
+                  cursor: "default",
+                  color: "white",
+                }}
+              >
+                {targetUser.vorname}
+              </Typography>
+            </Box>
+          </Box>
+
+          <Box
+            p={2}
+            mt={2}
+            sx={{
+              borderRadius: 2,
+              backgroundColor: "rgba(20, 20, 20, 0.6)",
+              backdropFilter: "blur(10px)",
+              color: "white",
+              boxShadow: 3,
+              height: "85%",
+              marginBottom: 2,
+              overflow: "auto",
+            }}
+          >
+    <List
+      sx={{
+        position: 'relative',
+        overflow: 'auto',
+        width: '100%',
+        '& ul': { padding: 0 },
+      }}
+    >
+      {privateMessages[targetUser] ? (
+        privateMessages[targetUser].map((message, idx) => {
+          const date = new Date(message.date);
+          const formattedDate = date.toLocaleDateString();
+          const formattedTime = date.toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+          const shouldShowDate =
+            idx === 0 || formattedDate !== new Date(privateMessages[targetUser][idx - 1].date).toLocaleDateString();
+
+          return (
+            <div key={idx}>
+              {shouldShowDate && (
+                <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <Typography variant="caption" color="textSecondary">
+                    {formattedDate}
+                  </Typography>
+                </ListItem>
               )}
-            </ul>
-            <div ref={messagesRef}></div>
-          </div>
-        </div>
+              <ListItem
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems:
+                    message.sender === socket._id || message.sender === socket.id ? 'flex-end' : 'flex-start',
+                  backgroundColor:
+                    message.sender === socket._id || message.sender === socket.id
+                      ? 'rgba(0, 255, 255, 0.08)'
+                      : 'rgba(255, 255, 255, 0.08)',
+                  borderRadius: 5,
+                  padding: 1,
+                  marginBottom: 1,
+                  boxShadow: 1,
+                  maxWidth: '75%',
+                  width: 'fit-content',
+                  marginLeft:
+                    message.sender === socket._id || message.sender === socket.id ? 'auto' : 0,
+                  marginRight: message.sender === socket._id || message.sender === socket.id ? 0 : 'auto',
+                }}
+              >
+                <ListItemText primary={message.message} secondary={formattedTime} />
+              </ListItem>
+              {shouldShowDate && <Divider sx={{ margin: '4px 0' }} />}
+            </div>
+          );
+        })
+      ) : (
+        <ListItem>
+          <ListItemText primary="No messages yet" />
+        </ListItem>
+      )}
+      <div ref={messagesRef}></div>
+    </List>
+          </Box>
+        </Box>
       );
     } else {
       return (
-        <div>
-          <h4>Select User</h4>
-          <div
-            id="text"
-            className="overflow-auto  justify-content-between rounded"
-          ></div>
-        </div>
+        <Box
+          sx={{
+            borderRadius: 5,
+            backgroundColor: "rgba(0, 255, 255, 0.08)",
+            backdropFilter: "blur(5px)",
+            boxShadow: 3,
+          }}
+        >
+        </Box>
       );
     }
   }
@@ -284,39 +385,63 @@ function Chat() {
     };
 
     return (
-      <div>
-        <div className="input-group mb-3">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Search"
-            aria-label="Search"
-            aria-describedby="button-addon2"
-            value={searchUser}
-            onChange={searchHandler}
-          />
-          <Button>
-            <iconify-icon
-              icon="mingcute:contacts-line"
-              onClick={() => setshowFriendModal(true)}
-            />
-          </Button>
-        </div>
-        {showResults && (
-          <ListGroup>
-            {searchUserResult.map((result, index) => (
-              <ListGroup.Item
-                action
-                key={index}
-                onClick={() => handleUserClick(result)}
-                variant="light"
-              >
-                {result.username} {result.vorname}
-              </ListGroup.Item>
-            ))}
-          </ListGroup>
-        )}
-      </div>
+      <Box>
+      <TextField
+        placeholder="Search"
+        value={searchUser}
+        onChange={searchHandler}
+        sx={{
+          width: '100%',
+          '& .MuiInputBase-input': {
+            paddingLeft: '32px',
+            maxHeight: '5px',
+          },
+        }}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <Button sx={{ padding: '6px' }} onClick={() => setshowFriendModal(true)}>
+                <AddIcon />
+              </Button>
+            </InputAdornment>
+          ),
+        }}
+      />
+      {showResults && (
+        <Box
+          sx={{
+            overflow: 'auto',
+            maxHeight: '100px',
+          }}
+        >
+          <Paper
+            sx={{
+              borderRadius: 3,
+              boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.15)',
+              width: '100%',
+            }}
+          >
+            <List sx={{ padding: 0 }}>
+              {searchUserResult.map((result, index) => (
+                <ListItem
+                  key={index}
+                  sx={{
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 255, 255, 0.08)',
+                      cursor: 'pointer',
+                      zIndex: 9999,
+                    },
+                  }}
+                  onClick={() => handleUserClick(result)}
+                >
+                  <ListItemText primary={`${result.username} ${result.vorname}`} />
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
+        </Box>
+      )}
+    </Box>
     );
   }
 
@@ -324,8 +449,7 @@ function Chat() {
     return (
       <div>
         <form onSubmit={sendMessage}>
-          <div className="row mt-2 mb-2 d-block ">
-            <div className="col-md input-group">
+            <div className="input-group">
               <input
                 placeholder="Message ..."
                 required
@@ -337,8 +461,6 @@ function Chat() {
                 <iconify-icon icon="ic:round-send"></iconify-icon>
               </button>
             </div>
-            <div className="col-sm" id="SocketID"></div>
-          </div>
         </form>
       </div>
     );
@@ -427,74 +549,172 @@ function Chat() {
     );
   };
 
-  function FriendsList () {
+  function FriendsList() {
+    const [openOnline, setOpenOnline] = useState(true);
+    const [openOffline, setOpenOffline] = useState(true);
+
     return (
-      <div className="UserList">
-      <h4>Online</h4>
-      <ul className="users">
-        {onlineFriends.map((user, idx) => {
-          return (
-            <li key={idx}>
-              <Button
-                variant="outline-light"
-                onClick={() => selectUser(user)}
-              >
-                {user.vorname}
-              </Button>
-            </li>
-          );
-        })}
-      </ul>
-      <h4>Offline</h4>
-      <ul className="users">
-        {offlineFriends.map((user, idx) => {
-          return (
-            <li key={idx}>
-              <Button
-                variant="outline-light"
-                onClick={() => selectUser(user)}
-              >
-                {user.vorname}
-              </Button>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
-    )
+      <Box className="UserList" height="100%" overflow="auto">
+        <Box
+         onClick={() => setOpenOnline(!openOnline)}
+         sx={{
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            padding: "4px",
+            borderRadius: "5px",
+            textAlign: "center",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+            cursor: "pointer",
+            boxShadow: "3px 3px 3px rgba(0, 0, 0, 0.4)",
+          }}>
+        <Typography
+          color={"lightgreen"}
+          variant="h6"
+        >
+          Online
+        </Typography>
+        <IconButton  >
+            {openOnline ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+        </Box>
+
+        {openOnline && (
+          <List>
+            {onlineFriends.map((user, idx) => {
+              return (
+                <ListItem key={idx}>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => selectUser(user)}
+                  >
+                    {user.vorname}
+                  </Button>
+                </ListItem>
+              );
+            })}
+          </List>
+        )}
+        <Box 
+        onClick={() => setOpenOffline(!openOffline)}
+        sx={{
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            padding: "4px",
+            borderRadius: "5px",
+            textAlign: "center",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            cursor: "pointer",
+            boxShadow: "3px 3px 3px rgba(0, 0, 0, 0.4)",
+          }}>
+        <Typography
+          color={"red"}
+          variant="h6"
+        >
+          Offline
+        </Typography>
+        <IconButton  >
+            {openOffline ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+        </Box>
+        {openOffline && (
+          <List>
+            {offlineFriends.map((user, idx) => {
+              return (
+                <ListItem key={idx}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => selectUser(user)}
+                    sx={{
+                      boxShadow: 3,
+                      width: "100%",
+                      padding: "10px",
+   
+                      
+                    }}
+                  >
+                    {user.vorname}
+                  </Button>
+                </ListItem>
+              );
+            })}
+          </List>
+        )}
+      </Box>
+    );
   }
 
   return (
-    <div className="HoleChatAppContainer container-fluid">
-      <div className="row">
-        <div className={`UserSelection col-lg-4 col-xl-4 ${targetUser ? 'd-none d-sm-none d-md-none d-lg-block d-xl-block' : ''}`}>
-          <div className="row text-center">
-            <h4>Gonkle - {socket.username}</h4>
-          </div>
-          <div className="row px-3 py-2">
+    <Container
+      className="HoleChatAppContainer"
+      style={{ height: `calc(100vh - 200px)` }}
+    >
+      <Grid container spacing={2} style={{ height: "100%" }}>
+        <Grid 
+        item 
+        md={4} 
+        xs={12}
+        style={{
+          height: "100%",
+          display: isMobile && !targetUser ? "block" : !isMobile ? "block" : "none"}}
+        >
+          <Box p={2} mt={2} sx={{                  
+            borderRadius: 5,
+            backgroundColor: "rgba(0, 255, 255, 0.08)",
+            backdropFilter: "blur(5px)",
+            boxShadow: 3,
+            }}>
             <Search />
             <FriendsModal />
-          </div>
-          <div className="row">
+          </Box>
+          <Box p={3} mt={2} sx={{                  
+            borderRadius: 5,
+            backgroundColor: "rgba(0, 255, 255, 0.08)",
+            backdropFilter: "blur(5px)",
+            boxShadow: 3,
+            height: "100%",
+            }}>
             <FriendsList />
-          </div>
-        </div>
-        <div className={`Chatting col ${targetUser ? '' : 'd-none d-sm-none d-md-none d-lg-block d-xl-block'}`}>
-          {targetUser && (
-            <div className="row px-3 py-2 border-start border-muted">
-              <ChatContainer targetUser={targetUser} />
-              <InputMessage />
-            </div>
-          )}
-          {targetUser === null && (
-            <div className="row px-3 py-2 border-start border-muted">
+          </Box>
+        </Grid>
+        <Grid
+          item
+          md={8}
+          xs={12}
+          style={{ 
+            height: "100%",
+            display: isMobile && !targetUser ? "none" : "block"
+          }}
+        >
+          <Box mt={2} sx={{
+            borderRadius: 5,
+            backgroundColor: targetUser ? 'transparent' : "rgba(0, 255, 255, 0.08)",
+            backdropFilter: targetUser ? 'none' : "blur(5px)",
+            boxShadow: targetUser ? 0 : 3,
+            height: "100%",
+          }}>
               <ChatContainer />
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+          </Box>
+          <Box mt={2} sx={{                  
+            borderRadius: 5,
+            backgroundColor: "rgba(0, 255, 255, 0.08)",
+            backdropFilter: "blur(5px)",
+            boxShadow: 3,
+            padding: !targetUser ? 4 : 2,
+            }}>
+              {targetUser && (
+                
+                <InputMessage />
+            )}
+          </Box>
+        </Grid>
+      </Grid>
+    </Container>
+  )
+
 }
 
 export default Chat;
