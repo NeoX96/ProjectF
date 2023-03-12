@@ -271,7 +271,7 @@ router.post("/api/validateSession", async (req, res) => {
 router.post('/api/createEvent', async (req, res) => {
 
   try {
-      const userID = await UserModel.findOne({ sessionID: req.body.sessionID }, { _id: 1 });
+      const userID = await UserModel.findOne({ sessionID: req.body.user }, { _id: 1 });
 
       const data = {
           user: userID,
@@ -307,6 +307,13 @@ router.post('/api/getEvents', async (req, res) => {
       return res.status(404).json({ msg: 'Event not found' });
     }
 
+    // find username of the creator of the event.user object ID in Usermodel
+    const username = await UserModel.findById(event.user, { username: 1 });
+
+    // add username to event object
+    event.username = username;
+
+    
     res.status(200).json(event);
 
   } catch (error) {
