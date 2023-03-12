@@ -281,6 +281,7 @@ router.post('/api/createEvent', async (req, res) => {
           lat: req.body.lat,
           lng: req.body.lng,
           index: req.body.index,
+          vorname: req.body.vorname,
       }
 
       const newEvent = new EventModel(data);
@@ -313,5 +314,7 @@ router.post('/api/getEvents', async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+
 
 module.exports = router;

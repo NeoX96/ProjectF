@@ -81,20 +81,7 @@ function Maps() {
     getEvents();
   }, []);
 
-  function handleClick() {
-    const data = { anzahl: 1, vorname: vorname };
-    console.log(data)
-    axios.post(`${DOMAIN}/createTeilnehmer`, data)
-    .then(response => {
-      // Erfolgreiche Antwort vom Server
-      console.log(response.data);
-    })
-    .catch(error => {
-      // Fehler aufgetreten
-      console.log(error.response.status);
-      console.log(error.response.data);
-    });
-  }
+ 
 
 
 
@@ -130,6 +117,7 @@ function Maps() {
           event.target.eventTime.value
       );
       handleClose();
+      
       // Wenn Event erstellt worden ist, dann nochmal Events aus DB holen und in die Map einfügen, da der lokale Marker entfernt wird
       // Eventueller useEffect außerhalb der Funktion, der bei jedem Event erstellen ausgeführt wird
 
@@ -269,47 +257,57 @@ function Maps() {
 
   // Events auf Map anzeigen
   function SetEventsMap() {
-
     if (events.length === 0) {
       console.log("Keine Events vorhanden");
       return <div></div>;
     }
-    console.log()
-
+  
+    function showInfo(event) {
+      const popupContent = event.target.closest('.leaflet-popup-content');
+      const createdBy = popupContent.querySelector('.created-by');
+      createdBy.insertAdjacentHTML('beforeend', `<p>Vorname: ${event.vorname}</p>`);
+    }
+  
     return (
       <div>
         {events.map((event) => (
           <Marker
             key={event._id}
             position={{ lat: [event.lat], lng: [event.lng] }}
-          icon={
-            event.index === 0
-          ? GetIcon([30, 30], "frisbee") 
-          : event.index === 1 
-            ? GetIcon([30, 30], "fussball") 
-            : event.index === 2
-              ? GetIcon([30, 30], "volleyball")
-              : event.index === 3 
-                ? GetIcon([30, 30], "basketball") 
-                : event.index === 4 
-                  ? GetIcon([50, 50], "tischtennis") 
-                  : event.index === 5 
-                    ? GetIcon([30, 40], "skateboard")
-                    : GetIcon([30, 40], "marker")
+            icon={
+              event.index === 0
+                ? GetIcon([30, 30], "frisbee") 
+                : event.index === 1 
+                  ? GetIcon([30, 30], "fussball") 
+                  : event.index === 2
+                    ? GetIcon([30, 30], "volleyball")
+                    : event.index === 3 
+                      ? GetIcon([30, 30], "basketball") 
+                      : event.index === 4 
+                        ? GetIcon([50, 50], "tischtennis") 
+                        : event.index === 5 
+                          ? GetIcon([30, 40], "skateboard")
+                          : GetIcon([30, 40], "marker")
             }
-          
           >
-            <Popup>
-            <p class="event-name"><strong>{event.name}</strong></p>
+            <Popup onOpen={() => showInfo(event)}>
+          <div class="event-info-container">
+            <p class="event-name blue-bg">
+              <strong class="name">{event.name}</strong>
+              <span class="info-button">i</span>
+            </p>
             <p class="event--datum">Datum: {event.date}</p>
-            <p class="event-equipment">{event.equipment ? 'Sportgerät ✓' : 'Kein Sportgerät ✘'}</p>
+            <p class="event-equipment">
+              {event.equipment ? "Sportgerät ✓" : "Kein Sportgerät ✘"}
+            </p>
+            <div class="button-container">
+              <button class="play-button" onclick="joinEvent()">+ Mitspielen</button>
+              <button class="chat-button" onclick="joinEvent()">+ Chat</button>
+            </div>
+          </div>
+        </Popup>
 
-            <p> Dieses Event wurde von {event.vorname} erstellt</p>
-            <button onClick={handleClick}>Teilnehmen</button>
-             <button class="event-Chat-button"> chat</button>
 
-
-            </Popup>
           </Marker>
         ))}
       </div>

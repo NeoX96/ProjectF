@@ -1,30 +1,68 @@
 .fancy-input {
-    margin: 1em 0 1em 0;
-    position: relative;
-  }
-  .fancy-input label {
-    position: absolute;
-    top: .5em;
-    left: .5em;
-    color: #666;
-  }
-  .fancy-input input {
-    padding: .5em;
-  }
+  margin: 1em 0 1em 0;
+  position: relative;
+}
+.fancy-input label {
+  position: absolute;
+  top: .5em;
+  left: .5em;
+  color: #666;
+}
+.fancy-input input {
+  padding: .5em;
+}
 
-  .event-box {
-    background-color: black;
-    display: inline-block;
-    padding: 10px;
-    border-radius: 5px;
-  }
+.Popup {
+  background-color: black;
+  color: white;
+  border: 2px solid red;
+  padding: 10px;
+}
+
+.blue-bg {
+  background-color: rgba(11, 164, 246, 0.44);
+  padding: 5px;
+  border-radius: 10px;
+  text-align: center;
+}
+
   
-  .event-name {
-    text-align: center;
-  }
-  
-  .event-equipment {
-    text-align: center;
-    margin-top: 10px;
-    display: flex;
-  }  
+.created-by {
+  margin-top: 10px;
+}
+
+.info-button {
+  margin-left: 5px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  padding: 5px 10px; 
+  font-size: 12px;
+  cursor: pointer;
+  line-height: 1; 
+}
+
+.info-button:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.play-button {
+  background-color: green;
+  color: white;
+  padding: 4px 8px;
+  font-size: 14px;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.chat-button {
+  background-color: rgb(44, 158, 228);
+  color: white;
+  padding: 4px 8px;
+  font-size: 14px;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
