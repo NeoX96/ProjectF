@@ -299,6 +299,33 @@ router.post('/api/createEvent', async (req, res) => {
   }
 });
 
+router.post("/api/joinEvent", async (req, res) => {
+
+  try {
+
+    const userID = await UserModel.find({ sessionID: req.body.user }, { _id: 1 });
+    const eventData = await EventModel.find({ _id: req.body.eventID });
+
+
+    if (!eventData) {
+      return res.status(404).json({ msg: 'Event not found' });
+    }
+
+    if (eventData[0].teilnehmer.includes(userID[0]._id)) {
+      return res.status(405).json({ msg: 'User already joined' });
+    }
+
+    eventData[0].teilnehmer.push(userID[0]._id);
+    await eventData[0].save();
+
+    res.status(200).json({ msg: 'User joined' });
+  
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
 router.post('/api/getEvents', async (req, res) => {
   try {
     const event = await EventModel.find(); // Veranstaltung anhand der ID abrufen
@@ -327,17 +354,8 @@ router.post('/api/getEvents', async (req, res) => {
 });
 
 
-router.post('/api/joinEvent'), async (req, res) => {
-  try {
-    
-
-
-  } catch {
-
-  }
-
-
-}
-
 
 module.exports = router;
+
+
+
