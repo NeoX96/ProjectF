@@ -309,6 +309,7 @@ function Maps() {
 
               case 500:
                 alert("Serverfehler");
+                break;
 
               default:
                 alert("Unbekannter Fehler");

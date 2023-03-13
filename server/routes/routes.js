@@ -335,7 +335,14 @@ router.post('/api/getEvents', async (req, res) => {
       event.map(async (event) => {
         // find the user by id and get the username
         const user = await UserModel.findById(event.user);
-        return { ...event._doc, owner: user.username };
+        if (!user) {
+          return { ...event._doc, owner: 'User not found' };
+        }
+
+        if (user) {
+          return { ...event._doc, owner: user.username };
+        }
+       
       })
     );
 
