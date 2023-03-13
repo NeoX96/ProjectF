@@ -48,7 +48,6 @@ function Maps() {
   const [showModal, setShowModal] = useState(false);
   const [markerExists, setMarkerExists] = useState(false);
 
-  const vorname = Cookies.get("vorname");
   const { index } = useContext(IndexContext);
 
   console.log("index: " + index);
@@ -122,7 +121,6 @@ function Maps() {
         lat: eventLatLng.lat,
         lng: eventLatLng.lng,
         index: index,
-        vorname: vorname,
         //equipment: event.target.eventTool.value,
 
         // get SessionID from cookie
@@ -286,11 +284,49 @@ function Maps() {
     }
 
 
-    function joinEvent () {
+    function joinEvent (event) {
+      try {
+        const data = {
+          user: sessionID,
+          eventID: event._id,
+        };
+        
+        axios
+        .post(`${DOMAIN}/joinEvent`, data)
+        .then((res) => {
+          switch (res.status) {
+            case 200:
+              alert("Event erfolgreich beigetreten");
+              break;
+            
+              case 404:
+                alert("Event nicht gefunden");
+                break;
 
-      alert("Joined");
-      
-    }
+              case 405:
+                alert("Bei Event bereits beigetreten");
+                break;
+
+              case 500:
+                alert("Serverfehler");
+
+              default:
+                alert("Unbekannter Fehler");
+                break;
+          }
+
+        })
+        .catch((err) => {
+          alert("Fehler beim beitreten des Events");
+        });
+
+
+  
+      } catch (err) {
+        console.log(err);
+        alert("Fehler beim beitreten des Events");
+      }
+    };
 
 
 
@@ -347,7 +383,7 @@ function Maps() {
                 </p>
 
                 <div class="button-container">
-                  <Button onClick={joinEvent} >+ Mitspielen</Button>
+                  <Button onClick={() => joinEvent(event)} >+ Mitspielen</Button>
                   <button class="chat-button">&#9993; Chat</button>
                 </div>
               </div>
