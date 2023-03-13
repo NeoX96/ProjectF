@@ -94,8 +94,43 @@ function Maps() {
     };
 
     // Formular abschicken
-    const submitForm = (event) => {
-      event.preventDefault();
+      const submitForm = (event) => {
+        event.preventDefault();
+      
+        const eventTime = new Date(event.target.elements.eventTime.value);
+        const eventName = event.target.elements.eventName.value;
+    
+      // Check if the event time is more than 1 year in the future
+      const now = new Date();
+      const oneYearFromNow = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+    
+     
+        if (eventTime > oneYearFromNow) {
+          // Create a notification box with the message
+          const notificationBox = document.getElementById("notificationBox");
+          notificationBox.innerHTML = "<span>&#9432;</span><p>Das Datum liegt zu weit in der Zukunft</p>";
+          notificationBox.classList.add("notification-box");
+          return;
+        }
+      
+    
+      if (eventTime < now) {
+        // Create a notification box with the message
+        const notificationBox = document.getElementById("notificationBox");
+        notificationBox.innerHTML = "<span>&#9432;</span><p>Das Datum liegt in der Vergangenheit</p>";
+        notificationBox.classList.add("notification-box");
+        return;
+      }
+
+      if (!eventName) {
+        // Create a notification box with the message
+        const notificationBox = document.getElementById("notificationBox");
+        notificationBox.innerHTML = "<span>&#9432;</span><p>Bitte geben Sie den Namen der Veranstaltung ein</p>";
+        notificationBox.classList.add("notification-box");
+        return;
+      }
+    
+      
 
       // Axios Post ans Backend - Event erstellen
 
@@ -194,6 +229,7 @@ function Maps() {
                   type="datetime-local"
                   placeholder="Geben Sie die Uhrzeit des Events ein"
                 />
+                <div id="notificationBox"></div>
               </Form.Group>
               <Form.Group
                 controlId="eventTool"
