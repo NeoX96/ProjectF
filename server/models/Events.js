@@ -37,11 +37,6 @@ index: {
 
 },
 
-vorname: {
-    type: String,
-
-
-},
 
 teilnehmer: [{ type: mongoose.Schema.Types.ObjectId, ref: User }]
 });
