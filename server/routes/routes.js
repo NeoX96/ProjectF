@@ -282,6 +282,7 @@ router.post('/api/createEvent', async (req, res) => {
           lng: req.body.lng,
           index: req.body.index,
           vorname: req.body.vorname,
+          teilnehmer: req.body.teilnehmer,
       }
 
       const newEvent = new EventModel(data);
@@ -325,6 +326,18 @@ router.post('/api/getEvents', async (req, res) => {
   }
 });
 
+
+router.post('/api/joinEvent'), async (req, res) => {
+  try {
+    
+
+
+  } catch {
+
+  }
+
+
+}
 
 
 module.exports = router;

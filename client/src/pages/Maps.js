@@ -208,6 +208,10 @@ function Maps() {
       </>
     );
   }
+  
+  
+
+
 
   // Standort setzen
   function UserPostionMarker() {
@@ -281,6 +285,15 @@ function Maps() {
       }
     }
 
+
+    function joinEvent () {
+
+      alert("Joined");
+      
+    }
+
+
+
     return (
       <div>
         {events.map((event) => (
@@ -334,7 +347,7 @@ function Maps() {
                 </p>
 
                 <div class="button-container">
-                  <button class="play-button">+ Mitspielen</button>
+                  <Button onClick={joinEvent} >+ Mitspielen</Button>
                   <button class="chat-button">&#9993; Chat</button>
                 </div>
               </div>
