@@ -413,6 +413,7 @@ function Maps() {
         zoom={14}
         minZoom={10}
         scrollWheelZoom
+        attributionControl={false}
         style={{ height: "100vh" }}
       >
         <TileLayer
