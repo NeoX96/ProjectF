@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import OtpInput from "react18-input-otp";
 import axios from "axios";
+import Title from "../components/title";
 
 import { DOMAIN } from "../index";
 
@@ -73,12 +74,16 @@ export default function Verify() {
 
   return (
     <Container
-      className="d-flex align-items-center justify-content-center text-primary"
+      className="d-flex align-items-center justify-content-center "
       style={{ height: "100vh" }}
     >
       <Row>
+        <Col>
+          <Title className="text-dark" />
+        </Col>
+
         <Col xs={12} sm={15} md={18} lg={21}>
-          <Card className="shadow-sm rounded">
+          <Card className="shadow-sm rounded text-primary">
             <Card.Body>
               <h1 className="text-center ">Verify</h1>
                 <OtpInput
