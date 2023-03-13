@@ -128,7 +128,18 @@ function Maps() {
 
       axios
         .post(`${DOMAIN}/createEvent`, data)
-        .then((res) => {})
+        .then((res) => {
+          switch (res.status) {
+            case 200:
+              alert("Event wurde erstellt!");
+              break;
+            case 400:
+              alert("Event konnte nicht erstellt werden!");
+              break;
+            default:
+              alert("Fehler beim erstellen des Events!");
+          }
+        })
         .catch((err) => {
           console.log(err);
         });
