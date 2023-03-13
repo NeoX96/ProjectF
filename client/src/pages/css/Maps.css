@@ -68,3 +68,26 @@
 .hidden {
   display: none;
 }
+
+
+
+.notification-box {
+  background-color: rgba(255, 0, 0, 0.5);
+  border: 1px solid gray;
+  border-radius: 3px;
+  padding: 10px;
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-box p {
+  margin: 0;
+  padding-left: 10px;
+}
+
+.notification-box span {
+  font-size: 20px;
+  margin-right: 10px;
+}

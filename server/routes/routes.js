@@ -273,6 +273,11 @@ router.post('/api/createEvent', async (req, res) => {
   try {
       const userID = await UserModel.findOne({ sessionID: req.body.user }, { _id: 1 });
 
+      if (!userID) {
+          console.log("User not found");
+          return res.status(400).json({ error: "User not found" });
+      }
+
       const data = {
           user: userID,
           name: req.body.name,
@@ -289,8 +294,7 @@ router.post('/api/createEvent', async (req, res) => {
       await newEvent.save();
       console.log("Event created");
 
-
-
+      res.status(200).json({ msg: 'Event created' });
 
 
   } catch (error) {
@@ -335,7 +339,14 @@ router.post('/api/getEvents', async (req, res) => {
       event.map(async (event) => {
         // find the user by id and get the username
         const user = await UserModel.findById(event.user);
-        return { ...event._doc, owner: user.username };
+        if (!user) {
+          return { ...event._doc, owner: 'User not found' };
+        }
+
+        if (user) {
+          return { ...event._doc, owner: user.username };
+        }
+       
       })
     );
 
