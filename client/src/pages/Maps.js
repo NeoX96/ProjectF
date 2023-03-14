@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Form, Modal } from "react-bootstrap";
 import Control from "react-leaflet-custom-control";
-import { Button, ToggleButton } from "@mui/material";
+import { Button, ToggleButton, Box } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import Cookies from "js-cookie";
 import {
@@ -18,7 +18,6 @@ import "leaflet/dist/leaflet.css";
 import "./css/Maps.css";
 import axios from "axios";
 import { IndexContext } from "../App";
-
 import { DOMAIN } from "../index";
 
 /*
@@ -341,13 +340,15 @@ function Maps() {
       axios
         .post(`${DOMAIN}/joinEvent`, data)
         .then((res) => {
-          switch (res.status) {
-            case 200:
-              // Update the button text to "Ich nehme teil"
-              setEventJoined(true);
-              alert("Event erfolgreich beigetreten");
+          setEventJoined(true);
+
+        })
+        .catch((err) => {
+          switch (err.response.status) {
+            case 403:
+              alert("Nutzer nicht gefunden");
               break;
-  
+
             case 404:
               alert("Event nicht gefunden");
               break;
@@ -364,12 +365,9 @@ function Maps() {
               alert("Unbekannter Fehler");
               break;
           }
-        })
-        .catch((err) => {
-          alert("Fehler beim beitreten des Events");
         });
     }
-  
+
 
     return (
       <div>
@@ -392,6 +390,7 @@ function Maps() {
                 ? GetIcon([30, 40], "skateboard")
                 : GetIcon([30, 40], "marker")
             }
+           
           >
             <Popup>
               <div className="event-info-container">
@@ -404,11 +403,24 @@ function Maps() {
                     i
                   </span>
                 </p>
-    
+                {console.log(event.usernames)}
                 {/* Render the info box if it is visible */}
                 {infoBoxVisible && (
-                  <div className="popup-content"><strong>Organisator:</strong> {event.owner}</div>
+                  <div>
+                    <div className="popup-content"><strong>Organisator:</strong> {event.owner}</div>
+                    <div><strong>Teilnehmer:</strong></div>
+                    <Box sx={{ maxHeight: 50, overflow: 'auto' }}>
+                      <div>
+                        <ul sx={{ margin: 0, padding: 0 }}>
+                          {event.usernames.map((username) => (
+                            <li key={username}>{username}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </Box>
+                  </div>
                 )}
+
     
                 <p className="event--datum">
                   <strong>Datum:</strong> {formatDate(event.uhrzeit)}
@@ -429,13 +441,14 @@ function Maps() {
                 </p>
     
                 <div className="button-container">
-                  <Button
-                    className="play-button"
-                    onClick={() => joinEvent(event)}
-                    id={`event-${event._id}-button`}
-                  >
-                    {eventJoined ? "Ich nehme teil" : "+ Mitspielen"}
-                  </Button>
+                <Button
+                  className={`play-button ${eventJoined ? "bg-danger" : ""}`}
+                  onClick={eventJoined ? () => leaveEvent(event) : () => joinEvent(event)}
+                  id={`event-${event._id}-button`}
+                >
+                  {eventJoined ? "Verlassen" : "+ Mitspielen"}
+                </Button>
+
                   <button className="chat-button">&#9993; Chat</button>
                 </div>
               </div>
