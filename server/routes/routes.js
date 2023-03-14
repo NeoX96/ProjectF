@@ -310,6 +310,10 @@ router.post("/api/joinEvent", async (req, res) => {
     const userID = await UserModel.find({ sessionID: req.body.user }, { _id: 1 });
     const eventData = await EventModel.find({ _id: req.body.eventID });
 
+    if (!userID) {
+      return res.status(403).json({ msg: 'User not found' });
+    }
+
 
     if (!eventData) {
       return res.status(404).json({ msg: 'Event not found' });
@@ -339,22 +343,30 @@ router.post('/api/getEvents', async (req, res) => {
       event.map(async (event) => {
         // find the user by id and get the username
         const user = await UserModel.findById(event.user);
+        
+        // write in teilnehmer only the username of the array of teilnehmer in events
+        const teilnehmer = await UserModel.find({ _id: { $in: event.teilnehmer } }, { username: 1 });
+        
         if (!user) {
           return { ...event._doc, owner: 'User not found' };
         }
 
         if (user) {
-          return { ...event._doc, owner: user.username };
+          const updatedEvent = { ...event._doc, owner: user.username };
+          if (teilnehmer) {
+            updatedEvent.usernames = teilnehmer.map((user) => user.username);
+          }
+          return updatedEvent;
         }
        
       })
     );
 
-    console.log(events);
-
     if (!event) {
       return res.status(404).json({ msg: 'Event not found' });
     }
+
+    console.log(events);
 
     res.status(200).json(events);
 
@@ -367,6 +379,3 @@ router.post('/api/getEvents', async (req, res) => {
 
 
 module.exports = router;
-
-
-
