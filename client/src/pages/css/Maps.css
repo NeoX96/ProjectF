@@ -65,6 +65,15 @@
   border-radius: 2px;
   cursor: pointer;
 }
+.play-button {
+  background-color: rgb(44, 158, 228);
+  color: white;
+  padding: 4px 8px;
+  font-size: 14px;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+}
 .hidden {
   display: none;
 }
