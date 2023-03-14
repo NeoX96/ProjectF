@@ -368,6 +368,10 @@ function Maps() {
         });
     }
 
+    function leaveEvent(event) {
+      alert("Event verlassen");
+    }
+
 
     return (
       <div>
