@@ -3,6 +3,7 @@ import { Form, Modal } from "react-bootstrap";
 import Control from "react-leaflet-custom-control";
 import { Button, ToggleButton, Box, Typography } from "@mui/material";
 import EventIcon from '@mui/icons-material/Event';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import AddIcon from "@mui/icons-material/Add";
 import Cookies from "js-cookie";
 import {
@@ -402,7 +403,7 @@ function Maps() {
             <Popup>
               <div className="event-info-container">
                 <p className="event-name blue-bg">
-                  <strong className="name">{event.name}</strong>
+                  <strong className="name">{event.username}</strong>
                   <span
                     className="info-button"
                     onClick={() => showInfo(event)}
@@ -467,6 +468,21 @@ function Maps() {
   }
 
 
+  function handleDeleteEvent(eventId) {
+    // Senden einer DELETE-Anforderung an die API-Endpunkt-URL mit dem Ereignis-ID-Parameter
+    axios.delete(`${DOMAIN}/events/${eventId}`)
+      .then(() => {
+        // Wenn die Anforderung erfolgreich ist, aktualisieren Sie den Zustand des Ereignisarrays
+        const updatedEvents = events.filter(event => event._id !== eventId);
+        setEvents(updatedEvents);
+      })
+      .catch((error) => {
+        // Wenn ein Fehler auftritt, loggen Sie den Fehler oder geben Sie eine Fehlermeldung aus
+        console.error(error);
+        alert('Beim Löschen des Ereignisses ist ein Fehler aufgetreten.');
+      });
+  }
+
   function ShowEventsData() {
 
     return (
@@ -492,6 +508,13 @@ function Maps() {
             }}
             >
               <Typography>{event.name}</Typography>
+              <Typography>{event.eventID}</Typography>
+              <Button color="error" aria-label="delete" onClick={() => {
+                console.log(event._id);
+                handleDeleteEvent(event._id);
+              }}>
+                <DeleteForeverIcon />
+              </Button>
               </Box>
           ))}          
 
