@@ -476,13 +476,24 @@ function Maps() {
         p: 2,
         backdropFilter: "blur(5px)",
         backgroundColor: "rgba(255, 255, 255, 0.3)",
-        borderRadius: 3
-        
+        borderRadius: 3,
+        maxHeight: 200,
+        overflow: 'auto'
       }}>
-        <Typography>
-        <div>{events.name}</div>
-          
-        </Typography>
+
+          {events.map((event) => (
+            <Box key={event._id}
+            sx={{ 
+              m: 2,
+              p: 0.5,
+              backdropFilter: "blur(5px)",
+              backgroundColor: "rgba(255, 255, 255, 0.3)",
+              borderRadius: 3
+            }}
+            >
+              <Typography>{event.name}</Typography>
+              </Box>
+          ))}          
 
       </Box>
     )
@@ -539,7 +550,6 @@ function Maps() {
       </MapContainer>
     </div>
   );
-
 }
 
-export default Maps;
+export default Maps
