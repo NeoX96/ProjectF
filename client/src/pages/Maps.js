@@ -125,10 +125,20 @@ function Maps() {
       if (!eventName) {
         // Create a notification box with the message
         const notificationBox = document.getElementById("notificationBox");
-        notificationBox.innerHTML = "<span>&#9432;</span><p>Bitte geben Sie den Namen der Veranstaltung ein</p>";
+        notificationBox.innerHTML = "<span>&#9432;</span><p>Bitte geben Sie den Namen der Veranstaltung an</p>";
         notificationBox.classList.add("notification-box");
         return;
       }
+
+      if (!event.target.elements.eventTime.value) {
+        // Create a notification box with the message
+        const notificationBox = document.getElementById("notificationBox");
+        notificationBox.innerHTML = "<span>&#9432;</span><p>Bitte geben Sie das Datum der Veranstaltung an</p>";
+        notificationBox.classList.add("notification-box");
+        return;
+      }
+
+      
     
       
 
@@ -331,51 +341,49 @@ function Maps() {
     }
 
 
-    function joinEvent (event) {
+    function joinEvent(event) {
       try {
         const data = {
           user: sessionID,
           eventID: event._id,
         };
-        
+    
         axios
-        .post(`${DOMAIN}/joinEvent`, data)
-        .then((res) => {
-          switch (res.status) {
-            case 200:
-              alert("Event erfolgreich beigetreten");
-              break;
-            
+          .post(`${DOMAIN}/joinEvent`, data)
+          .then((res) => {
+            switch (res.status) {
+              case 200:
+                // Update the button text to "Ich nehme teil"
+                const button = document.getElementById(`event-${event._id}-button`);
+                button.textContent = "teilgenommen";
+                alert("Event erfolgreich beigetreten");
+                break;
+    
               case 404:
                 alert("Event nicht gefunden");
                 break;
-
+    
               case 405:
                 alert("Bei Event bereits beigetreten");
                 break;
-
+    
               case 500:
                 alert("Serverfehler");
                 break;
-
+    
               default:
                 alert("Unbekannter Fehler");
                 break;
-          }
-
-        })
-        .catch((err) => {
-          alert("Fehler beim beitreten des Events");
-        });
-
-
-  
+            }
+          })
+          .catch((err) => {
+            alert("Fehler beim beitreten des Events");
+          });
       } catch (err) {
         console.log(err);
         alert("Fehler beim beitreten des Events");
       }
-    };
-
+    }
 
 
     return (
@@ -431,7 +439,9 @@ function Maps() {
                 </p>
 
                 <div class="button-container">
-                  <Button onClick={() => joinEvent(event)} >+ Mitspielen</Button>
+                <Button class="play-button" onClick={() => joinEvent(event)} id={`event-${event._id}-button`}>
+                  {event.eventJoined ? "Ich nehme teil" : "+ Mitspielen"}
+                </Button>
                   <button class="chat-button">&#9993; Chat</button>
                 </div>
               </div>
