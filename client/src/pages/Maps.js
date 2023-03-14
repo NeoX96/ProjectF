@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Form, Modal } from "react-bootstrap";
 import Control from "react-leaflet-custom-control";
-import { Button, ToggleButton, Box } from "@mui/material";
+import { Button, ToggleButton, Box, Typography } from "@mui/material";
+import EventIcon from '@mui/icons-material/Event';
 import AddIcon from "@mui/icons-material/Add";
 import Cookies from "js-cookie";
 import {
@@ -19,6 +20,7 @@ import "./css/Maps.css";
 import axios from "axios";
 import { IndexContext } from "../App";
 import { DOMAIN } from "../index";
+
 
 /*
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -46,6 +48,7 @@ function Maps() {
   const [eventLatLng, setEventLatLng] = useState({ lat: 0, lng: 0 });
   const [showModal, setShowModal] = useState(false);
   const [markerExists, setMarkerExists] = useState(false);
+  const [showEvents, setShowEvents] = useState(false);
 
   const { index } = useContext(IndexContext);
 
@@ -464,6 +467,27 @@ function Maps() {
   }
 
 
+  function ShowEventsData() {
+
+    return (
+      <Box 
+      
+      sx={{ 
+        p: 2,
+        backdropFilter: "blur(5px)",
+        backgroundColor: "rgba(255, 255, 255, 0.3)",
+        borderRadius: 3
+        
+      }}>
+        <Typography>
+        <div>{events.name}</div>
+          
+        </Typography>
+
+      </Box>
+    )
+  }
+
                  
   
 
@@ -500,6 +524,17 @@ function Maps() {
             </ToggleButton>
         </Control>
 
+        <Control prepend position="topleft">
+            <Button
+              value="check"
+              onClick={() => setShowEvents(!showEvents)}
+              sx={{ color: "white", bgcolor: "primary.main", borderRadius: 10, boxShadow: 5}}
+            >
+              <EventIcon/>
+            </Button>
+          {showEvents === true ? <ShowEventsData /> : null}
+        </Control>
+  
         
       </MapContainer>
     </div>
