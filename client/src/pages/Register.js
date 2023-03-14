@@ -161,7 +161,6 @@ const RegisterForm = () => {
             color="primary"
             onClick={changeAuthMode}
             aria-label="login"
-            disabled
           >
             Bereits Registriert? Login
           </Button>
