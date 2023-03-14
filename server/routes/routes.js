@@ -390,6 +390,40 @@ router.delete('/api/events/:id', async (req, res) => {
   }
 });
 
+router.delete('/api/events/:eventId', async (req, res) => {
+  try {
+    const eventId = req.params.eventId;
+    const userId = req.user.id;
+
+    // Find the event by ID
+    const event = await Event.findById(eventId);
+
+    // Check if the event exists
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // Check if the user is a participant of the event
+    if (!event.participants.includes(userId)) {
+      return res.status(403).json({ message: 'You are not a participant of this event' });
+    }
+
+    // Remove the user from the event's participants array
+    event.participants = event.participants.filter(participant => participant.toString() !== userId);
+
+    // Save the updated event to the database
+    const updatedEvent = await event.save();
+
+    // Send a success response
+    res.status(200).json(updatedEvent);
+
+  } catch (err) {
+    // Handle errors
+    console.error(err);
+    res.status(500).json({ message: 'Failed to delete object' });
+  }
+});
+
 
 
 module.exports = router;

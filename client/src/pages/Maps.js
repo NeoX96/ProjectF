@@ -4,6 +4,7 @@ import Control from "react-leaflet-custom-control";
 import { Button, ToggleButton, Box, Typography } from "@mui/material";
 import EventIcon from '@mui/icons-material/Event';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import AddIcon from "@mui/icons-material/Add";
 import Cookies from "js-cookie";
 import {
@@ -23,19 +24,6 @@ import { IndexContext } from "../App";
 import { DOMAIN } from "../index";
 
 
-/*
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCog } from "@fortawesome/free-solid-svg-icons";
-*/
-
-/*
-const MAP_STYLES = [
-  { name: "Standard", url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" },
-  { name: "Schwarz-Weiß", url: "https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" },
-  { name: "Grau", url: "https://tiles.wmflabs.org/bw-mapnik-landuse/{z}/{x}/{y}.png" },
-  { name: "Wasserfarben", url: "https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png" },
-];
-*/
 // Universelle GetIcon Funktion mit Icongröße und Iconname
 function GetIcon(_iconSize, _iconName) {
   return L.icon({
@@ -50,6 +38,8 @@ function Maps() {
   const [showModal, setShowModal] = useState(false);
   const [markerExists, setMarkerExists] = useState(false);
   const [showEvents, setShowEvents] = useState(false);
+ 
+
 
   const { index } = useContext(IndexContext);
 
@@ -307,6 +297,7 @@ function Maps() {
     // State variables to control visibility and content of the info box
     const [infoBoxVisible, setInfoBoxVisible] = useState(false);
     const [eventJoined, setEventJoined] = useState(false);
+    const [eventLeft, setEventLeft] = useState(false);
   
 
 
@@ -336,11 +327,19 @@ function Maps() {
   
     function joinEvent(event) {
       
+      console.log(event.teilnehmer);
+  ///////////////////////////////////////////////// aktuellenUser = usertest
+      if (event.user === event.teilnehmer) {
+        alert("Sie können nicht beitreten, da Sie diese Veranstaltung selbst erstellt haben.");
+        console.log(sessionID);
+        return;
+      }
+    
       const data = {
         user: sessionID,
         eventID: event._id,
       };
-  
+    
       axios
         .post(`${DOMAIN}/joinEvent`, data)
         .then((res) => {
@@ -372,11 +371,23 @@ function Maps() {
         });
     }
 
-    function leaveEvent(event) {
+
+    ////////////////////////////////////////////////////////////////////////////
+    
+async function leaveEvent(event) {
+  console.log("leaveEvent:", event._id);
+  try {
+    const response = await axios.delete(`${DOMAIN}/api/events/${event._id}/${event.userId}`);
+    if (response.status === 200) {
+      setEventLeft(true);
       alert("Event verlassen");
+    } else {
+      throw new Error('Failed to delete object');
     }
-
-
+  } catch (error) {
+    console.error(error);
+  }
+}
     return (
       <div>
         {events.map((event) => (
@@ -403,7 +414,7 @@ function Maps() {
             <Popup>
               <div className="event-info-container">
                 <p className="event-name blue-bg">
-                  <strong className="name">{event.username}</strong>
+                  <strong className="name">{event.name}</strong>
                   <span
                     className="info-button"
                     onClick={() => showInfo(event)}
@@ -450,12 +461,12 @@ function Maps() {
     
                 <div className="button-container">
                 <Button
-                  className={`play-button ${eventJoined ? "bg-danger" : ""}`}
-                  onClick={eventJoined ? () => leaveEvent(event) : () => joinEvent(event)}
-                  id={`event-${event._id}-button`}
-                >
-                  {eventJoined ? "Verlassen" : "+ Mitspielen"}
-                </Button>
+                className={`play-button ${eventJoined && !eventLeft ? "bg-danger" : ""}`}
+                onClick={eventJoined && !eventLeft ? () => leaveEvent(event) : () => joinEvent(event)}
+                id={`event-${event._id}-button`}
+              >
+                {eventJoined && !eventLeft ? "Verlassen" : "+ Mitspielen"}
+              </Button>
 
                   <button className="chat-button">&#9993; Chat</button>
                 </div>
@@ -483,42 +494,65 @@ function Maps() {
       });
   }
 
+/////////////////////////////////////////////////////// map definieren
+ 
+function getParticipatingEvents(eventID, eventlat, eventlng) {
+  
+
+  Maps.setView([eventlat, eventlng], 15);
+  console.log(`Event lat: ${eventlat}, lng: ${eventlng}`);
+}
+
+
   function ShowEventsData() {
 
     return (
-      <Box 
-      
+      <Box>
+  <Typography variant="h4">Creating Events</Typography>
+  
+  {events.map((event) => (
+    <Box key={event._id}
       sx={{ 
-        p: 2,
+        m: 2,
+        p: 0.5,
         backdropFilter: "blur(5px)",
         backgroundColor: "rgba(255, 255, 255, 0.3)",
-        borderRadius: 3,
-        maxHeight: 200,
-        overflow: 'auto'
+        borderRadius: 3
+      }}
+    >
+      <Typography>{event.name}</Typography>
+      <Button color="error" aria-label="delete" onClick={() => {
+        console.log(event._id);
+        handleDeleteEvent(event._id);
       }}>
+        <DeleteForeverIcon />
+      </Button>
+    </Box>
+  ))}
 
-          {events.map((event) => (
-            <Box key={event._id}
-            sx={{ 
-              m: 2,
-              p: 0.5,
-              backdropFilter: "blur(5px)",
-              backgroundColor: "rgba(255, 255, 255, 0.3)",
-              borderRadius: 3
-            }}
-            >
-              <Typography>{event.name}</Typography>
-              <Typography>{event.eventID}</Typography>
-              <Button color="error" aria-label="delete" onClick={() => {
-                console.log(event._id);
-                handleDeleteEvent(event._id);
-              }}>
-                <DeleteForeverIcon />
-              </Button>
-              </Box>
-          ))}          
+  <Typography variant="h4">Events I'm Participating In</Typography>
 
-      </Box>
+
+  {events.map((event) => (
+    <Box key={event._id}
+      sx={{ 
+        m: 2,
+        p: 0.5,
+        backdropFilter: "blur(5px)",
+        backgroundColor: "rgba(255, 255, 255, 0.3)",
+        borderRadius: 3
+      }}
+    >
+      <Typography>{event.name}</Typography>
+      <Button color="error" aria-label="delete" onClick={() => {
+        console.log(event._id);
+        getParticipatingEvents(event._id, event.lat, event.lng);
+      }}>
+        <LocationSearchingIcon />
+      </Button>
+    </Box>
+  ))}
+</Box>
     )
   }
 
