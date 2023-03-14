@@ -303,6 +303,7 @@ function Maps() {
   function SetEventsMap() {
     // State variables to control visibility and content of the info box
     const [infoBoxVisible, setInfoBoxVisible] = useState(false);
+    const [eventJoined, setEventJoined] = useState(false);
   
 
 
@@ -433,7 +434,7 @@ function Maps() {
                     onClick={() => joinEvent(event)}
                     id={`event-${event._id}-button`}
                   >
-                    {event.eventJoined ? "Ich nehme teil" : "+ Mitspielen"}
+                    {eventJoined ? "Ich nehme teil" : "+ Mitspielen"}
                   </Button>
                   <button className="chat-button">&#9993; Chat</button>
                 </div>
