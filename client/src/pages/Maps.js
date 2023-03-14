@@ -102,10 +102,10 @@ function Maps() {
     
       // Check if the event time is more than 1 year in the future
       const now = new Date();
-      const oneYearFromNow = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+      const oneMonthFromNow = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
     
      
-        if (eventTime > oneYearFromNow) {
+        if (eventTime > oneMonthFromNow) {
           // Create a notification box with the message
           const notificationBox = document.getElementById("notificationBox");
           notificationBox.innerHTML = "<span>&#9432;</span><p>Das Datum liegt zu weit in der Zukunft</p>";
@@ -177,6 +177,7 @@ function Maps() {
           switch (res.status) {
             case 200:
               alert("Event wurde erstellt!");
+              getEvents();
               break;
             case 400:
               alert("Event konnte nicht erstellt werden!");
@@ -489,6 +490,7 @@ function Maps() {
       </MapContainer>
     </div>
   );
+
 }
 
 export default Maps;
