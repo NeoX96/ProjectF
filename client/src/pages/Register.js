@@ -60,7 +60,16 @@ const RegisterForm = () => {
       email: email,
       password: password,
     };
-
+  
+    const today = new Date();
+    const birthdate = new Date(geburtstag);
+    const age = today.getFullYear() - birthdate.getFullYear();
+  
+    if (age < 18) {
+      alert("Du musst mindestens 18 Jahre alt sein, um dich zu registrieren.");
+      return;
+    }
+  
     try {
       const response = await axios.post(`${DOMAIN}/createUser`, registered);
       if (response.status === 200) {
@@ -72,17 +81,18 @@ const RegisterForm = () => {
         case 401:
           alert("Bereits Registriert");
           break;
-
+  
         case 402:
           alert("Fehler bei der Registrierung");
           break;
-
+  
         default:
           alert("Fehler bei der Registrierung");
           break;
       }
     }
   };
+  
 
   return (
     <MainContainer>
