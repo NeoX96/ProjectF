@@ -301,11 +301,16 @@ function Maps() {
 
   // Events auf Map anzeigen
   function SetEventsMap() {
+    // State variables to control visibility and content of the info box
+    const [infoBoxVisible, setInfoBoxVisible] = useState(false);
+  
+
+
     if (events.length === 0) {
       console.log("Keine Events vorhanden");
       return <div></div>;
     }
-
+  
     function formatDate(dateString) {
       const date = new Date(dateString);
       const day = date.getDate().toString().padStart(2, "0");
@@ -313,79 +318,57 @@ function Maps() {
       const year = date.getFullYear();
       return `${day}.${month}.${year}`;
     }
-
+  
     function formatTime(dateString) {
       const date = new Date(dateString);
       const hours = date.getHours().toString().padStart(2, "0");
       const minutes = date.getMinutes().toString().padStart(2, "0");
       return `${hours}:${minutes}`;
     }
-
-    function showInfo(event) {
-      const popupContainer = document.getElementById("popup-container");
-
-      if (!popupContainer) return;
-
-      const popupContent = document.createElement("div");
-      popupContent.classList.add("popup-content");
-      popupContainer.appendChild(popupContent);
-      var infoBox = document.getElementById("info-box");
-      var infoContent = document.getElementById("info-content");
-      if (infoBox.classList.contains("hidden")) {
-        // Box öffnen
-        infoContent.innerHTML = "<strong>Organisator:</strong> " + event.owner;
-        infoBox.classList.remove("hidden");
-      } else {
-        // Box schließen
-        infoBox.classList.add("hidden");
-      }
+  
+    function showInfo() {
+      setInfoBoxVisible(prevState => !prevState);
     }
-
-
+  
     function joinEvent(event) {
-      try {
-        const data = {
-          user: sessionID,
-          eventID: event._id,
-        };
-    
-        axios
-          .post(`${DOMAIN}/joinEvent`, data)
-          .then((res) => {
-            switch (res.status) {
-              case 200:
-                // Update the button text to "Ich nehme teil"
-                const button = document.getElementById(`event-${event._id}-button`);
-                button.textContent = "teilgenommen";
-                alert("Event erfolgreich beigetreten");
-                break;
-    
-              case 404:
-                alert("Event nicht gefunden");
-                break;
-    
-              case 405:
-                alert("Bei Event bereits beigetreten");
-                break;
-    
-              case 500:
-                alert("Serverfehler");
-                break;
-    
-              default:
-                alert("Unbekannter Fehler");
-                break;
-            }
-          })
-          .catch((err) => {
-            alert("Fehler beim beitreten des Events");
-          });
-      } catch (err) {
-        console.log(err);
-        alert("Fehler beim beitreten des Events");
-      }
+      
+      const data = {
+        user: sessionID,
+        eventID: event._id,
+      };
+  
+      axios
+        .post(`${DOMAIN}/joinEvent`, data)
+        .then((res) => {
+          switch (res.status) {
+            case 200:
+              // Update the button text to "Ich nehme teil"
+              setEventJoined(true);
+              alert("Event erfolgreich beigetreten");
+              break;
+  
+            case 404:
+              alert("Event nicht gefunden");
+              break;
+  
+            case 405:
+              alert("Bei Event bereits beigetreten");
+              break;
+  
+            case 500:
+              alert("Serverfehler");
+              break;
+  
+            default:
+              alert("Unbekannter Fehler");
+              break;
+          }
+        })
+        .catch((err) => {
+          alert("Fehler beim beitreten des Events");
+        });
     }
-
+  
 
     return (
       <div>
@@ -410,24 +393,29 @@ function Maps() {
             }
           >
             <Popup>
-              <div class="event-info-container">
-                <p class="event-name blue-bg">
-                  <strong class="name">{event.name}</strong>
-                  <span class="info-button" onClick={() => showInfo(event)}>
+              <div className="event-info-container">
+                <p className="event-name blue-bg">
+                  <strong className="name">{event.name}</strong>
+                  <span
+                    className="info-button"
+                    onClick={() => showInfo(event)}
+                  >
                     i
                   </span>
-                  <div id="popup-container"></div>
-                  <div id="info-box" class="hidden">
-                    <p id="info-content"></p>
-                  </div>
                 </p>
-                <p class="event--datum">
+    
+                {/* Render the info box if it is visible */}
+                {infoBoxVisible && (
+                  <div className="popup-content"><strong>Organisator:</strong> {event.owner}</div>
+                )}
+    
+                <p className="event--datum">
                   <strong>Datum:</strong> {formatDate(event.uhrzeit)}
                 </p>
-                <p class="event--uhrzeit">
+                <p className="event--uhrzeit">
                   <strong>Uhrzeit:</strong> {formatTime(event.uhrzeit)}
                 </p>
-                <p class="event-equipment">
+                <p className="event-equipment">
                   {event.equipment ? (
                     <>
                       <strong>Sportgerät:</strong> ✓
@@ -438,12 +426,16 @@ function Maps() {
                     </>
                   )}
                 </p>
-
-                <div class="button-container">
-                <Button class="play-button" onClick={() => joinEvent(event)} id={`event-${event._id}-button`}>
-                  {event.eventJoined ? "Ich nehme teil" : "+ Mitspielen"}
-                </Button>
-                  <button class="chat-button">&#9993; Chat</button>
+    
+                <div className="button-container">
+                  <Button
+                    className="play-button"
+                    onClick={() => joinEvent(event)}
+                    id={`event-${event._id}-button`}
+                  >
+                    {event.eventJoined ? "Ich nehme teil" : "+ Mitspielen"}
+                  </Button>
+                  <button className="chat-button">&#9993; Chat</button>
                 </div>
               </div>
             </Popup>
@@ -452,6 +444,10 @@ function Maps() {
       </div>
     );
   }
+
+
+                 
+  
 
   return (
     <div>
@@ -493,4 +489,4 @@ function Maps() {
 
 }
 
-export default Maps;
+export default Maps;                                                                                                       
