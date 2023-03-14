@@ -66,14 +66,14 @@ const RegisterForm = () => {
     const age = today.getFullYear() - birthdate.getFullYear();
   
     if (age < 18) {
-      alert("Du musst mindestens 18 Jahre alt sein, um dich zu registrieren.");
+      alert("Es tut uns leid, du musst mindestens 18 Jahre alt sein, um dich zu registrieren. Bitte komm später wieder!");
       return;
     }
   
     try {
       const response = await axios.post(`${DOMAIN}/createUser`, registered);
       if (response.status === 200) {
-        alert("Registrierung erfolgreich");
+        alert("Registrierung erfolgreich. Bitte Verifikations-Email bestätigen. Sieh auch im Spam-Ordner nach!");
         navigate("/Login");
       }
     } catch (error) {
