@@ -21,13 +21,14 @@ const LogoutButton = () => {
       backgroundColor: "rgba(0, 0, 0, 0.6)",
       zIndex: 401,
       position: "fixed",
-      top: 10,
-      right: 10,
-      borderRadius: 5,
+      top: -10,
+      right: -20,
+      borderRadius: 4,
       boxShadow: 6,
+      transform: 'rotate(-90deg)',
     }}
   >
-    <LogoutIcon sx={{ mr: 1 }} />
+    <LogoutIcon sx={{ pt: 0.5, m: 1, transform: 'rotate(+90deg)' }} />
   </Button>
   );
 };
