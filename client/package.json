@@ -1,6 +1,6 @@
 {
-  "name": "sportconnect",
-  "version": "0.2.0",
+  "name": "gonkle",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.10.6",
