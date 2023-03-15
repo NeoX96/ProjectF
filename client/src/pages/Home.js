@@ -75,6 +75,13 @@ const HoverGrowFab = () => {
 function Home() {
   const { index, setIndex } = useContext(IndexContext);
   const vorname = Cookies.get("vorname");
+
+  // wenn vorname nicht gesetzt ist, dann sessionID löschen und auf Login weiterleiten
+  if (!vorname) {
+    Cookies.remove("sessionID");
+    window.location.href = "/";
+  }
+
   
   const theme = useTheme();
   const navigate = useNavigate();
