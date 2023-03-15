@@ -20,6 +20,7 @@ import {
   Paper,
   Divider,
   Badge,
+  Fab
 } from "@mui/material";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -539,6 +540,7 @@ function Chat() {
   // FriendsModal zum akzeptieren von Freundschaftsanfragen
   const FriendsModal = () => {
     const [pendingRequests, setPendingRequests] = useState([]);
+    const [sentPendingRequests, setSentPendingRequests] = useState([]);
 
     const handleClose = () => setshowFriendModal(false);
 
@@ -550,6 +552,7 @@ function Chat() {
         socket.on("get_pending_requests", (data) => {
           if (data.success) {
             setPendingRequests(data.pendingUsers);
+            setSentPendingRequests(data.sentUsers);
           }
         });
       }
@@ -564,8 +567,10 @@ function Chat() {
           show={showFriendModal}
           onHide={handleClose}
           className="text-center"
+          size="lg"
         >
           <Modal.Body>
+          <h3>Freundschaftsanfragen</h3>
             <Table striped hover>
               <thead>
                 <tr>
@@ -605,6 +610,27 @@ function Chat() {
                     ))
                   : null}
               </tbody>
+            </Table>
+
+            <h3>Gesendete Freundschaftsanfragen</h3>
+            <Table striped hover>
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Vorname</th>
+                </tr>
+              </thead>
+              <tbody className="align-middle">
+                {sentPendingRequests && sentPendingRequests.length > 0
+                  ? sentPendingRequests.map((request, index) => (
+                      <tr key={index}>
+                        <td>{request.username}</td>
+                        <td>{request.vorname}</td>
+                      </tr>
+                    ))
+                  : null}
+              </tbody>
+
             </Table>
           </Modal.Body>
           <Modal.Footer>
@@ -812,6 +838,27 @@ function Chat() {
       </Grid>
     </Container>
   );
-}
+};
 
 export default Chat;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
