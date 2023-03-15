@@ -313,12 +313,11 @@ router.post("/api/toggleEvent", async (req, res) => {
     const userID = await UserModel.find({ sessionID: req.body.user }, { _id: 1 });
     const eventData = await EventModel.find({ _id: req.body.eventID });
 
-    if (!userID) {
+    if (!userID || userID.length === 0) {
       return res.status(403).json({ msg: 'User not found' });
     }
-
-
-    if (!eventData) {
+    
+    if (!eventData || eventData.length === 0) {
       return res.status(404).json({ msg: 'Event not found' });
     }
 
