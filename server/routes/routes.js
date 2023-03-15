@@ -10,6 +10,9 @@ const JWTSEC = process.env.JWTSEC;
 const UserModel = require("../models/Users");
 const EventModel = require("../models/Events");
 const verifyEmailModel = require("../models/Verify");
+const FriendModel = require("../models/Friends");
+
+
 const { generateOTP } = require("./OTP");
 
 const crypto = require('crypto');
@@ -421,6 +424,45 @@ router.delete('/api/events/:eventId', async (req, res) => {
     // Handle errors
     console.error(err);
     res.status(500).json({ message: 'Failed to delete object' });
+  }
+});
+
+router.post('/api/sendFriendRequest', async (req, res) => {
+  try {
+      const user = await UserModel.find({ sessionID: req.body.user }, { _id: 1 });
+      const owner = await EventModel.find({ _id: req.body.eventID }, { user: 1 });
+
+      const ownerFriendModel = await FriendModel.find({ user: owner[0].user });
+
+      if (!user) {
+          return res.status(403).json({ msg: 'User not found' });
+      }
+
+      if (!owner) {
+          return res.status(404).json({ msg: 'Event not found' });
+      }
+
+      // if Owner is user 
+      if (owner[0].user == user[0]._id) {
+          return res.status(405).json({ msg: 'User is owner' });
+      }
+
+      if (ownerFriendModel[0].friends.includes(user[0]._id)) {
+          return res.status(406).json({ msg: 'User already in friends' });
+      }
+
+      if (ownerFriendModel[0].pending.includes(user[0]._id)) {
+          return res.status(407).json({ msg: 'User already send request' });
+      }
+
+      ownerFriendModel[0].pending.push(user[0]._id);
+      await ownerFriendModel[0].save();
+
+      res.status(200).json({ msg: 'Request send' });
+
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ msg: 'Server Error' });
   }
 });
 
