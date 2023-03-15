@@ -69,6 +69,21 @@ const RegisterForm = () => {
       alert("Es tut uns leid, du musst mindestens 18 Jahre alt sein, um dich zu registrieren. Bitte komm später wieder!");
       return;
     }
+
+    if (email.length > 48) {
+      alert("Die Email-Adresse ist zu lang. Bitte gib eine kürzere ein.");
+      return;
+    }
+
+    if (nickname.length > 29) {
+      alert("Der Nickname ist zu lang. Bitte gib einen kürzeren ein.");
+      return;
+    }
+
+    if (vorname.length > 29) {
+      alert("Der Vorname ist zu lang. Bitte gib einen kürzeren ein.");
+      return;
+    }
   
     try {
       const response = await axios.post(`${DOMAIN}/createUser`, registered);
@@ -104,6 +119,7 @@ const RegisterForm = () => {
             variant="outlined"
             value={vorname}
             required
+            inputProps={{ maxLength: 29 }}
             onChange={(event) => setVorname(event.target.value)}
           />
           <TextField
@@ -111,6 +127,7 @@ const RegisterForm = () => {
             variant="outlined"
             value={nickname}
             required
+            inputProps={{ maxLength: 29 }}
             onChange={(event) => setNickname(event.target.value)}
           />
           <TextField
@@ -119,6 +136,7 @@ const RegisterForm = () => {
             type="date"
             value={geburtstag}
             required
+            inputProps={{ max: new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split("T")[0], min : "1923-01-01"}}
             onChange={(event) => setGeburtstag(event.target.value)}
           />
           <TextField
@@ -127,6 +145,7 @@ const RegisterForm = () => {
             type="email"
             value={email}
             required
+            inputProps={{ maxLength: 48 }}
             onChange={(event) => setEmail(event.target.value)}
           />
           <TextField
@@ -136,7 +155,7 @@ const RegisterForm = () => {
             value={password}
             required
             onChange={(event) => setPassword(event.target.value)}
-            inputProps={{ minLength: 6 }}
+            inputProps={{ minLength: 6, maxLength: 29 }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
