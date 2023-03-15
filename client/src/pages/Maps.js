@@ -8,6 +8,7 @@ import EventIcon from '@mui/icons-material/Event';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import AddIcon from "@mui/icons-material/Add";
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import ChatIcon from '@mui/icons-material/Chat';
 import AddLocationAltTwoToneIcon from '@mui/icons-material/AddLocationAltTwoTone';
 
@@ -579,44 +580,79 @@ function Maps() {
 
 
     return (
-      <Box
+      <Box  
       >
-  <Typography variant="h4">Own Events</Typography>
+    <Box 
+  style={{
+    backdropFilter: "blur(5px)",
+    backgroundColor: "rgba(153, 204, 255, 0.5)",
+    boxShadow: 1,
+    borderRadius: 3,
+    padding: "0.5rem", // increase the padding
+  }}
+>
+  <Typography variant="h4"><KeyboardDoubleArrowRightIcon/> Meine Events</Typography>
+</Box>
   
-  {ownEvents.map((event) => (
-    <Box key={event._id}
-      sx={{ 
-        m: 2,
-        p: 0.5,
-        backdropFilter: "blur(5px)",
-        backgroundColor: "rgba(255, 255, 255, 0.3)",
-        boxShadow: 1,
-        borderRadius: 3
-      }}
-    >
+   
+{ownEvents.map((event) => (
+  <Box key={event._id}
+    sx={{ 
+      m: 2,
+      p: 0.5,
+      backdropFilter: "blur(5px)",
+      backgroundColor: "rgba(255, 255, 255, 0.3)",
+      boxShadow: 1,
+      borderRadius: 3,
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      textAlign: "center"
+    }}
+  >
+    <div style={{ display: "flex", alignItems: "center" }}>
+    <img src={GetIcon([30, 30], "frisbee")} style={{ marginRight: "10px" }} alt="" />
       <Typography>{event.name}</Typography>
+    </div>
+    <div style={{ display: "flex", alignItems: "center" }}>
+      <EventJumpButton lat={event.lat} lng={event.lng} />
       <Button color="error" aria-label="delete" onClick={() => {
         console.log(event._id);
         handleDeleteEvent(event._id);
-      }}>
+      }} style={{ marginLeft: "auto", paddingLeft: "10px" }}>
         <DeleteForeverIcon />
       </Button>
-      <EventJumpButton lat={event.lat} lng={event.lng} />
-    </Box>
-  ))}
-
-  <Typography variant="h4">Events I'm Participating In</Typography>
+    </div>
+  </Box>
+))}
+  
+  <Box 
+  style={{
+    backdropFilter: "blur(5px)",
+    backgroundColor: "rgba(153, 204, 255, 0.5)",
+    boxShadow: 1,
+    borderRadius: 3,
+    padding: "0.5rem", // increase the padding
+  }}
+>
+<Typography variant="h4"> <KeyboardDoubleArrowRightIcon/>Teilnahme-Events </Typography>
+</Box>
+  
+  
 
 
   {joinedEvents.map((event) => (
     <Box key={event._id}
-      sx={{ 
-        m: 2,
-        p: 0.5,
-        backdropFilter: "blur(5px)",
-        backgroundColor: "rgba(255, 255, 255, 0.3)",
-        borderRadius: 3
-      }}
+    sx={{ 
+      m: 2,
+      p: 0.5,
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      backdropFilter: "blur(5px)",
+      backgroundColor: "rgba(255, 255, 255, 0.3)",
+      borderRadius: 3
+    }}
     >
       <Typography>{event.name}</Typography>
       <EventJumpButton lat={event.lat} lng={event.lng} />
@@ -631,7 +667,7 @@ function Maps() {
     const map = useMap();
   
     function handleClick() {
-      map.flyTo([lat, lng]);
+      map.flyTo([lat, lng],15);
     }
   
     return (
