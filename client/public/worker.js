@@ -1,7 +1,13 @@
-var CACHE_NAME = 'Gonkle';
+var CACHE_NAME = 'Gonkle_v1';
 var urlsToCache = [
   '/',
-  '/completed'
+  '/Login',
+  '/Register',
+  '/Home',
+  '/Maps',
+  '/Chat',
+  '/Landing',
+  '/Verify',
 ];
 
 // Install a service worker
