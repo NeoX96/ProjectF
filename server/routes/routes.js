@@ -353,36 +353,26 @@ router.post("/api/toggleEvent", async (req, res) => {
 
 router.post('/api/getEvents', async (req, res) => {
   try {
-    const event = await EventModel.find(); // Veranstaltung anhand der ID abrufen
+    const event = await EventModel.find();
 
-    // map Events and add to all the username out of user Object ID
     const events = await Promise.all(
       event.map(async (event) => {
-        // find the user by id and get the username
         const user = await UserModel.findById(event.user);
-        
-        // write in teilnehmer only the username of the array of teilnehmer in events
         const teilnehmer = await UserModel.find({ _id: { $in: event.teilnehmer } }, { username: 1 });
-        
-        if (!user) {
-          return { ...event._doc, owner: 'User not found' };
-        }
 
-        if (user) {
-          const updatedEvent = { ...event._doc, owner: user.username };
-          if (teilnehmer) {
-            updatedEvent.usernames = teilnehmer.map((user) => user.username);
-          }
-          return updatedEvent;
-        }
-       
+        const updatedEvent = {
+          ...event._doc,
+          owner: user ? user.username : 'User not found',
+          usernames: teilnehmer.map((user) => user.username),
+        };
+
+        return updatedEvent;
       })
     );
 
     if (!event) {
       return res.status(404).json({ msg: 'Event not found' });
     }
-
 
     res.status(200).json(events);
 
@@ -391,6 +381,7 @@ router.post('/api/getEvents', async (req, res) => {
     res.status(500).send(error);
   }
 });
+
 
 router.delete('/api/events/:id', async (req, res) => {
   try {
