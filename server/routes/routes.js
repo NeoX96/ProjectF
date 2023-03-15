@@ -369,7 +369,6 @@ router.post('/api/getEvents', async (req, res) => {
       return res.status(404).json({ msg: 'Event not found' });
     }
 
-    console.log(events);
 
     res.status(200).json(events);
 
@@ -426,6 +425,57 @@ router.delete('/api/events/:eventId', async (req, res) => {
     res.status(500).json({ message: 'Failed to delete object' });
   }
 });
+
+
+router.post('/api/getOwnEvents', async (req, res) => {
+
+  try {
+    const user = await UserModel.find({ sessionID: req.body.sessionID }, { _id: 1 });
+    const own = await EventModel.find({ user: user[0]._id });
+  
+    if (!user) {
+      return res.status(403).json({ msg: 'User not found' });
+    }
+  
+    if (!own) {
+      return res.status(404).json({ msg: 'Event not found' });
+    }
+  
+    res.status(200).json(own);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: 'Server error' });
+  }
+  
+
+})
+
+
+router.post('/api/getJoinedEvents', async (req, res) => {
+  try {
+    const user = await UserModel.findOne({ sessionID: req.body.sessionID }, { _id: 1 });
+
+    if (!user) {
+      return res.status(403).json({ msg: 'User not found' });
+    }
+
+    const joined = await EventModel.find({ teilnehmer: { $in: [user._id] } });
+
+    if (!joined) {
+      return res.status(404).json({ msg: 'Event not found' });
+    }
+
+    res.status(200).json(joined);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
+
+
+
+
+
 
 router.post('/api/sendFriendRequest', async (req, res) => {
   try {
