@@ -158,6 +158,7 @@ function Maps() {
           event.target.eventTime.value
       );
       handleClose();
+      
 
       // Wenn Event erstellt worden ist, dann nochmal Events aus DB holen und in die Map einfügen, da der lokale Marker entfernt wird
       // Eventueller useEffect außerhalb der Funktion, der bei jedem Event erstellen ausgeführt wird
@@ -182,6 +183,7 @@ function Maps() {
           switch (res.status) {
             case 200:
               alert("Event wurde erstellt!");
+              setEnableEvent(false);
               getEvents();
               break;
             case 400:
