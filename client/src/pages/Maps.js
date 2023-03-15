@@ -334,14 +334,6 @@ function Maps() {
   
     function joinEvent(event) {
       
-      console.log(event.teilnehmer);
-  ///////////////////////////////////////////////// aktuellenUser = usertest
-      if (event.user === event.teilnehmer) {
-        alert("Sie können nicht beitreten, da Sie diese Veranstaltung selbst erstellt haben.");
-        console.log(sessionID);
-        return;
-      }
-    
       const data = {
         user: sessionID,
         eventID: event._id,
