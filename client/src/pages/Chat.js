@@ -3,13 +3,31 @@ import socketIO from "socket.io-client";
 import { Modal, Table } from "react-bootstrap";
 import Cookies from "js-cookie";
 import { endpoint } from "../index";
-import { Box, Container, Grid, Typography, useMediaQuery, useTheme, IconButton, ListItemText, ListItem , List, Button, TextField, InputAdornment, Paper, Divider } from "@mui/material";
+import {
+  Box,
+  Container,
+  Grid,
+  Typography,
+  useMediaQuery,
+  useTheme,
+  IconButton,
+  ListItemText,
+  ListItem,
+  List,
+  Button,
+  TextField,
+  InputAdornment,
+  Paper,
+  Divider,
+  Badge,
+} from "@mui/material";
 
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import AddIcon from '@mui/icons-material/Add';
-import PersonRemoveTwoToneIcon from '@mui/icons-material/PersonRemove';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import AddIcon from "@mui/icons-material/Add";
+import PersonRemoveTwoToneIcon from "@mui/icons-material/PersonRemove";
+import SendIcon from '@mui/icons-material/Send';
 
 const socket = socketIO(endpoint, { autoConnect: false });
 
@@ -26,11 +44,9 @@ function Chat() {
   const [targetUser, setTargetUser] = useState(null);
   const [showFriendModal, setshowFriendModal] = useState(false);
 
-  
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState({});
 
   const sessionID = Cookies.get("sessionID");
-
-
 
   // useEffect zum Verbinden mit SocketIO
   useEffect(() => {
@@ -69,21 +85,24 @@ function Chat() {
         ...privateMessages,
         [targetUser]: [...privateMessages[targetUser], data],
       });
+
+      if (targetUser === null || data.sender !== targetUser.userID) {
+        setUnreadMessagesCount({
+          ...unreadMessagesCount,
+          [data.sender]: (unreadMessagesCount[data.sender] || 0) + 1,
+        });
+      }
+
     });
 
     if (messagesRef.current) {
-        messagesRef.current.scrollIntoView({ behavior: "smooth" });
+      messagesRef.current.scrollIntoView({ behavior: "smooth" });
     }
-
 
     return () => {
       socket.off("receive_private_message");
     };
-  }, [privateMessages, targetUser]);
-
-
-
-
+  }, [privateMessages, targetUser, unreadMessagesCount]);
 
   // initial useEffect
   useEffect(() => {
@@ -162,8 +181,7 @@ function Chat() {
   const deleteFriend = (friend) => {
     socket.emit("delete_friend", friend);
     unselectUser();
-  }; 
-
+  };
 
   // select user to chat with
   const selectUser = (user) => {
@@ -194,14 +212,12 @@ function Chat() {
         ...prevPrivateMessages,
         [targetUser]: data,
       }));
-
     });
 
     return () => {
       socket.off("get_private_messages");
     };
   }, [targetUser]);
- 
 
   // ChatContainer for each user
   function ChatContainer() {
@@ -209,53 +225,56 @@ function Chat() {
     if (targetUser !== null) {
       return (
         <Box sx={{ height: "100%" }}>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          backdropFilter: "blur(5px)",
-          borderRadius: 2,
-          padding: 1,
-          boxShadow: 3,
-          height: "10%",
-          maxWidth: "100%",
-        }}
-      >
-        <Box>
-          <IconButton onClick={() => unselectUser()}>
-            <ArrowBackIcon />
-          </IconButton>
-        </Box>
-        <Box
-          sx={{
-            marginLeft: 1,
-          }}
-        >
-          <Typography
-            variant="h5"
+          <Box
             sx={{
-              fontFamily: "Montserrat, sans-serif",
-              textShadow: "4px 4px 4px rgba(30, 30, 30, 0.6)",
-              textDecoration: "none",
-              cursor: "default",
-              color: "white",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              backdropFilter: "blur(5px)",
+              borderRadius: 2,
+              padding: 1,
+              boxShadow: 3,
+              height: "10%",
+              maxWidth: "100%",
             }}
           >
-            {targetUser.vorname}
-          </Typography>
-        </Box>
-        <Box
-          sx={{
-            marginLeft: "auto",
-          }}
-        >
-          <IconButton sx={{boxShadow: 2, mr: 5, backdropFilter: 4}} onClick={() => deleteFriend(targetUser._id)}>
-            <PersonRemoveTwoToneIcon  color="error"/>
-          </IconButton>
-        </Box>
-      </Box>
+            <Box>
+              <IconButton onClick={() => unselectUser()}>
+                <ArrowBackIcon />
+              </IconButton>
+            </Box>
+            <Box
+              sx={{
+                marginLeft: 1,
+              }}
+            >
+              <Typography
+                variant="h5"
+                sx={{
+                  fontFamily: "Montserrat, sans-serif",
+                  textShadow: "4px 4px 4px rgba(30, 30, 30, 0.6)",
+                  textDecoration: "none",
+                  cursor: "default",
+                  color: "white",
+                }}
+              >
+                {targetUser.vorname}
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                marginLeft: "auto",
+              }}
+            >
+              <IconButton
+                sx={{ boxShadow: 2, mr: 5, backdropFilter: 4 }}
+                onClick={() => deleteFriend(targetUser._id)}
+              >
+                <PersonRemoveTwoToneIcon color="error" />
+              </IconButton>
+            </Box>
+          </Box>
 
           <Box
             p={2}
@@ -271,68 +290,88 @@ function Chat() {
               overflow: "auto",
             }}
           >
-    <List
-      sx={{
-        position: 'relative',
-        overflow: 'auto',
-        width: '100%',
-        '& ul': { padding: 0 },
-      }}
-    >
-      {privateMessages[targetUser] ? (
-        privateMessages[targetUser].map((message, idx) => {
-          const date = new Date(message.date);
-          const formattedDate = date.toLocaleDateString();
-          const formattedTime = date.toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-          });
-          const shouldShowDate =
-            idx === 0 || formattedDate !== new Date(privateMessages[targetUser][idx - 1].date).toLocaleDateString();
+            <List
+              sx={{
+                position: "relative",
+                overflow: "auto",
+                width: "100%",
+                "& ul": { padding: 0 },
+              }}
+            >
+              {privateMessages[targetUser] ? (
+                privateMessages[targetUser].map((message, idx) => {
+                  const date = new Date(message.date);
+                  const formattedDate = date.toLocaleDateString();
+                  const formattedTime = date.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
+                  const shouldShowDate =
+                    idx === 0 ||
+                    formattedDate !==
+                      new Date(
+                        privateMessages[targetUser][idx - 1].date
+                      ).toLocaleDateString();
 
-          return (
-            <div key={idx}>
-              {shouldShowDate && (
-                <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
-                  <Typography variant="caption" color="textSecondary">
-                    {formattedDate}
-                  </Typography>
+                  return (
+                    <div key={idx}>
+                      {shouldShowDate && (
+                        <ListItem
+                          sx={{ display: "flex", justifyContent: "center" }}
+                        >
+                          <Typography variant="caption" color="textSecondary">
+                            {formattedDate}
+                          </Typography>
+                        </ListItem>
+                      )}
+                      <ListItem
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems:
+                            message.sender === socket._id ||
+                            message.sender === socket.id
+                              ? "flex-end"
+                              : "flex-start",
+                          backgroundColor:
+                            message.sender === socket._id ||
+                            message.sender === socket.id
+                              ? "rgba(0, 255, 255, 0.08)"
+                              : "rgba(255, 255, 255, 0.08)",
+                          borderRadius: 5,
+                          padding: 1,
+                          marginBottom: 1,
+                          boxShadow: 1,
+                          maxWidth: "75%",
+                          width: "fit-content",
+                          marginLeft:
+                            message.sender === socket._id ||
+                            message.sender === socket.id
+                              ? "auto"
+                              : 0,
+                          marginRight:
+                            message.sender === socket._id ||
+                            message.sender === socket.id
+                              ? 0
+                              : "auto",
+                        }}
+                      >
+                        <ListItemText
+                          primary={message.message}
+                          secondary={formattedTime}
+                        />
+                      </ListItem>
+                      {shouldShowDate && <Divider sx={{ margin: "4px 0" }} />}
+                    </div>
+                  );
+                })
+              ) : (
+                <ListItem>
+                  <ListItemText primary="No messages yet" />
                 </ListItem>
               )}
-              <ListItem
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems:
-                    message.sender === socket._id || message.sender === socket.id ? 'flex-end' : 'flex-start',
-                  backgroundColor:
-                    message.sender === socket._id || message.sender === socket.id
-                      ? 'rgba(0, 255, 255, 0.08)'
-                      : 'rgba(255, 255, 255, 0.08)',
-                  borderRadius: 5,
-                  padding: 1,
-                  marginBottom: 1,
-                  boxShadow: 1,
-                  maxWidth: '75%',
-                  width: 'fit-content',
-                  marginLeft:
-                    message.sender === socket._id || message.sender === socket.id ? 'auto' : 0,
-                  marginRight: message.sender === socket._id || message.sender === socket.id ? 0 : 'auto',
-                }}
-              >
-                <ListItemText primary={message.message} secondary={formattedTime} />
-              </ListItem>
-              {shouldShowDate && <Divider sx={{ margin: '4px 0' }} />}
-            </div>
-          );
-        })
-      ) : (
-        <ListItem>
-          <ListItemText primary="No messages yet" />
-        </ListItem>
-      )}
-      <div ref={messagesRef}></div>
-    </List>
+              <div ref={messagesRef}></div>
+            </List>
           </Box>
         </Box>
       );
@@ -345,8 +384,7 @@ function Chat() {
             backdropFilter: "blur(5px)",
             boxShadow: 3,
           }}
-        >
-        </Box>
+        ></Box>
       );
     }
   }
@@ -413,62 +451,67 @@ function Chat() {
 
     return (
       <Box>
-      <TextField
-        placeholder="Search"
-        value={searchUser}
-        onChange={searchHandler}
-        sx={{
-          width: '100%',
-          '& .MuiInputBase-input': {
-            paddingLeft: '32px',
-            maxHeight: '5px',
-          },
-        }}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <Button sx={{ padding: '6px' }} onClick={() => setshowFriendModal(true)}>
-                <AddIcon />
-              </Button>
-            </InputAdornment>
-          ),
-        }}
-      />
-      {showResults && (
-        <Box
+        <TextField
+          placeholder="Search"
+          value={searchUser}
+          onChange={searchHandler}
           sx={{
-            overflow: 'auto',
-            maxHeight: '100px',
+            width: "100%",
+            "& .MuiInputBase-input": {
+              paddingLeft: "32px",
+              maxHeight: "5px",
+            },
           }}
-        >
-          <Paper
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <Button
+                  sx={{ padding: "6px" }}
+                  onClick={() => setshowFriendModal(true)}
+                >
+                  <AddIcon />
+                </Button>
+              </InputAdornment>
+            ),
+          }}
+        />
+        {showResults && (
+          <Box
             sx={{
-              borderRadius: 3,
-              boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.15)',
-              width: '100%',
+              overflow: "auto",
+              maxHeight: "100px",
             }}
           >
-            <List sx={{ padding: 0 }}>
-              {searchUserResult.map((result, index) => (
-                <ListItem
-                  key={index}
-                  sx={{
-                    '&:hover': {
-                      backgroundColor: 'rgba(0, 255, 255, 0.08)',
-                      cursor: 'pointer',
-                      zIndex: 9999,
-                    },
-                  }}
-                  onClick={() => handleUserClick(result)}
-                >
-                  <ListItemText primary={`${result.username} ${result.vorname}`} />
-                </ListItem>
-              ))}
-            </List>
-          </Paper>
-        </Box>
-      )}
-    </Box>
+            <Paper
+              sx={{
+                borderRadius: 3,
+                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.15)",
+                width: "100%",
+              }}
+            >
+              <List sx={{ padding: 0 }}>
+                {searchUserResult.map((result, index) => (
+                  <ListItem
+                    key={index}
+                    sx={{
+                      "&:hover": {
+                        backgroundColor: "rgba(0, 255, 255, 0.08)",
+                        cursor: "pointer",
+                        zIndex: 9999,
+                      },
+                    }}
+                    onClick={() => handleUserClick(result)}
+                  >
+                    <ListItemText
+                      primary={`${result.username} ${result.vorname}`}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Paper>
+          </Box>
+        )}
+      </Box>
     );
   }
 
@@ -476,18 +519,18 @@ function Chat() {
     return (
       <div>
         <form onSubmit={sendMessage}>
-            <div className="input-group">
-              <input
-                placeholder="Message ..."
-                required
-                className="form-control"
-                type="text"
-                name = "message"
-              />
-              <button className="btn btn-primary" type="submit">
-                <iconify-icon icon="ic:round-send"></iconify-icon>
-              </button>
-            </div>
+          <div className="input-group">
+            <input
+              placeholder="Message ..."
+              required
+              className="form-control"
+              type="text"
+              name="message"
+            />
+            <Button variant="contained" type="submit">
+              <SendIcon />
+            </Button>
+          </div>
         </form>
       </div>
     );
@@ -583,8 +626,8 @@ function Chat() {
     return (
       <Box className="UserList" height="100%" overflow="auto">
         <Box
-         onClick={() => setOpenOnline(!openOnline)}
-         sx={{
+          onClick={() => setOpenOnline(!openOnline)}
+          sx={{
             backgroundColor: "rgba(0, 0, 0, 0.5)",
             padding: "4px",
             borderRadius: "5px",
@@ -595,15 +638,12 @@ function Chat() {
             marginBottom: "20px",
             cursor: "pointer",
             boxShadow: "3px 3px 3px rgba(0, 0, 0, 0.4)",
-          }}>
-        <Typography
-          color={"lightgreen"}
-          variant="h6"
-          ml="10px"
+          }}
         >
-          Online
-        </Typography>
-        <IconButton  >
+          <Typography color={"lightgreen"} variant="h6" ml="10px">
+            Online
+          </Typography>
+          <IconButton>
             {openOnline ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </Box>
@@ -616,25 +656,34 @@ function Chat() {
                   <Button
                     variant="outlined"
                     color="primary"
-                    onClick={() => selectUser(user)}
+                    onClick={() => {
+                      selectUser(user);
+                      setUnreadMessagesCount({
+                        ...unreadMessagesCount,
+                        [user.userID]: 0,
+                      });
+                    }}
                     sx={{
                       boxShadow: 3,
                       width: "100%",
                       padding: "10px",
-   
-                      
                     }}
                   >
-                    {user.vorname}
+                    <Badge
+                      badgeContent={unreadMessagesCount[user.userID] || 0}
+                      color="error"
+                    >
+                      {user.vorname}
+                    </Badge>
                   </Button>
                 </ListItem>
               );
             })}
           </List>
         )}
-        <Box 
-        onClick={() => setOpenOffline(!openOffline)}
-        sx={{
+        <Box
+          onClick={() => setOpenOffline(!openOffline)}
+          sx={{
             backgroundColor: "rgba(0, 0, 0, 0.5)",
             padding: "4px",
             borderRadius: "5px",
@@ -644,15 +693,12 @@ function Chat() {
             alignItems: "center",
             cursor: "pointer",
             boxShadow: "3px 3px 3px rgba(0, 0, 0, 0.4)",
-          }}>
-        <Typography
-          color={"red"}
-          variant="h6"
-          ml="10px"
+          }}
         >
-          Offline
-        </Typography>
-        <IconButton  >
+          <Typography color={"red"} variant="h6" ml="10px">
+            Offline
+          </Typography>
+          <IconButton>
             {openOffline ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </Box>
@@ -690,30 +736,40 @@ function Chat() {
       style={{ height: `calc(100vh - 200px)` }}
     >
       <Grid container spacing={2} style={{ height: "95%" }}>
-        <Grid 
-        item 
-        md={4} 
-        xs={12}
-        style={{
-          height: "100%",
-          display: isMobile && !targetUser ? "block" : !isMobile ? "block" : "none"}}
+        <Grid
+          item
+          md={4}
+          xs={12}
+          style={{
+            height: "100%",
+            display:
+              isMobile && !targetUser ? "block" : !isMobile ? "block" : "none",
+          }}
         >
-          <Box p={2} mt={2} sx={{                  
-            borderRadius: 5,
-            backgroundColor: "rgba(0, 255, 255, 0.08)",
-            backdropFilter: "blur(5px)",
-            boxShadow: 3,
-            }}>
+          <Box
+            p={2}
+            mt={2}
+            sx={{
+              borderRadius: 5,
+              backgroundColor: "rgba(0, 255, 255, 0.08)",
+              backdropFilter: "blur(5px)",
+              boxShadow: 3,
+            }}
+          >
             <Search />
             <FriendsModal />
           </Box>
-          <Box p={3} mt={2} sx={{                  
-            borderRadius: 5,
-            backgroundColor: "rgba(0, 255, 255, 0.08)",
-            backdropFilter: "blur(5px)",
-            boxShadow: 3,
-            height: "100%",
-            }}>
+          <Box
+            p={3}
+            mt={2}
+            sx={{
+              borderRadius: 5,
+              backgroundColor: "rgba(0, 255, 255, 0.08)",
+              backdropFilter: "blur(5px)",
+              boxShadow: 3,
+              height: "100%",
+            }}
+          >
             <FriendsList />
           </Box>
         </Grid>
@@ -721,37 +777,41 @@ function Chat() {
           item
           md={8}
           xs={12}
-          style={{ 
+          style={{
             height: "100%",
-            display: isMobile && !targetUser ? "none" : "block"
+            display: isMobile && !targetUser ? "none" : "block",
           }}
         >
-          <Box mt={2} sx={{
-            borderRadius: 5,
-            backgroundColor: targetUser ? 'transparent' : "rgba(0, 255, 255, 0.08)",
-            backdropFilter: targetUser ? 'none' : "blur(5px)",
-            boxShadow: targetUser ? 0 : 3,
-            height: "100%",
-          }}>
-              <ChatContainer />
+          <Box
+            mt={2}
+            sx={{
+              borderRadius: 5,
+              backgroundColor: targetUser
+                ? "transparent"
+                : "rgba(0, 255, 255, 0.08)",
+              backdropFilter: targetUser ? "none" : "blur(5px)",
+              boxShadow: targetUser ? 0 : 3,
+              height: "100%",
+            }}
+          >
+            <ChatContainer />
           </Box>
-          <Box mt={2} sx={{                  
-            borderRadius: 5,
-            backgroundColor: "rgba(0, 255, 255, 0.08)",
-            backdropFilter: "blur(5px)",
-            boxShadow: 3,
-            padding: !targetUser ? 4 : 2,
-            }}>
-              {targetUser && (
-                
-                <InputMessage />
-            )}
+          <Box
+            mt={2}
+            sx={{
+              borderRadius: 5,
+              backgroundColor: "rgba(0, 255, 255, 0.08)",
+              backdropFilter: "blur(5px)",
+              boxShadow: 3,
+              padding: !targetUser ? 4 : 2,
+            }}
+          >
+            {targetUser && <InputMessage />}
           </Box>
         </Grid>
       </Grid>
     </Container>
-  )
-
+  );
 }
 
 export default Chat;
