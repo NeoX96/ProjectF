@@ -642,13 +642,13 @@ function getParticipatingEvents(eventID, eventlat, eventlng) {
           {enableEvent === true ? <CreateEvent /> : null}
         </Control>
 
-        <Control prepend position="bottomright">
+        <Control prepend position="topleft">
             <ToggleButton
               value="check"
               selected={enableEvent}
               onChange={() => setEnableEvent(!enableEvent)}
               selectedColor="red"
-              sx={{ color: "white", bgcolor: "primary.main", mb: 10, mr: 3, borderRadius: 10, boxShadow: 5}}
+              sx={{ color: "white", bgcolor: "primary.main", mb: "40%", mr: 3, borderRadius: 10, boxShadow: 5}}
             >
               <AddLocationAltTwoToneIcon />
             </ToggleButton>
