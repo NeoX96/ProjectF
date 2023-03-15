@@ -304,8 +304,21 @@ function Maps() {
   function SetEventsMap() {
     // State variables to control visibility and content of the info box
     const [infoBoxVisible, setInfoBoxVisible] = useState(false);
-    const [eventJoined, setEventJoined] = useState(false);
-    const [eventLeft, setEventLeft] = useState(false);
+    const [joinedEvents, setJoinedEvents] = useState([]);
+
+
+    useEffect(() => {
+      async function fetchJoinedEvents() {
+        const response = await axios.post(`${DOMAIN}/getJoinedEvents`, { sessionID });
+        setJoinedEvents(response.data);
+      }
+      fetchJoinedEvents();
+    }, []);
+
+
+    function isUserJoined(eventID) {
+      return joinedEvents.some((event) => event._id === eventID);
+    }
   
 
 
@@ -333,7 +346,7 @@ function Maps() {
       setInfoBoxVisible(prevState => !prevState);
     }
   
-    function joinEvent(event) {
+    function toggleEvent(event) {
       
       const data = {
         user: sessionID,
@@ -341,10 +354,20 @@ function Maps() {
       };
     
       axios
-        .post(`${DOMAIN}/joinEvent`, data)
+        .post(`${DOMAIN}/toggleEvent`, data)
         .then((res) => {
-          setEventJoined(true);
-
+          getEvents();
+          switch (res.status) {
+            case 200:
+              alert("Event verlassen");
+              break;
+            case 201:
+              alert("Event beigetreten");
+              break;
+            default:
+              alert("Fehler beim beitreten/verlassen des Events!");
+              break;
+          }
         })
         .catch((err) => {
           switch (err.response.status) {
@@ -376,22 +399,6 @@ function Maps() {
     }
 
 
-    ////////////////////////////////////////////////////////////////////////////
-    
-    async function leaveEvent(event) {
-      console.log("leaveEvent:", event._id);
-      try {
-        const response = await axios.delete(`${DOMAIN}/events/${event._id}/${event.userId}`);
-        if (response.status === 200) {
-          setEventLeft(true);
-          alert("Event verlassen");
-        } else {
-          throw new Error('Failed to delete object');
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
 
 
     function sendFriendRequest (event) {
@@ -446,7 +453,9 @@ function Maps() {
 
     return (
       <div>
-        {events.map((event) => (
+        {events.map((event) => {
+          const eventJoined = isUserJoined(event._id);
+          return (
           <Marker
             key={event._id}
             position={{ lat: [event.lat], lng: [event.lng] }}
@@ -517,20 +526,21 @@ function Maps() {
     
                 <div className="button-container">
                 <Button
-                className={`play-button ${eventJoined && !eventLeft ? "bg-danger" : ""}`}
-                onClick={eventJoined && !eventLeft ? () => leaveEvent(event) : () => joinEvent(event)}
-                id={`event-${event._id}-button`}
-                endIcon={<AddIcon />}
-              >
-                {eventJoined && !eventLeft ? "Verlassen" : "Mitspielen"}
-              </Button>
+                  className={`play-button ${eventJoined ? "bg-danger" : ""}`}
+                  onClick={() => toggleEvent(event)}
+                  id={`event-${event._id}-button`}
+                  endIcon={<AddIcon />}
+                >
+                  {eventJoined ? "Verlassen" : "Mitspielen"}
+                </Button>
 
                   <Button className="chat-button" onClick={() => sendFriendRequest(event)} endIcon={<ChatIcon />}>Chat</Button>
                 </div>
               </div>
             </Popup>
           </Marker>
-        ))}
+          );
+        })}
       </div>
     );
   }
