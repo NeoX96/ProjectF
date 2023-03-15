@@ -1,18 +1,23 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Form, Modal } from "react-bootstrap";
 import Control from "react-leaflet-custom-control";
-import { Button, ToggleButton, Box, Typography } from "@mui/material";
+import {
+  Button,
+  ToggleButton,
+  Box,
+  Typography,
+  IconButton,
+} from "@mui/material";
 
-
-import EventIcon from '@mui/icons-material/Event';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
+import EventIcon from "@mui/icons-material/Event";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 import AddIcon from "@mui/icons-material/Add";
-import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
-import ChatIcon from '@mui/icons-material/Chat';
-import AddLocationAltTwoToneIcon from '@mui/icons-material/AddLocationAltTwoTone';
-
-
+import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
+import ChatIcon from "@mui/icons-material/Chat";
+import AddLocationAltTwoToneIcon from "@mui/icons-material/AddLocationAltTwoTone";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import Cookies from "js-cookie";
 import {
@@ -31,7 +36,6 @@ import axios from "axios";
 import { IndexContext } from "../App";
 import { DOMAIN } from "../index";
 
-
 // Universelle GetIcon Funktion mit Icongröße und Iconname
 function GetIcon(_iconSize, _iconName) {
   return L.icon({
@@ -46,8 +50,6 @@ function Maps() {
   const [showModal, setShowModal] = useState(false);
   const [markerExists, setMarkerExists] = useState(false);
   const [showEvents, setShowEvents] = useState(false);
- 
-
 
   const { index } = useContext(IndexContext);
 
@@ -95,30 +97,34 @@ function Maps() {
     };
 
     // Formular abschicken
-      const submitForm = (event) => {
-        event.preventDefault();
-      
-        const eventTime = new Date(event.target.elements.eventTime.value);
-        const eventName = event.target.elements.eventName.value;
-    
+    const submitForm = (event) => {
+      event.preventDefault();
+
+      const eventTime = new Date(event.target.elements.eventTime.value);
+      const eventName = event.target.elements.eventName.value;
+
       // Check if the event time is more than 1 year in the future
       const now = new Date();
-      const oneMonthFromNow = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
-    
-     
-        if (eventTime > oneMonthFromNow) {
-          // Create a notification box with the message
-          const notificationBox = document.getElementById("notificationBox");
-          notificationBox.innerHTML = "<span>&#9432;</span><p>Das Datum liegt zu weit in der Zukunft</p>";
-          notificationBox.classList.add("notification-box");
-          return;
-        }
-      
-    
+      const oneMonthFromNow = new Date(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        now.getDate()
+      );
+
+      if (eventTime > oneMonthFromNow) {
+        // Create a notification box with the message
+        const notificationBox = document.getElementById("notificationBox");
+        notificationBox.innerHTML =
+          "<span>&#9432;</span><p>Das Datum liegt zu weit in der Zukunft</p>";
+        notificationBox.classList.add("notification-box");
+        return;
+      }
+
       if (eventTime < now) {
         // Create a notification box with the message
         const notificationBox = document.getElementById("notificationBox");
-        notificationBox.innerHTML = "<span>&#9432;</span><p>Das Datum liegt in der Vergangenheit</p>";
+        notificationBox.innerHTML =
+          "<span>&#9432;</span><p>Das Datum liegt in der Vergangenheit</p>";
         notificationBox.classList.add("notification-box");
         return;
       }
@@ -126,7 +132,8 @@ function Maps() {
       if (!eventName) {
         // Create a notification box with the message
         const notificationBox = document.getElementById("notificationBox");
-        notificationBox.innerHTML = "<span>&#9432;</span><p>Bitte geben Sie den Namen der Veranstaltung an</p>";
+        notificationBox.innerHTML =
+          "<span>&#9432;</span><p>Bitte geben Sie den Namen der Veranstaltung an</p>";
         notificationBox.classList.add("notification-box");
         return;
       }
@@ -134,14 +141,11 @@ function Maps() {
       if (!event.target.elements.eventTime.value) {
         // Create a notification box with the message
         const notificationBox = document.getElementById("notificationBox");
-        notificationBox.innerHTML = "<span>&#9432;</span><p>Bitte geben Sie das Datum der Veranstaltung an</p>";
+        notificationBox.innerHTML =
+          "<span>&#9432;</span><p>Bitte geben Sie das Datum der Veranstaltung an</p>";
         notificationBox.classList.add("notification-box");
         return;
       }
-
-      
-    
-      
 
       // Axios Post ans Backend - Event erstellen
 
@@ -265,10 +269,6 @@ function Maps() {
       </>
     );
   }
-  
-  
-
-
 
   // Standort setzen
   function UserPostionMarker() {
@@ -306,27 +306,25 @@ function Maps() {
     const [infoBoxVisible, setInfoBoxVisible] = useState(false);
     const [joinedEvents, setJoinedEvents] = useState([]);
 
-
     useEffect(() => {
       async function fetchJoinedEvents() {
-        const response = await axios.post(`${DOMAIN}/getJoinedEvents`, { sessionID });
+        const response = await axios.post(`${DOMAIN}/getJoinedEvents`, {
+          sessionID,
+        });
         setJoinedEvents(response.data);
       }
       fetchJoinedEvents();
     }, []);
 
-
     function isUserJoined(eventID) {
       return joinedEvents.some((event) => event._id === eventID);
     }
-  
-
 
     if (events.length === 0) {
       console.log("Keine Events vorhanden");
       return <div></div>;
     }
-  
+
     function formatDate(dateString) {
       const date = new Date(dateString);
       const day = date.getDate().toString().padStart(2, "0");
@@ -334,25 +332,24 @@ function Maps() {
       const year = date.getFullYear();
       return `${day}.${month}.${year}`;
     }
-  
+
     function formatTime(dateString) {
       const date = new Date(dateString);
       const hours = date.getHours().toString().padStart(2, "0");
       const minutes = date.getMinutes().toString().padStart(2, "0");
       return `${hours}:${minutes}`;
     }
-  
+
     function showInfo() {
-      setInfoBoxVisible(prevState => !prevState);
+      setInfoBoxVisible((prevState) => !prevState);
     }
-  
+
     function toggleEvent(event) {
-      
       const data = {
         user: sessionID,
         eventID: event._id,
       };
-    
+
       axios
         .post(`${DOMAIN}/toggleEvent`, data)
         .then((res) => {
@@ -378,19 +375,19 @@ function Maps() {
             case 404:
               alert("Event nicht gefunden");
               break;
-  
+
             case 405:
               alert("Bei Event bereits beigetreten");
               break;
 
             case 406:
-                alert("Du bist Owner der Veranstaltung");
-                break;
-  
+              alert("Du bist Owner der Veranstaltung");
+              break;
+
             case 500:
               alert("Serverfehler");
               break;
-  
+
             default:
               alert("Unbekannter Fehler");
               break;
@@ -398,21 +395,16 @@ function Maps() {
         });
     }
 
-
-
-
-    function sendFriendRequest (event) {
-
+    function sendFriendRequest(event) {
       const data = {
         user: sessionID,
         eventID: event._id,
       };
-    
+
       axios
         .post(`${DOMAIN}/sendFriendRequest`, data)
         .then((res) => {
           alert("Freundschaftsanfrage gesendet");
-
         })
         .catch((err) => {
           switch (err.response.status) {
@@ -425,7 +417,9 @@ function Maps() {
               break;
 
             case 405:
-              alert("Du kannst dir nicht selbst eine Freundschaftsanfrage senden");
+              alert(
+                "Du kannst dir nicht selbst eine Freundschaftsanfrage senden"
+              );
               break;
 
             case 406:
@@ -433,7 +427,9 @@ function Maps() {
               break;
 
             case 407:
-              alert("Du hast bereits eine Freundschaftsanfrage an diesen Nutzer gesendet");
+              alert(
+                "Du hast bereits eine Freundschaftsanfrage an diesen Nutzer gesendet"
+              );
               break;
 
             case 500:
@@ -443,252 +439,300 @@ function Maps() {
             default:
               alert("Unbekannter Fehler");
               break;
-            }
+          }
         });
-
     }
-
-
-
 
     return (
       <div>
         {events.map((event) => {
           const eventJoined = isUserJoined(event._id);
           return (
-          <Marker
-            key={event._id}
-            position={{ lat: [event.lat], lng: [event.lng] }}
-            icon={
-              event.index === 0
-                ? GetIcon([30, 30], "frisbee")
-                : event.index === 1
-                ? GetIcon([30, 30], "fussball")
-                : event.index === 2
-                ? GetIcon([30, 30], "volleyball")
-                : event.index === 3
-                ? GetIcon([30, 30], "basketball")
-                : event.index === 4
-                ? GetIcon([50, 50], "tischtennis")
-                : event.index === 5
-                ? GetIcon([30, 40], "skateboard")
-                : GetIcon([30, 40], "marker")
-            }
-           
-          >
-            <Popup>
-              <div className="event-info-container">
-                <p className="event-name blue-bg">
-                  <strong className="name">{event.name}</strong>
-                  <span
-                    className="info-button"
-                    onClick={() => showInfo(event)}
-                  >
-                    i
-                  </span>
-                </p>
-                {console.log(event.usernames)}
-                {/* Render the info box if it is visible */}
-                {infoBoxVisible && (
-                  <div>
-                    <div className="popup-content"><strong>Organisator:</strong> {event.owner}</div>
-                    <div><strong>Teilnehmer:</strong></div>
-                    <Box sx={{ maxHeight: 50, overflow: 'auto' }}>
-                      <div>
-                        <ul sx={{ margin: 0, padding: 0 }}>
-                          {event.usernames.map((username) => (
-                            <li key={username}>{username}</li>
-                          ))}
-                        </ul>
+            <Marker
+              key={event._id}
+              position={{ lat: [event.lat], lng: [event.lng] }}
+              icon={
+                event.index === 0
+                  ? GetIcon([30, 30], "frisbee")
+                  : event.index === 1
+                  ? GetIcon([30, 30], "fussball")
+                  : event.index === 2
+                  ? GetIcon([30, 30], "volleyball")
+                  : event.index === 3
+                  ? GetIcon([30, 30], "basketball")
+                  : event.index === 4
+                  ? GetIcon([50, 50], "tischtennis")
+                  : event.index === 5
+                  ? GetIcon([30, 40], "skateboard")
+                  : GetIcon([30, 40], "marker")
+              }
+            >
+              <Popup>
+                <div className="event-info-container">
+                  <p className="event-name blue-bg">
+                    <strong className="name">{event.name}</strong>
+                    <span
+                      className="info-button"
+                      onClick={() => showInfo(event)}
+                    >
+                      i
+                    </span>
+                  </p>
+                  {console.log(event.usernames)}
+                  {/* Render the info box if it is visible */}
+                  {infoBoxVisible && (
+                    <div>
+                      <div className="popup-content">
+                        <strong>Organisator:</strong> {event.owner}
                       </div>
-                    </Box>
-                  </div>
-                )}
-
-    
-                <p className="event--datum">
-                  <strong>Datum:</strong> {formatDate(event.uhrzeit)}
-                </p>
-                <p className="event--uhrzeit">
-                  <strong>Uhrzeit:</strong> {formatTime(event.uhrzeit)}
-                </p>
-                <p className="event-equipment">
-                  {event.equipment ? (
-                    <>
-                      <strong>Sportgerät:</strong> ✓
-                    </>
-                  ) : (
-                    <>
-                      <strong>Sportgerät:</strong> ✘
-                    </>
+                      <div>
+                        <strong>Teilnehmer:</strong>
+                      </div>
+                      <Box sx={{ maxHeight: 50, overflow: "auto" }}>
+                        <div>
+                          <ul sx={{ margin: 0, padding: 0 }}>
+                            {event.usernames.map((username) => (
+                              <li key={username}>{username}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </Box>
+                    </div>
                   )}
-                </p>
-    
-                <div className="button-container">
-                <Button
-                  className={`play-button ${eventJoined ? "bg-danger" : ""}`}
-                  onClick={() => toggleEvent(event)}
-                  id={`event-${event._id}-button`}
-                  endIcon={<AddIcon />}
-                >
-                  {eventJoined ? "Verlassen" : "Mitspielen"}
-                </Button>
 
-                  <Button className="chat-button" onClick={() => sendFriendRequest(event)} endIcon={<ChatIcon />}>Chat</Button>
+                  <p className="event--datum">
+                    <strong>Datum:</strong> {formatDate(event.uhrzeit)}
+                  </p>
+                  <p className="event--uhrzeit">
+                    <strong>Uhrzeit:</strong> {formatTime(event.uhrzeit)}
+                  </p>
+                  <p className="event-equipment">
+                    {event.equipment ? (
+                      <>
+                        <strong>Sportgerät:</strong> ✓
+                      </>
+                    ) : (
+                      <>
+                        <strong>Sportgerät:</strong> ✘
+                      </>
+                    )}
+                  </p>
+
+                  <div className="button-container">
+                    <Button
+                      className={`play-button ${
+                        eventJoined ? "bg-danger" : ""
+                      }`}
+                      onClick={() => toggleEvent(event)}
+                      id={`event-${event._id}-button`}
+                      endIcon={<AddIcon />}
+                    >
+                      {eventJoined ? "Verlassen" : "Mitspielen"}
+                    </Button>
+
+                    <Button
+                      className="chat-button"
+                      onClick={() => sendFriendRequest(event)}
+                      endIcon={<ChatIcon />}
+                    >
+                      Chat
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </Popup>
-          </Marker>
+              </Popup>
+            </Marker>
           );
         })}
       </div>
     );
   }
 
-
   function handleDeleteEvent(eventId) {
     // Senden einer DELETE-Anforderung an die API-Endpunkt-URL mit dem Ereignis-ID-Parameter
-    axios.delete(`${DOMAIN}/events/${eventId}`)
+    axios
+      .delete(`${DOMAIN}/events/${eventId}`)
       .then(() => {
         // Wenn die Anforderung erfolgreich ist, aktualisieren Sie den Zustand des Ereignisarrays
-        const updatedEvents = events.filter(event => event._id !== eventId);
+        const updatedEvents = events.filter((event) => event._id !== eventId);
         setEvents(updatedEvents);
       })
       .catch((error) => {
         // Wenn ein Fehler auftritt, loggen Sie den Fehler oder geben Sie eine Fehlermeldung aus
         console.error(error);
-        alert('Beim Löschen des Ereignisses ist ein Fehler aufgetreten.');
+        alert("Beim Löschen des Ereignisses ist ein Fehler aufgetreten.");
       });
   }
 
-
- 
-
-
   function ShowEventsData() {
-
     const [ownEvents, setOwnEvents] = useState([]);
     const [joinedEvents, setJoinedEvents] = useState([]);
-  
+    const [openOwnEvents, setopenOwnEvents] = useState(true);
+    const [openJoinedEvents, setopenJoinedEvents] = useState(true);
+
     useEffect(() => {
       async function fetchOwnEvents() {
-        const response = await axios.post(`${DOMAIN}/getOwnEvents`, { sessionID });
+        const response = await axios.post(`${DOMAIN}/getOwnEvents`, {
+          sessionID,
+        });
         setOwnEvents(response.data);
       }
-  
+
       async function fetchJoinedEvents() {
-        const response = await axios.post(`${DOMAIN}/getJoinedEvents`, { sessionID });
+        const response = await axios.post(`${DOMAIN}/getJoinedEvents`, {
+          sessionID,
+        });
         setJoinedEvents(response.data);
       }
 
-  
       fetchOwnEvents();
       fetchJoinedEvents();
     }, []);
 
-
-
-
     return (
-      <Box  
+      <Box
+        sx={{
+          margin: "1rem",
+          maxHeight: "50vh",
+          overflow: "auto",
+        }}
       >
-    <Box 
-  style={{
-    backdropFilter: "blur(5px)",
-    backgroundColor: "rgba(153, 204, 255, 0.5)",
-    boxShadow: 1,
-    borderRadius: 3,
-    padding: "0.5rem", // increase the padding
-  }}
->
-  <Typography variant="h4"><KeyboardDoubleArrowRightIcon/> Meine Events</Typography>
-</Box>
-  
-   
-{ownEvents.map((event) => (
-  <Box key={event._id}
-    sx={{ 
-      m: 2,
-      p: 0.5,
-      backdropFilter: "blur(5px)",
-      backgroundColor: "rgba(255, 255, 255, 0.3)",
-      boxShadow: 1,
-      borderRadius: 3,
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      textAlign: "center"
-    }}
-  >
-    <div style={{ display: "flex", alignItems: "center" }}>
-    <img src={GetIcon([30, 30], "frisbee")} style={{ marginRight: "10px" }} alt="" />
-      <Typography>{event.name}</Typography>
-    </div>
-    <div style={{ display: "flex", alignItems: "center" }}>
-      <EventJumpButton lat={event.lat} lng={event.lng} />
-      <Button color="error" aria-label="delete" onClick={() => {
-        console.log(event._id);
-        handleDeleteEvent(event._id);
-      }} style={{ marginLeft: "auto", paddingLeft: "10px" }}>
-        <DeleteForeverIcon />
-      </Button>
-    </div>
-  </Box>
-))}
-  
-  <Box 
-  style={{
-    backdropFilter: "blur(5px)",
-    backgroundColor: "rgba(153, 204, 255, 0.5)",
-    boxShadow: 1,
-    borderRadius: 3,
-    padding: "0.5rem", // increase the padding
-  }}
->
-<Typography variant="h4"> <KeyboardDoubleArrowRightIcon/>Teilnahme-Events </Typography>
-</Box>
-  
-  
+        <Box
+          marginBottom={1}
+          style={{
+            backdropFilter: "blur(5px)",
+            backgroundColor: "rgba(153, 204, 255, 0.5)",
+            boxShadow: 1,
+            borderRadius: 3,
+            padding: "0.5rem", // increase the padding
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h4">
+            <KeyboardDoubleArrowRightIcon /> Meine Events
+          </Typography>
+          <IconButton onClick={() => setopenOwnEvents(!openOwnEvents)}>
+              {openOwnEvents ? (
+                <KeyboardArrowUpIcon />
+              ) : (
+                <KeyboardArrowDownIcon />
+              )}
+            </IconButton>
+        </Box>
 
+        {openOwnEvents && (
+          <div>
+            {ownEvents.map((event) => (
+              <Box
+                key={event._id}
+                sx={{
+                  m: 2,
+                  p: 0.5,
+                  backdropFilter: "blur(5px)",
+                  backgroundColor: "rgba(255, 255, 255, 0.3)",
+                  boxShadow: 1,
+                  borderRadius: 3,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  textAlign: "center",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <img
+                    src={GetIcon([30, 30], "frisbee")}
+                    style={{ marginRight: "10px" }}
+                    alt=""
+                  />
+                  <Typography>{event.name}</Typography>
+                </div>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <EventJumpButton lat={event.lat} lng={event.lng} />
+                  <Button
+                    color="error"
+                    aria-label="delete"
+                    onClick={() => {
+                      console.log(event._id);
+                      handleDeleteEvent(event._id);
+                    }}
+                    style={{ marginLeft: "auto", paddingLeft: "10px" }}
+                  >
+                    <DeleteForeverIcon />
+                  </Button>
+                </div>
+              </Box>
+            ))}
+          </div>
+        )}
 
-  {joinedEvents.map((event) => (
-    <Box key={event._id}
-    sx={{ 
-      m: 2,
-      p: 0.5,
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      backdropFilter: "blur(5px)",
-      backgroundColor: "rgba(255, 255, 255, 0.3)",
-      borderRadius: 3
-    }}
-    >
-      <Typography>{event.name}</Typography>
-      <EventJumpButton lat={event.lat} lng={event.lng} />
-    </Box>
-  ))}
-</Box>
-    )
+        <Box
+          marginBottom={1}
+          style={{
+            backdropFilter: "blur(5px)",
+            backgroundColor: "rgba(153, 204, 255, 0.5)",
+            boxShadow: 1,
+            borderRadius: 3,
+            padding: "0.5rem",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h4">
+            <KeyboardDoubleArrowRightIcon />
+            Teilnahme-Events
+          </Typography>
+          <IconButton onClick={() => setopenJoinedEvents(!openJoinedEvents)}>
+            {openJoinedEvents ? (
+              <KeyboardArrowUpIcon />
+            ) : (
+              <KeyboardArrowDownIcon />
+            )}
+          </IconButton>
+
+        </Box>
+
+        {openJoinedEvents && (
+          <div>
+            {joinedEvents.map((event) => (
+              <Box
+                key={event._id}
+                sx={{
+                  m: 2,
+                  p: 0.5,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  backdropFilter: "blur(5px)",
+                  backgroundColor: "rgba(255, 255, 255, 0.3)",
+                  borderRadius: 3,
+                  boxShadow: 1,
+                }}
+              >
+                <Typography>{event.name}</Typography>
+                <EventJumpButton lat={event.lat} lng={event.lng} />
+              </Box>
+            ))}
+          </div>
+        )}
+      </Box>
+    );
   }
-
 
   function EventJumpButton({ lat, lng }) {
     const map = useMap();
-  
+
     function handleClick() {
-      map.flyTo([lat, lng],15);
+      map.flyTo([lat, lng], 15);
     }
-  
+
     return (
       <Button color="error" aria-label="jump-to-event" onClick={handleClick}>
         <LocationSearchingIcon />
       </Button>
     );
   }
-
-                 
-  
 
   return (
     <div>
@@ -712,32 +756,42 @@ function Maps() {
         </Control>
 
         <Control prepend position="topleft">
-            <ToggleButton
-              value="check"
-              selected={enableEvent}
-              onChange={() => setEnableEvent(!enableEvent)}
-              selectedColor="red"
-              sx={{ color: "white", bgcolor: "primary.main", mb: "40%", mr: 3, borderRadius: 10, boxShadow: 5}}
-            >
-              <AddLocationAltTwoToneIcon />
-            </ToggleButton>
+          <ToggleButton
+            value="check"
+            selected={enableEvent}
+            onChange={() => setEnableEvent(!enableEvent)}
+            selectedColor="red"
+            sx={{
+              color: "white",
+              bgcolor: "primary.main",
+              mb: "40%",
+              mr: 3,
+              borderRadius: 10,
+              boxShadow: 5,
+            }}
+          >
+            <AddLocationAltTwoToneIcon />
+          </ToggleButton>
         </Control>
 
         <Control prepend position="topleft">
-            <Button
-              value="check"
-              onClick={() => setShowEvents(!showEvents)}
-              sx={{ color: "white", bgcolor: "primary.main", borderRadius: 10, boxShadow: 5}}
-            >
-              <EventIcon/>
-            </Button>
+          <Button
+            value="check"
+            onClick={() => setShowEvents(!showEvents)}
+            sx={{
+              color: "white",
+              bgcolor: "primary.main",
+              borderRadius: 10,
+              boxShadow: 5,
+            }}
+          >
+            <EventIcon />
+          </Button>
           {showEvents === true ? <ShowEventsData /> : null}
         </Control>
-  
-        
       </MapContainer>
     </div>
   );
 }
 
-export default Maps
+export default Maps;
