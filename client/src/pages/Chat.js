@@ -20,7 +20,8 @@ import {
   Paper,
   Divider,
   Badge,
-  Fab
+  Fab,
+  Stack,
 } from "@mui/material";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -28,7 +29,9 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import AddIcon from "@mui/icons-material/Add";
 import PersonRemoveTwoToneIcon from "@mui/icons-material/PersonRemove";
-import SendIcon from '@mui/icons-material/Send';
+import SendIcon from "@mui/icons-material/Send";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
 
 const socket = socketIO(endpoint, { autoConnect: false });
 
@@ -93,7 +96,6 @@ function Chat() {
           [data.sender]: (unreadMessagesCount[data.sender] || 0) + 1,
         });
       }
-
     });
 
     if (messagesRef.current) {
@@ -570,13 +572,13 @@ function Chat() {
           size="lg"
         >
           <Modal.Body>
-          <h3>Freundschaftsanfragen</h3>
+            <h3>Freundschaftsanfragen</h3>
             <Table striped hover>
               <thead>
                 <tr>
                   <th>Username</th>
                   <th>Vorname</th>
-                  <th>Aktion</th>
+                  <th> </th>
                 </tr>
               </thead>
               <tbody className="align-middle">
@@ -586,25 +588,44 @@ function Chat() {
                         <td>{request.username}</td>
                         <td>{request.vorname}</td>
                         <td>
-                          <Button
-                            className="mr-2"
-                            variant="success"
-                            onClick={() => {
-                              socket.emit("accept_request", request._id);
-                              handleClose();
-                            }}
+                          <Stack
+                            direction={isMobile ? "column" : "row"}
+                            spacing={1}
                           >
-                            Accept
-                          </Button>
-                          <Button
-                            variant="danger"
-                            onClick={() => {
-                              socket.emit("decline_request", request._id);
-                              handleClose();
-                            }}
-                          >
-                            Decline
-                          </Button>
+                            <Fab
+                              variant="outlined"
+                              sx={{
+                                borderColor: "success.main",
+                                color: "success.main",
+                                "&:hover": {
+                                  backgroundColor: "success.light",
+                                },
+                              }}
+                              onClick={() => {
+                                socket.emit("accept_request", request._id);
+                                handleClose();
+                              }}
+                            >
+                              <CheckIcon />
+                            </Fab>
+
+                            <Fab
+                              variant="outlined"
+                              sx={{
+                                borderColor: "error.main",
+                                color: "error.main",
+                                "&:hover": {
+                                  backgroundColor: "error.light",
+                                },
+                              }}
+                              onClick={() => {
+                                socket.emit("decline_request", request._id);
+                                handleClose();
+                              }}
+                            >
+                              <CloseIcon />
+                            </Fab>
+                          </Stack>
                         </td>
                       </tr>
                     ))
@@ -618,6 +639,7 @@ function Chat() {
                 <tr>
                   <th>Username</th>
                   <th>Vorname</th>
+                  <th> </th>
                 </tr>
               </thead>
               <tbody className="align-middle">
@@ -626,11 +648,32 @@ function Chat() {
                       <tr key={index}>
                         <td>{request.username}</td>
                         <td>{request.vorname}</td>
+                        <td>
+                        <Stack
+                            direction={isMobile ? "column" : "row"}
+                          >
+                          <Fab
+                            variant="outlined"
+                            sx={{
+                              borderColor: "error.main",
+                              color: "error.main",
+                              "&:hover": {
+                                backgroundColor: "error.light",
+                              },
+                            }}
+                            onClick={() => {
+                              socket.emit("remove_request", request._id);
+                              handleClose();
+                            }}
+                          >
+                            <CloseIcon />
+                          </Fab>
+                          </Stack>
+                        </td>
                       </tr>
                     ))
                   : null}
               </tbody>
-
             </Table>
           </Modal.Body>
           <Modal.Footer>
@@ -693,6 +736,9 @@ function Chat() {
                       boxShadow: 3,
                       width: "100%",
                       padding: "10px",
+                      backdropFilter: "blur(15px)",
+                      fontWeight: "bold",
+                      borderRadius: "15px",
                     }}
                   >
                     <Badge
@@ -838,27 +884,6 @@ function Chat() {
       </Grid>
     </Container>
   );
-};
+}
 
 export default Chat;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
