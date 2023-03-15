@@ -2,10 +2,17 @@ import React, { useState, useEffect, useContext } from "react";
 import { Form, Modal } from "react-bootstrap";
 import Control from "react-leaflet-custom-control";
 import { Button, ToggleButton, Box, Typography } from "@mui/material";
+
+
 import EventIcon from '@mui/icons-material/Event';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import AddIcon from "@mui/icons-material/Add";
+import ChatIcon from '@mui/icons-material/Chat';
+import AddLocationAltTwoToneIcon from '@mui/icons-material/AddLocationAltTwoTone';
+
+
+
 import Cookies from "js-cookie";
 import {
   MapContainer,
@@ -374,20 +381,72 @@ function Maps() {
 
     ////////////////////////////////////////////////////////////////////////////
     
-async function leaveEvent(event) {
-  console.log("leaveEvent:", event._id);
-  try {
-    const response = await axios.delete(`${DOMAIN}/api/events/${event._id}/${event.userId}`);
-    if (response.status === 200) {
-      setEventLeft(true);
-      alert("Event verlassen");
-    } else {
-      throw new Error('Failed to delete object');
+    async function leaveEvent(event) {
+      console.log("leaveEvent:", event._id);
+      try {
+        const response = await axios.delete(`${DOMAIN}/events/${event._id}/${event.userId}`);
+        if (response.status === 200) {
+          setEventLeft(true);
+          alert("Event verlassen");
+        } else {
+          throw new Error('Failed to delete object');
+        }
+      } catch (error) {
+        console.error(error);
+      }
     }
-  } catch (error) {
-    console.error(error);
-  }
-}
+
+
+    function sendFriendRequest (event) {
+
+      const data = {
+        user: sessionID,
+        eventID: event._id,
+      };
+    
+      axios
+        .post(`${DOMAIN}/sendFriendRequest`, data)
+        .then((res) => {
+          alert("Freundschaftsanfrage gesendet");
+
+        })
+        .catch((err) => {
+          switch (err.response.status) {
+            case 403:
+              alert("Nutzer nicht gefunden");
+              break;
+
+            case 404:
+              alert("Event nicht gefunden");
+              break;
+
+            case 405:
+              alert("Du kannst dir nicht selbst eine Freundschaftsanfrage senden");
+              break;
+
+            case 406:
+              alert("Du bist bereits mit diesem Nutzer befreundet");
+              break;
+
+            case 407:
+              alert("Du hast bereits eine Freundschaftsanfrage an diesen Nutzer gesendet");
+              break;
+
+            case 500:
+              alert("Serverfehler");
+              break;
+
+            default:
+              alert("Unbekannter Fehler");
+              break;
+            }
+        });
+
+    }
+
+
+
+
     return (
       <div>
         {events.map((event) => (
@@ -464,11 +523,12 @@ async function leaveEvent(event) {
                 className={`play-button ${eventJoined && !eventLeft ? "bg-danger" : ""}`}
                 onClick={eventJoined && !eventLeft ? () => leaveEvent(event) : () => joinEvent(event)}
                 id={`event-${event._id}-button`}
+                endIcon={<AddIcon />}
               >
-                {eventJoined && !eventLeft ? "Verlassen" : "+ Mitspielen"}
+                {eventJoined && !eventLeft ? "Verlassen" : "Mitspielen"}
               </Button>
 
-                  <button className="chat-button">&#9993; Chat</button>
+                  <Button className="chat-button" onClick={() => sendFriendRequest(event)} endIcon={<ChatIcon />}>Chat</Button>
                 </div>
               </div>
             </Popup>
@@ -507,7 +567,8 @@ function getParticipatingEvents(eventID, eventlat, eventlng) {
   function ShowEventsData() {
 
     return (
-      <Box>
+      <Box
+      >
   <Typography variant="h4">Creating Events</Typography>
   
   {events.map((event) => (
@@ -517,6 +578,7 @@ function getParticipatingEvents(eventID, eventlat, eventlng) {
         p: 0.5,
         backdropFilter: "blur(5px)",
         backgroundColor: "rgba(255, 255, 255, 0.3)",
+        boxShadow: 1,
         borderRadius: 3
       }}
     >
@@ -588,7 +650,7 @@ function getParticipatingEvents(eventID, eventlat, eventlng) {
               selectedColor="red"
               sx={{ color: "white", bgcolor: "primary.main", mb: 10, mr: 3, borderRadius: 10, boxShadow: 5}}
             >
-              <AddIcon />
+              <AddLocationAltTwoToneIcon />
             </ToggleButton>
         </Control>
 
