@@ -188,32 +188,33 @@ socketIO.on("connection", (socket) => {
         }
     });
 
-    socket.on("ask_private_messages", (data) => {
-        // Find the sender user by ID
-        UserModel.findOne({ userID: data.sender }, (err, sender) => {
-            if (err) {
-                console.log(err);
-            } else {
-                // Find the receiver user by ID
-                UserModel.findOne({ userID: data.targetUser }, (err, receiver) => {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        // Find all messages from sender to receiver
-                        MessageModel.find({ $or: [{ sender: sender._id, receiver: receiver._id }, { sender: receiver._id, receiver: sender._id }] }, (err, result) => {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                // Emit the messages to the client
-                                socket.emit("get_private_messages", result);
-                            }
-                        });
-                    }
-                });
+    socket.on("ask_private_messages", async (data) => {
+        try {
+            const sender = await UserModel.findOne({ userID: data.sender });
+            if (!sender) {
+                console.log("Sender not found");
+                return;
             }
-        });
     
+            const receiver = await UserModel.findOne({ userID: data.targetUser });
+            if (!receiver) {
+                console.log("Receiver not found");
+                return;
+            }
+    
+            const result = await MessageModel.find({
+                $or: [
+                    { sender: sender._id, receiver: receiver._id },
+                    { sender: receiver._id, receiver: sender._id }
+                ]
+            });
+    
+            socket.emit("get_private_messages", result);
+        } catch (err) {
+            console.log(err);
+        }
     });
+    
 
 
     // search for users when someone wants to add a friend
