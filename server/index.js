@@ -458,6 +458,43 @@ socketIO.on("connection", (socket) => {
             socket.emit("decline_request_response", { success: false, message: "Error while declining friend request" });
         }
     });
+
+    socket.on("delete_friend", async (friendId) => {
+        try {
+            // Find the friend model for the current user
+            const user = await FriendModel.findOne({ user: socket._id });
+            const friend = await FriendModel.findOne({ user: friendId });
+    
+            if (!user || !friend) {
+                console.log("User or friend not found");
+                socket.emit("delete_friend_response", { success: false, message: "User or friend not found" });
+                return;
+            }
+    
+            // Remove the friend from the current user's friends array
+            await FriendModel.updateOne(
+                { user: socket._id },
+                { $pull: { friends: friendId } }
+            );
+    
+            // Remove the current user from the friend's friends array
+            await FriendModel.updateOne(
+                { user: friendId },
+                { $pull: { friends: socket._id } }
+            );
+
+            // delete all messages between the two users
+            await MessageModel.deleteMany({ $or: [{ sender: socket._id, receiver: friendId }, { sender: friendId, receiver: socket._id }] });
+
+    
+            console.log("Friendship deleted successfully");
+            socket.emit("delete_friend_response", { success: true, message: "Friendship deleted successfully" });
+    
+        } catch (error) {
+            console.error(error);
+        }
+    });
+    
     
     
     
