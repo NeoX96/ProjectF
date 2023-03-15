@@ -8,6 +8,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const socket = socketIO(endpoint, { autoConnect: false });
 
@@ -117,11 +118,22 @@ function Chat() {
       }
     });
 
+    // response from server if friend was deleted
+    socket.on("delete_friend_response", (data) => {
+      if (data.success) {
+        alert(data.message);
+        socket.emit("ask_friends");
+      } else {
+        alert(data.message);
+      }
+    });
+
     return () => {
       socket.off("get_friends");
       socket.off("session");
       socket.off("accept_request_response");
       socket.off("decline_request_response");
+      socket.off("delete_friend_response");
       socket.disconnect();
     };
   }, []);
@@ -145,6 +157,12 @@ function Chat() {
       return;
     }
   };
+
+  const deleteFriend = (friend) => {
+    socket.emit("delete_friend", friend);
+    unselectUser();
+  }; 
+
 
   // select user to chat with
   const selectUser = (user) => {
@@ -190,44 +208,53 @@ function Chat() {
     if (targetUser !== null) {
       return (
         <Box sx={{ height: "100%" }}>
-          <Box
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          backdropFilter: "blur(5px)",
+          borderRadius: 2,
+          padding: 1,
+          boxShadow: 3,
+          height: "10%",
+          maxWidth: "100%",
+        }}
+      >
+        <Box>
+          <IconButton onClick={() => unselectUser()}>
+            <ArrowBackIcon />
+          </IconButton>
+        </Box>
+        <Box
+          sx={{
+            marginLeft: 1,
+          }}
+        >
+          <Typography
+            variant="h5"
             sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-              backdropFilter: "blur(5px)",
-              borderRadius: 2,
-              padding: 1,
-              boxShadow: 3,
-              height: "10%",
-              maxWidth: "100%",
+              fontFamily: "Montserrat, sans-serif",
+              textShadow: "4px 4px 4px rgba(30, 30, 30, 0.6)",
+              textDecoration: "none",
+              cursor: "default",
+              color: "white",
             }}
           >
-            <Box>
-              <IconButton onClick={() => unselectUser()}>
-                <ArrowBackIcon />
-              </IconButton>
-            </Box>
-            <Box
-              sx={{
-                marginLeft: 1,
-              }}
-            >
-              <Typography
-                variant="h5"
-                sx={{
-                  fontFamily: "Montserrat, sans-serif",
-                  textShadow: "4px 4px 4px rgba(30, 30, 30, 0.6)",
-                  textDecoration: "none",
-                  cursor: "default",
-                  color: "white",
-                }}
-              >
-                {targetUser.vorname}
-              </Typography>
-            </Box>
-          </Box>
+            {targetUser.vorname}
+          </Typography>
+        </Box>
+        <Box
+          sx={{
+            marginLeft: "auto",
+          }}
+        >
+          <IconButton sx={{mr: 5}} onClick={() => deleteFriend(targetUser._id)}>
+            <DeleteIcon  color="error"/>
+          </IconButton>
+        </Box>
+      </Box>
 
           <Box
             p={2}
