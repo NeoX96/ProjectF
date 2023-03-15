@@ -366,6 +366,10 @@ function Maps() {
             case 405:
               alert("Bei Event bereits beigetreten");
               break;
+
+            case 406:
+                alert("Du bist Owner der Veranstaltung");
+                break;
   
             case 500:
               alert("Serverfehler");

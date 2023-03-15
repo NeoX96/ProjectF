@@ -326,6 +326,11 @@ router.post("/api/joinEvent", async (req, res) => {
       return res.status(405).json({ msg: 'User already joined' });
     }
 
+    // check if user is Owner of the Event
+    if (eventData[0].user == userID[0]._id) {
+      return res.status(406).json({ msg: 'User is Owner of the Event' });
+    }
+
     eventData[0].teilnehmer.push(userID[0]._id);
     await eventData[0].save();
 
