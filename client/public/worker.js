@@ -1,4 +1,4 @@
-var CACHE_NAME = 'Gonkle_v1';
+var CACHE_NAME = 'test-cache-v2-PWA';
 var urlsToCache = [
   '/',
   '/Login',
@@ -39,7 +39,7 @@ self.addEventListener('fetch', event => {
 
 // Update a service worker
 self.addEventListener('activate', event => {
-  var cacheWhitelist = ['Gonkle'];
+  var cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
