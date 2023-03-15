@@ -107,7 +107,7 @@ function Maps() {
       const now = new Date();
       const oneMonthFromNow = new Date(
         now.getFullYear(),
-        now.getMonth() + 1,
+        now.getMonth() + 6,
         now.getDate()
       );
 
