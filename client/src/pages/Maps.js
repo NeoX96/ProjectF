@@ -554,24 +554,40 @@ function Maps() {
       });
   }
 
-/////////////////////////////////////////////////////// map definieren
- 
-function getParticipatingEvents(eventID, eventlat, eventlng) {
-  
 
-  Maps.setView([eventlat, eventlng], 15);
-  console.log(`Event lat: ${eventlat}, lng: ${eventlng}`);
-}
+ 
 
 
   function ShowEventsData() {
 
+    const [ownEvents, setOwnEvents] = useState([]);
+    const [joinedEvents, setJoinedEvents] = useState([]);
+  
+    useEffect(() => {
+      async function fetchOwnEvents() {
+        const response = await axios.post(`${DOMAIN}/getOwnEvents`, { sessionID });
+        setOwnEvents(response.data);
+      }
+  
+      async function fetchJoinedEvents() {
+        const response = await axios.post(`${DOMAIN}/getJoinedEvents`, { sessionID });
+        setJoinedEvents(response.data);
+      }
+
+  
+      fetchOwnEvents();
+      fetchJoinedEvents();
+    }, []);
+
+
+
+
     return (
       <Box
       >
-  <Typography variant="h4">Creating Events</Typography>
+  <Typography variant="h4">Own Events</Typography>
   
-  {events.map((event) => (
+  {ownEvents.map((event) => (
     <Box key={event._id}
       sx={{ 
         m: 2,
@@ -589,13 +605,14 @@ function getParticipatingEvents(eventID, eventlat, eventlng) {
       }}>
         <DeleteForeverIcon />
       </Button>
+      <EventJumpButton lat={event.lat} lng={event.lng} />
     </Box>
   ))}
 
   <Typography variant="h4">Events I'm Participating In</Typography>
 
 
-  {events.map((event) => (
+  {joinedEvents.map((event) => (
     <Box key={event._id}
       sx={{ 
         m: 2,
@@ -606,16 +623,26 @@ function getParticipatingEvents(eventID, eventlat, eventlng) {
       }}
     >
       <Typography>{event.name}</Typography>
-      <Button color="error" aria-label="delete" onClick={() => {
-        console.log(event._id);
-        getParticipatingEvents(event._id, event.lat, event.lng);
-      }}>
-        <LocationSearchingIcon />
-      </Button>
+      <EventJumpButton lat={event.lat} lng={event.lng} />
     </Box>
   ))}
 </Box>
     )
+  }
+
+
+  function EventJumpButton({ lat, lng }) {
+    const map = useMap();
+  
+    function handleClick() {
+      map.flyTo([lat, lng]);
+    }
+  
+    return (
+      <Button color="error" aria-label="jump-to-event" onClick={handleClick}>
+        <LocationSearchingIcon />
+      </Button>
+    );
   }
 
                  
