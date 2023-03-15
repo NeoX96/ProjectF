@@ -4,11 +4,12 @@ import { Modal, Table } from "react-bootstrap";
 import Cookies from "js-cookie";
 import { endpoint } from "../index";
 import { Box, Container, Grid, Typography, useMediaQuery, useTheme, IconButton, ListItemText, ListItem , List, Button, TextField, InputAdornment, Paper, Divider } from "@mui/material";
+
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
+import PersonRemoveTwoToneIcon from '@mui/icons-material/PersonRemove';
 
 const socket = socketIO(endpoint, { autoConnect: false });
 
@@ -200,7 +201,7 @@ function Chat() {
       socket.off("get_private_messages");
     };
   }, [targetUser]);
-
+ 
 
   // ChatContainer for each user
   function ChatContainer() {
@@ -250,8 +251,8 @@ function Chat() {
             marginLeft: "auto",
           }}
         >
-          <IconButton sx={{mr: 5}} onClick={() => deleteFriend(targetUser._id)}>
-            <DeleteIcon  color="error"/>
+          <IconButton sx={{boxShadow: 2, mr: 5, backdropFilter: 4}} onClick={() => deleteFriend(targetUser._id)}>
+            <PersonRemoveTwoToneIcon  color="error"/>
           </IconButton>
         </Box>
       </Box>
@@ -598,6 +599,7 @@ function Chat() {
         <Typography
           color={"lightgreen"}
           variant="h6"
+          ml="10px"
         >
           Online
         </Typography>
@@ -646,6 +648,7 @@ function Chat() {
         <Typography
           color={"red"}
           variant="h6"
+          ml="10px"
         >
           Offline
         </Typography>
@@ -665,8 +668,9 @@ function Chat() {
                       boxShadow: 3,
                       width: "100%",
                       padding: "10px",
-   
-                      
+                      backdropFilter: "blur(15px)",
+                      fontWeight: "bold",
+                      borderRadius: "15px",
                     }}
                   >
                     {user.vorname}
@@ -685,7 +689,7 @@ function Chat() {
       className="HoleChatAppContainer"
       style={{ height: `calc(100vh - 200px)` }}
     >
-      <Grid container spacing={2} style={{ height: "100%" }}>
+      <Grid container spacing={2} style={{ height: "95%" }}>
         <Grid 
         item 
         md={4} 
