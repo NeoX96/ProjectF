@@ -306,7 +306,7 @@ router.post('/api/createEvent', async (req, res) => {
   }
 });
 
-router.post("/api/joinEvent", async (req, res) => {
+router.post("/api/toggleEvent", async (req, res) => {
 
   try {
 
@@ -322,19 +322,28 @@ router.post("/api/joinEvent", async (req, res) => {
       return res.status(404).json({ msg: 'Event not found' });
     }
 
-    if (eventData[0].teilnehmer.includes(userID[0]._id)) {
-      return res.status(405).json({ msg: 'User already joined' });
-    }
 
     // check if user is Owner of the Event
-    if (eventData[0].user == userID[0]._id) {
+    if (eventData[0].user.equals(userID[0]._id)) {
+      console.log('User is Owner of the Event');
       return res.status(406).json({ msg: 'User is Owner of the Event' });
     }
+    
+
+    if (eventData[0].teilnehmer.includes(userID[0]._id)) {
+      console.log('User left');
+
+      eventData[0].teilnehmer.pull(userID[0]._id);
+      await eventData[0].save();
+      return res.status(200).json({ msg: 'User left' });
+    }
+
 
     eventData[0].teilnehmer.push(userID[0]._id);
     await eventData[0].save();
 
-    res.status(200).json({ msg: 'User joined' });
+    console.log('User joined');
+    res.status(201).json({ msg: 'User joined' });
   
   } catch (error) {
     console.log(error);
@@ -478,10 +487,6 @@ router.post('/api/getJoinedEvents', async (req, res) => {
 });
 
 
-
-
-
-
 router.post('/api/sendFriendRequest', async (req, res) => {
   try {
       const user = await UserModel.find({ sessionID: req.body.user }, { _id: 1 });
@@ -498,7 +503,7 @@ router.post('/api/sendFriendRequest', async (req, res) => {
       }
 
       // if Owner is user 
-      if (owner[0].user == user[0]._id) {
+      if (owner[0].user.equals(user[0]._id)) {
           return res.status(405).json({ msg: 'User is owner' });
       }
 
