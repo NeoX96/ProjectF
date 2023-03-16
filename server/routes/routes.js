@@ -199,13 +199,7 @@ router.post("/api/verifyEmail", async (req, res) => {
     await mainuser.save();
 
 
-    // Anpassung des Nodemailers
-    await transport.sendMail({
-      from: "noreply@gonkle.de",
-      to: mainuser.email,
-      subject: "Email-Verifizierung für Gonkle.de",
-      html: `Erfolgeich verifiziert`,
-    });
+
     return res.status(200).json("Verifizierung Erfolgreich");
   } catch (error) {
     console.log(error);
