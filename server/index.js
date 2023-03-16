@@ -40,6 +40,11 @@ mongoose.connect(process.env.DATABASE_ACCESS, () =>
   console.log("Database connected")
 );
 
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+  next();
+});
+
 app.use(routesAPI);
 
 app.listen(mongoPort, () => {
