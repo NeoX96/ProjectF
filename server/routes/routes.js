@@ -47,16 +47,16 @@ router.post("/api/createUser", async (req, res) => {
 
   console.log(user);
 
-  // Check if mail already exists
-  const findMail = UserModel.findOne({ email: user.email });
-  if (!findMail) {
+  // Check if email already exists
+  const findMail = await UserModel.findOne({ email: user.email });
+  if (findMail) {
     return res.status(401).json({ message: "Email already exists" });
   }
 
   // Check if username already exists
-  const findUsername = UserModel.findOne({ username: user.username });
-  if(!findUsername) {
-  return res.status(402).json({ message: "Username already exists" });
+  const findUsername = await UserModel.findOne({ username: user.username });
+  if (findUsername) {
+    return res.status(402).json({ message: "Username already exists" });
   }
 
   
