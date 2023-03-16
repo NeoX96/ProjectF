@@ -644,11 +644,6 @@ function Maps() {
             }}
           >
             <div style={{ display: "flex", alignItems: "center" }}>
-              <img
-                src={GetIcon([30, 30], "frisbee")}
-                style={{ marginRight: "10px" }}
-                alt=""
-              />
               <Typography style={{ display: "flex", alignItems: "center" }}>
                 {event.teilnehmer.length}{" "}
                 <GroupsIcon style={{ marginLeft: "5px", marginRight: "5px" }} />
