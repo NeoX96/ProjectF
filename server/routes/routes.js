@@ -47,6 +47,8 @@ router.post("/api/createUser", async (req, res) => {
 
   console.log(user);
 
+  user.email = user.email.trim().toLowerCase();
+
   // Check if email already exists
   const findMail = await UserModel.findOne({ email: user.email });
   if (findMail) {
@@ -225,7 +227,7 @@ router.post("/api/login", async (req, res) => {
       console.log("Password is incorrect");
       return res.status(400).json({ error: "Password is incorrect" });
     }
-    
+
 
     if (!user.verifed) {
       console.log("User not verifed");
