@@ -209,18 +209,23 @@ router.post("/api/verifyEmail", async (req, res) => {
 
 router.post("/api/login", async (req, res) => {
   try {
-    const user = await UserModel.findOne({ email: req.body.email });
+    const userEmail = req.body.email.toLowerCase().trim();
+    const userPassword = req.body.password;
+  
+    // Find user by email
+    const user = await UserModel.findOne({ email: userEmail });
     if (!user) {
       console.log("User not found");
       return res.status(400).json({ error: "User not found" });
     }
-
-    const password = req.body.password;
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
+  
+    // Check password
+    const isPasswordMatch = await bcrypt.compare(userPassword, user.password);
     if (!isPasswordMatch) {
       console.log("Password is incorrect");
       return res.status(400).json({ error: "Password is incorrect" });
     }
+    
 
     if (!user.verifed) {
       console.log("User not verifed");
