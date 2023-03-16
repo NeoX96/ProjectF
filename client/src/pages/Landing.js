@@ -12,7 +12,8 @@ const MainContainer = styled(Container)({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  minHeight: "100%",
+  minHeight: "100vh",
+
 });
 
 const StyledBox = styled(Box)({

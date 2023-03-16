@@ -19,7 +19,7 @@ const MainContainer = styled(Box)({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  height: "100%",
+  height: "100vh",
 });
 
 const GridContainer = styled(Box)({
