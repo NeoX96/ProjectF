@@ -9,7 +9,7 @@ import {
   IconButton,
 } from "@mui/material";
 
-import GroupsIcon from '@mui/icons-material/Groups';
+import GroupsIcon from "@mui/icons-material/Groups";
 import EventIcon from "@mui/icons-material/Event";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
@@ -159,7 +159,6 @@ function Maps() {
           event.target.eventTime.value
       );
       handleClose();
-      
 
       // Wenn Event erstellt worden ist, dann nochmal Events aus DB holen und in die Map einfügen, da der lokale Marker entfernt wird
       // Eventueller useEffect außerhalb der Funktion, der bei jedem Event erstellen ausgeführt wird
@@ -586,15 +585,11 @@ function Maps() {
         });
         setJoinedEvents(response.data);
       }
-      
-
 
       setEnableEvent(false);
       fetchOwnEvents();
       fetchJoinedEvents();
     }, []);
-
-    
 
     return (
       <Box
@@ -604,6 +599,7 @@ function Maps() {
           overflow: "auto",
         }}
       >
+
         <Box
           marginBottom={1}
           style={{
@@ -617,62 +613,80 @@ function Maps() {
             alignItems: "center",
           }}
         >
-          
           <Typography variant="h4">
             <KeyboardDoubleArrowRightIcon /> Meine Events
           </Typography>
           <IconButton onClick={() => setopenOwnEvents(!openOwnEvents)}>
-              {openOwnEvents ? (
-                <KeyboardArrowUpIcon />
-              ) : (
-                <KeyboardArrowDownIcon />
-              )}
-            </IconButton>
+            {openOwnEvents ? (
+              <KeyboardArrowUpIcon />
+            ) : (
+              <KeyboardArrowDownIcon />
+            )}
+          </IconButton>
         </Box>
 
-{ownEvents.map((event) => (    
-  <Box
-    key={event._id}
-    sx={{
-      m: 2,
-      p: 0.5,
-      backdropFilter: "blur(5px)",
-      backgroundColor: "rgba(255, 255, 255, 0.3)",
-      boxShadow: 1,
-      borderRadius: 3,
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      textAlign: "center",
-    }}
-  >
-    <div style={{ display: "flex", alignItems: "center" }}>
-      <img
-        src={GetIcon([30, 30], "frisbee")}
-        style={{ marginRight: "10px" }}
-        alt=""
-      />
-             <Typography style={{ display: "flex", alignItems: "center" }}>
-                {event.teilnehmer.length} <GroupsIcon style={{ marginLeft: "5px", marginRight: "5px" }} /> 
-                <span style={{ marginLeft: "10px", marginRight: "10px", fontSize: "1.2rem" }}>{event.name}</span>
+      {openOwnEvents && (
+        <div>
+        {ownEvents.map((event) => (
+          <Box
+            key={event._id}
+            sx={{
+              m: 2,
+              p: 0.5,
+              backdropFilter: "blur(5px)",
+              backgroundColor: "rgba(255, 255, 255, 0.3)",
+              boxShadow: 1,
+              borderRadius: 3,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img
+                src={GetIcon([30, 30], "frisbee")}
+                style={{ marginRight: "10px" }}
+                alt=""
+              />
+              <Typography style={{ display: "flex", alignItems: "center" }}>
+                {event.teilnehmer.length}{" "}
+                <GroupsIcon style={{ marginLeft: "5px", marginRight: "5px" }} />
+                <span
+                  style={{
+                    marginLeft: "10px",
+                    marginRight: "10px",
+                    fontSize: "1.2rem",
+                  }}
+                >
+                  {event.name}
+                </span>
               </Typography>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", marginLeft: "auto" }}>
-            <Button
-              color="error"
-              aria-label="delete"
-              onClick={() => {
-                console.log(event._id);
-                handleDeleteEvent(event._id);
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginLeft: "auto",
               }}
-              style={{ paddingLeft: "10px" }}
             >
-              <DeleteForeverIcon />
-            </Button>
-            <EventJumpButton lat={event.lat} lng={event.lng} />
-          </div>
-        </Box>
-      ))}
+              <Button
+                color="error"
+                aria-label="delete"
+                onClick={() => {
+                  console.log(event._id);
+                  handleDeleteEvent(event._id);
+                }}
+                style={{ paddingLeft: "10px" }}
+              >
+                <DeleteForeverIcon />
+              </Button>
+              <EventJumpButton lat={event.lat} lng={event.lng} />
+            </div>
+          </Box>
+        ))}
+        </div>
+      )}
 
         <Box
           marginBottom={1}
@@ -698,7 +712,6 @@ function Maps() {
               <KeyboardArrowDownIcon />
             )}
           </IconButton>
-
         </Box>
 
         {openJoinedEvents && (
@@ -719,9 +732,20 @@ function Maps() {
                 }}
               >
                 <Typography style={{ display: "flex", alignItems: "center" }}>
-                {event.teilnehmer.length} <GroupsIcon style={{ marginLeft: "5px", marginRight: "5px" }} /> 
-                <span style={{ marginLeft: "10px", marginRight: "10px", fontSize: "1.2rem" }}>{event.name}</span>
-              </Typography>
+                  {event.teilnehmer.length}{" "}
+                  <GroupsIcon
+                    style={{ marginLeft: "5px", marginRight: "5px" }}
+                  />
+                  <span
+                    style={{
+                      marginLeft: "10px",
+                      marginRight: "10px",
+                      fontSize: "1.2rem",
+                    }}
+                  >
+                    {event.name}
+                  </span>
+                </Typography>
                 <EventJumpButton lat={event.lat} lng={event.lng} />
               </Box>
             ))}
