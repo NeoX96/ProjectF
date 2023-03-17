@@ -71,6 +71,17 @@ router.post("/api/createUser", async (req, res) => {
   const newUser = new UserModel(user);
   await newUser.save();
 
+    // search new Users _id
+    const newUserID = await UserModel.find({ email: user.email}, { _id: 1 })
+
+    const newFriendModel = new FriendModel({
+      user: newUserID,
+      friends: [],
+      pending: [],
+      blocked: [],
+    });
+    await newFriendModel.save();
+
   // Create a new token for the user
   const OTP = generateOTP();
   const getUser = await UserModel.findOne({ email: user.email });
