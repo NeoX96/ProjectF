@@ -120,7 +120,6 @@ function Chat() {
     socket.on("get_friends", (online, offline) => {
       setOnlineFriends(online);
       setOfflineFriends(offline);
-      console.log(online, offline);
     });
 
     // response from server if friend request was accepted
@@ -165,10 +164,8 @@ function Chat() {
   const sendMessage = (event) => {
     event.preventDefault();
     const value = event.target.elements.message.value;
-    console.log(event.target.elements.message.value);
     if (value === "") return;
 
-    console.log(value);
     // if private message send to target user
     if (targetUser !== null) {
       socket.emit("send_private_message", {
@@ -203,7 +200,6 @@ function Chat() {
     }));
 
     if (targetUser) {
-      console.log(targetUser.userID);
       socket.emit("ask_private_messages", {
         sender: socket.id,
         targetUser: targetUser.userID,

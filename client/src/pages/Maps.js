@@ -54,7 +54,6 @@ function Maps() {
 
   const { index } = useContext(IndexContext);
 
-  console.log("index: " + index);
 
   /*
   const [position, setPosition] = useState(null);
@@ -67,7 +66,6 @@ function Maps() {
   // Funktion zum holen der Events aus der DB
   const getEvents = async () => {
     const res = await axios.post(`${DOMAIN}/getEvents`);
-    console.log(res.data);
 
     if (res.data) {
       setEvents(res.data);
@@ -150,14 +148,6 @@ function Maps() {
 
       // Axios Post ans Backend - Event erstellen
 
-      console.log("Formular wurde gesendet!");
-      console.log("eventlatlng " + eventLatLng.lat + " " + eventLatLng.lng);
-      console.log(
-        "Name " +
-          event.target.eventName.value +
-          ", Uhrzeit " +
-          event.target.eventTime.value
-      );
       handleClose();
 
       // Wenn Event erstellt worden ist, dann nochmal Events aus DB holen und in die Map einfügen, da der lokale Marker entfernt wird
@@ -323,7 +313,6 @@ function Maps() {
     }
 
     if (events.length === 0) {
-      console.log("Keine Events vorhanden");
       return <div></div>;
     }
 
@@ -480,7 +469,6 @@ function Maps() {
                       i
                     </span>
                   </p>
-                  {console.log(event.usernames)}
                   {/* Render the info box if it is visible */}
                   {infoBoxVisible && (
                     <div>
@@ -669,7 +657,6 @@ function Maps() {
                 color="error"
                 aria-label="delete"
                 onClick={() => {
-                  console.log(event._id);
                   handleDeleteEvent(event._id);
                 }}
                 style={{ paddingLeft: "10px" }}
