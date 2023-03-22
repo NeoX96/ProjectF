@@ -1,13 +1,6 @@
-var CACHE_NAME = 'test-cache-v2-PWA';
+var CACHE_NAME = 'test-cache-v3-PWA';
 var urlsToCache = [
-  '/',
-  '/Login',
-  '/Register',
-  '/Home',
-  '/Maps',
-  '/Chat',
-  '/Landing',
-  '/Verify',
+
 ];
 
 // Install a service worker
