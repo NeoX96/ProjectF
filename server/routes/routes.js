@@ -12,9 +12,7 @@ const EventModel = require("../models/Events");
 const verifyEmailModel = require("../models/Verify");
 const FriendModel = require("../models/Friends");
 
-
 const { generateOTP } = require("./OTP");
-
 const crypto = require('crypto');
 const randomId = () => crypto.randomBytes(16).toString("hex");
 
@@ -36,8 +34,6 @@ const transport = nodemailer.createTransport({
       rejectUnauthorized: false,
     },
   });
-
-
 
 
 router.post("/api/createUser", async (req, res) => {
@@ -185,7 +181,7 @@ router.post("/api/createUser", async (req, res) => {
     });
 });
 
-//verify email
+
 router.post("/api/verifyEmail", async (req, res) => {
   try {
     const { ID, OTP } = req.body;
@@ -219,6 +215,7 @@ router.post("/api/verifyEmail", async (req, res) => {
     return res.status(500).json("Server Error");
   }
 });
+
 
 router.post("/api/login", async (req, res) => {
   try {
@@ -263,6 +260,7 @@ router.post("/api/login", async (req, res) => {
   }
 });
 
+
 router.post("/api/validateSession", async (req, res) => {
   const sessionID = req.body.sessionID;
 
@@ -282,6 +280,7 @@ router.post("/api/validateSession", async (req, res) => {
     res.status(500).send("Internal server error");
   }
 });
+
 
 router.post('/api/createEvent', async (req, res) => {
 
@@ -317,6 +316,7 @@ router.post('/api/createEvent', async (req, res) => {
       res.status(500).send(error);
   }
 });
+
 
 router.post("/api/toggleEvent", async (req, res) => {
 
@@ -362,6 +362,7 @@ router.post("/api/toggleEvent", async (req, res) => {
   }
 });
 
+
 router.post('/api/getEvents', async (req, res) => {
   try {
     const event = await EventModel.find();
@@ -393,20 +394,6 @@ router.post('/api/getEvents', async (req, res) => {
   }
 });
 
-
-router.delete('/api/events/:id', async (req, res) => {
-  try {
-    const deletedEvent = await EventModel.findByIdAndDelete(req.params.id);
-    if (!deletedEvent) {
-      return res.status(404).json({ error: "Event not found" });
-    }
-    console.log("Event deleted");
-    res.status(200).json({ msg: "Event deleted" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
 
 router.delete('/api/events/:eventId', async (req, res) => {
   try {
