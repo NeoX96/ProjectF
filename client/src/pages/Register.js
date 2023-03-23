@@ -24,7 +24,7 @@ const MainContainer = styled(Box)({
 
 const GridContainer = styled(Box)({
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
   gap: "30px",
   width: "100%",
   maxWidth: "80vh",
