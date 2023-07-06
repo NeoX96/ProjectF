@@ -38,7 +38,5 @@ Dabei soll es möglich sein, sich mit anderen Sportlern zu verabreden, sich gege
 ## Technikerbörse - Plakat
 
 Hier ist unser Plakat für die Technikerbörse:
+![Plakat](https://github.com/NeoX96/ProjectF/assets/23174916/1896e5e2-dd2c-4130-a27c-6be1eef01909)
 
-<object data="Showcase/Plakat.pdf" type="application/pdf" width="841.89px" height="1189.37px">
-    <embed src="Showcase/Plakat.pdf">
-</object>
